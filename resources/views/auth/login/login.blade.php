@@ -3,32 +3,44 @@
 @section('title_page', $title_page)
 
 @section('content')
-    <div class="d-flex align-items-center justify-content-center min-vh-100 bg-light">
-        <div class="w-100" style="max-width: 400px;">
-            <form class="bg-white shadow-md rounded p-4">
-                <h2 class="text-left mb-4">Sign In</h2>
-                <div class="mb-3">
-                    <label for="exampleInputEmail1" class="form-label">Email address</label>
-                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
-                </div>
-                <div class="mb-3">
-                    <label for="exampleInputPassword1" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="exampleInputPassword1">
-                </div>
+    <div class="w-100" style="max-width: 400px;">
+        <form class="bg-white shadow-md rounded p-4">
+            <h2 class="text-left mb-4">Sign In</h2>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email address</label>
+                <input type="email" class="form-control" id="email" aria-describedby="emailHelp" name="email" autocomplete="off" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password" autocomplete="off" required>
+            </div>
 
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                        <label class="form-check-label" for="exampleCheck1">Remember me</label>
-                    </div>
-                    <a class="link-dark text-decoration-none" href="#">Forgot Password?</a>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                    <label class="form-check-label" for="exampleCheck1">Remember me</label>
                 </div>
-                <button type="submit" class="btn w-100 btn-dark"><strong>Sign In</strong></button>
-                <p class="text-center mt-5 mb-0">Doesn't have account?<a class="link-dark text-decoration-none" href="#"> <strong>Register Now</strong></a></p>
-            </form>
-            <p class="text-center text-muted mt-3">
-                &copy; 2024 Your Company. All rights reserved.
-            </p>
-        </div>
+                <a class="link-dark text-decoration-none" href="#">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="btn w-100 btn-dark"><strong>Sign In</strong></button>
+
+            <p class="text-center mt-4 mb-0">Doesn't have account?<a class="link-dark text-decoration-none" href="{{ route('register') }}"> <strong>Register Now</strong></a></p>
+
+            <hr class="w-50 mx-auto my-4">
+
+            <div class="container text-center">
+                <a href="#" class="btn btn-outline-dark btn-block social-btn">
+                    <i class="fab fa-google"></i> Sign in with Google
+                </a>
+                <a href="#" class="btn btn-outline-dark btn-block social-btn mt-3">
+                    <i class="fab fa-facebook-f"></i> Sign in with Facebook
+                </a>
+            </div>
+
+        </form>
+        <p class="text-center text-muted mt-3">
+            &copy; 2024 Your Company. All rights reserved.
+        </p>
     </div>
 @endsection

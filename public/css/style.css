@@ -1,0 +1,15 @@
+.social-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50px;  /* Membuat sudut tombol melengkung */
+    padding: 10px 20px;
+    font-size: 16px;
+    width: 100%;
+    max-width: 400px; /* Batasi lebar maksimum tombol */
+}
+
+.social-btn i {
+    font-size: 20px;
+    margin-right: 10px;  /* Memberi jarak antara ikon dan teks */
+}
