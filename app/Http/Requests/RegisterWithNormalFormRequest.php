@@ -22,14 +22,14 @@ class RegisterWithNormalFormRequest extends FormRequest
     public function rules(): array
     {
         return [
+            "branch" => ["required", "string"],
             "name" => ["required", "string", "min:3", "max:200"],
-            "username" => ["required", "string", "min:3", "max:50", "unique:users,username"],
+            "username" => ["required", "alpha_dash", "min:3", "max:50", "unique:user_profiles,username"],
             "gender" => ["required", "string"],
-            "phone" => ["required", "string"],
+            "phone" => ["required", "numeric", "min_digits:10", "max_digits:15"],
             "address" => ["required", "string", "min:3", "max:200"],
             "email" => ["required", "email:dns", "max:200", "unique:users,email"],
-            "password" => ["required", "string", "min:8", "confirmed"],
-            'password_confirmation' => ["required", "string", "min:8"]
+            "password" => ["required", "string", "min:8", "confirmed"]            
         ];
     }
 }

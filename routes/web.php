@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,4 +19,9 @@ Route::middleware(['guest'])->group(function () {
 
     Route::get("/register", [\App\Http\Controllers\Auth\AuthController::class, "register"])->name("register");
     Route::post("/register/submit", [\App\Http\Controllers\Auth\AuthController::class, "registerWithNormalForm"])->name("register.submit");
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get("/user", [Controller::class, "user"])->name("user");
+    Route::get("/dashboard", [Controller::class, "dashboard"])->name("dashboard");
 });

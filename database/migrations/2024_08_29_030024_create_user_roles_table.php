@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('user_roles', function (Blueprint $table) {
             $table->id();
-            $table->string('email')->unique()->nullable(false);
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password')->nullable();
-            $table->enum('registration_type', ['form', 'social'])->nullable(false);
-            $table->rememberToken();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Relasi ke users
+            $table->foreignId('role_id')->constrained()->onDelete('cascade'); // Relasi ke roles
             $table->timestamps();
         });
     }
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('user_roles');
     }
 };
