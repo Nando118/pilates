@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CompleteProfileRequest;
 use App\Http\Requests\RegisterWithNormalFormRequest;
+use App\Http\Requests\RegisterWithProviderRequest;
 use App\Models\Role;
 use App\Models\SocialAccount;
 use App\Models\User;
@@ -27,7 +28,7 @@ class AuthController extends Controller
 
     public function register()
     {
-        return view("auth.register.register", [
+        return view("auth.register.form", [
             "title_page" => "Pilates | Sign Up"
         ]);
     }
@@ -81,56 +82,124 @@ class AuthController extends Controller
     }
 
     // Register or Login With Social Media Account
-    public function googleOAuthRedirect()
+    public function redirectToProvider($provider)
     {
-        return Socialite::driver('google')->redirect();
+        return Socialite::driver($provider)->redirect();
     }
 
-    public function googleOAuthCallback()
+    public function handleProvideCallback($provider)
     {
         try {
-            DB::beginTransaction();
-            $googleUser = Socialite::driver('google')->user();
+            $providerData = Socialite::driver($provider)->user();
 
-            $user = User::query()->updateOrCreate([
-                "email" => $googleUser->email,
-            ], [
-                "registration_type" => "social"
-            ]);
+            $user = User::query()->where("email", "=", $providerData->getEmail())->first();
 
-            $userProfile = UserProfile::query()->updateOrCreate([
-                "user_id" => $user->id
-            ], [
-                "branch" => "",
-                "name" => $googleUser->name,
-                "username" => "",
-                "gender" => "other",
-                "phone" => "",
-                "address" => "",
-                "profile_picture" => null
-            ]);
+            if ($user) {
+                $userProfile = UserProfile::query()->where("user_id", "=", $user->id)->first();
 
-            $role = Role::where('name', 'client')->first();
+                if (empty($userProfile->branch) || empty($userProfile->username) || empty($userProfile->phone) || empty($userProfile->address)) {
+                    session(["PROVIDER_ID" => $providerData->getId()]);
 
-            // Menetapkan role ke pengguna
-            if ($user && $role) {
-                $user->roles()->attach($role->id);
+                    return redirect()->route("complete-registration");
+                }
+
+                Auth::login($user);
+
+                return redirect()->intended(route("home"));
+            } else {
+                DB::beginTransaction();
+
+                $user = User::query()->updateOrCreate([
+                    "email" => $providerData->email,
+                ], [
+                    "registration_type" => "social"
+                ]);
+
+                $userProfile = UserProfile::query()->updateOrCreate([
+                    "user_id" => $user->id
+                ], [
+                    "branch" => "",
+                    "name" => $providerData->name,
+                    "username" => "",
+                    "gender" => "other",
+                    "phone" => "",
+                    "address" => "",
+                    "profile_picture" => null
+                ]);
+
+                $role = Role::where('name', 'client')->first();
+
+                // Menetapkan role ke pengguna
+                if ($user && $role) {
+                    $user->roles()->attach($role->id);
+                }
+
+                $socialAccount = SocialAccount::query()->updateOrCreate([
+                    "user_id" => $user->id
+                ], [
+                    "provider" => "Google",
+                    "provider_id" => $providerData->id,
+                    "access_token" => $providerData->token
+                ]);
+
+                DB::commit();
+
+                session(["PROVIDER_ID" => $providerData->getId()]);
+
+                return redirect()->route("complete-registration");
             }
-
-            $socialAccount = SocialAccount::query()->updateOrCreate([
-                "user_id" => $user->id
-            ], [
-                "provider" => "Google",
-                "provider_id" => $googleUser->id,
-                "access_token" => $googleUser->token
-            ]);
-
-            DB::commit();
-
-            Auth::login($user);
-
-            return redirect()->route("home");
         } catch (\Exception $e) {
+            Log::error($e);
+            DB::rollBack();
+            return redirect()->route("login");
+        }
+    }
+
+    public function completeRegistration() {
+        if (!session()->has("PROVIDER_ID")) {
+            return redirect()->route("login");
+        }
+
+        return view("auth.complete-registration.register", [
+            "title_page" => "Pilates | Complete Registration"
+        ]);
+    }
+
+    public function completeRegistrationPost(RegisterWithProviderRequest $request) {
+        try {
+            $validated = $request->validated();
+
+            if ($validated) {
+                DB::beginTransaction();
+
+                $providerId = session()->get("PROVIDER_ID");
+
+                $socialAccount = SocialAccount::query()->where("provider_id", "=", $providerId)->first();
+                $userProfile = UserProfile::query()->where("user_id", "=", $socialAccount->user_id)->first();
+                $user = User::query()->where("id", "=", $socialAccount->user_id)->first();
+
+                $dataProfile = [
+                    "branch" => $validated['branch'],
+                    "username" => $validated['username'],
+                    "gender" => $validated['gender'],
+                    "phone" => $validated['phone'],
+                    "address" => $validated['address']
+                ];
+
+                $userProfile->update($dataProfile);
+
+                DB::commit();
+
+                session()->forget('PROVIDER_ID');
+
+                Auth::login($user);
+
+                return redirect()->intended(route("home"));
+            } else {
+                DB::rollBack();
+                return redirect()->back();
+            }
+        }catch (\Exception $e) {
             Log::error($e);
             DB::rollBack();
             return redirect()->route("login");

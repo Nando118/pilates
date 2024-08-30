@@ -30,7 +30,7 @@
             <hr class="w-50 mx-auto my-4">
 
             <div class="container text-center">
-                <a href="{{ route('googleOAuthRedirect') }}" class="btn btn-outline-dark btn-block social-btn">
+                <a href="{{ route('redirectToProvider', ['provider' => 'google']) }}" class="btn btn-outline-dark btn-block social-btn">
                     <i class="fab fa-google"></i> Sign in with Google
                 </a>
                 <a href="#" class="btn btn-outline-dark btn-block social-btn mt-3">

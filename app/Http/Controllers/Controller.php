@@ -10,13 +10,13 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
 
-    public function user()
+    public function home()
     {
-        return view("user.welcome", [
+        return view("home.welcome", [
             "title_page" => "Pilates | User"
         ]);
     }
-    
+
     public function dashboard()
     {
         return view("dashboard.layout.main-layout", [

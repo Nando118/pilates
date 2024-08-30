@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="w-100" style="max-width: 400px;">
-        <form class="bg-white shadow-md rounded p-4" action="{{ route('complete-profile.submit') }}" method="POST">
+        <form class="bg-white shadow-md rounded p-4" action="{{ route('complete-registration.submit') }}" method="POST">
             @csrf
             <h2 class="text-left mb-4">Complete Profile</h2>
 
@@ -16,7 +16,7 @@
                     <option value="tangerang" {{ old('branch') == 'tangerang' ? 'selected' : '' }}>Tangerang</option>
                 </select>
             </div>
-            
+
             <div class="mb-3">
                 <label for="username" class="form-label">Username</label>
                 <input type="text" class="form-control @error('username') is-invalid @enderror" id="username" name="username" autocomplete="off" value="{{ old('username') }}" required>
@@ -56,7 +56,7 @@
                 @enderror
             </div>
 
-            <button type="submit" class="btn w-100 btn-dark"><strong>Sign Up</strong></button>            
+            <button type="submit" class="btn w-100 btn-dark"><strong>Sign Up</strong></button>
         </form>
         <p class="text-center text-muted mt-3">
             &copy; 2024 Your Company. All rights reserved.
