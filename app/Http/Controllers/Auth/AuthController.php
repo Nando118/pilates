@@ -4,26 +4,52 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CompleteProfileRequest;
+use App\Http\Requests\LoginFormRequest;
 use App\Http\Requests\RegisterWithNormalFormRequest;
 use App\Http\Requests\RegisterWithProviderRequest;
+use App\Http\Requests\UserEmailCheckRequest;
+use App\Http\Requests\UserPasswordRequest;
 use App\Models\Role;
 use App\Models\SocialAccount;
 use App\Models\User;
 use App\Models\UserProfile;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
     public function login()
     {
-        return view("auth.login.login", [
+        return view("auth.login.form", [
             "title_page" => "Pilates | Sign In"
         ]);
+    }
+
+    public function loginPost(LoginFormRequest $request)
+    {
+        $validate = $request->validated();
+
+        if ($validate) {
+
+            $credentials = $request->only(["email", "password"]);
+            $remember = $request->has("remember");
+
+            if (Auth::attempt($credentials, $remember)) {
+
+                return redirect()->intended(route("home"));
+            } else {
+                return redirect()->back();
+            }
+        } else {
+            return redirect()->back();
+        }
     }
 
     public function register()
@@ -160,7 +186,7 @@ class AuthController extends Controller
             return redirect()->route("login");
         }
 
-        return view("auth.complete-registration.register", [
+        return view("auth.complete-registration.form", [
             "title_page" => "Pilates | Complete Registration"
         ]);
     }
@@ -203,6 +229,65 @@ class AuthController extends Controller
             Log::error($e);
             DB::rollBack();
             return redirect()->route("login");
+        }
+    }
+
+    // Forgot Password
+    public function forgotPassword() {
+        return view("auth.forgot-password.form", [
+            "title_page" => "Pilates | Forgot Password"
+        ]);
+    }
+
+    public function forgotPasswordEmail(UserEmailCheckRequest $request) {
+        try {
+            $request->validated();
+
+            $validated = User::query()->where("email", "=", $request['email'])->first();
+
+            if ($validated) {
+                $status = Password::sendResetLink($request->only("email"));
+
+                return $status === Password::RESET_LINK_SENT ? back() : back();
+            } else {
+                return redirect()->back();
+            }
+        }catch (\Exception $e){
+            Log::error($e);
+            return redirect()->back();
+        }
+    }
+
+    public function resetPassword(string $token) {
+        if ($token) {
+            return view("auth.forgot-password.reset-password.form", [
+                "title_page" => "Support Ticket System | Reset Password",
+                "token" => $token,
+                "email" => \request("email")
+            ]);
+        } else {
+            return redirect()->route("home");
+        }
+    }
+
+    public function resetPasswordUpdate(UserPasswordRequest $request) {
+        $validated = $request->validated();
+
+        if ($validated) {
+            $status = Password::reset(
+                $request->only('email', 'password', 'token'),
+                function (User $user, string $password) {
+                    $user->forceFill([
+                        'password' => Hash::make($password)
+                    ])->setRememberToken(Str::random(60));
+
+                    $user->save();
+                }
+            );
+
+            return $status === Password::PASSWORD_RESET ? redirect()->route('login') : back();
+        } else {
+            return redirect()->route("password.request");
         }
     }
 }
