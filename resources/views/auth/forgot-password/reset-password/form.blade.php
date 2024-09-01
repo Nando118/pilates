@@ -40,7 +40,7 @@
                 @enderror
             </div>
 
-            <button type="submit" class="btn w-100 btn-dark"><strong>Sign Up</strong></button>
+            <button type="submit" class="btn w-100 btn-dark"><strong>Save</strong></button>
 
             <p class="text-center mt-4 mb-0">Already have an account?<a class="link-dark text-decoration-none" href="{{ route('login') }}"> <strong>Sign In</strong></a></p>
         </form>

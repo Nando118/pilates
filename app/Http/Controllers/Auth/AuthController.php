@@ -14,6 +14,8 @@ use App\Models\SocialAccount;
 use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -41,10 +43,19 @@ class AuthController extends Controller
             $credentials = $request->only(["email", "password"]);
             $remember = $request->has("remember");
 
-            if (Auth::attempt($credentials, $remember)) {
+            $userCheck = User::query()->where("email", "=", $request["email"])->first();
 
-                return redirect()->intended(route("home"));
-            } else {
+            if ($userCheck) {
+                if ($userCheck->registration_type === "social") {
+                    return redirect()->back();
+                }
+
+                if (Auth::attempt($credentials, $remember)) {
+                    return redirect()->intended(route("home"));
+                } else {
+                    return redirect()->back();
+                }
+            }else{
                 return redirect()->back();
             }
         } else {
@@ -93,9 +104,13 @@ class AuthController extends Controller
                     $user->roles()->attach($role->id);
                 }
 
+                event(new Registered($user));
+
+                Auth::login($user);
+
                 DB::commit();
 
-                return redirect()->route("login");
+                return redirect()->route("verification.notice");
             } else {
                 DB::rollBack();
                 return redirect()->back();
@@ -105,6 +120,23 @@ class AuthController extends Controller
             DB::rollBack();
             return redirect()->back();
         }
+    }
+
+    public function emailNotice(Request $request){
+        return $request->user()->hasVerifiedEmail()
+            ? redirect()->route("home") : view('auth.email-verify.form', [
+                "title_page" => "Pilates | Sign Up"
+            ]);
+    }
+
+    public function emailVerify(EmailVerificationRequest $request){
+        $request->fulfill();
+        return redirect()->route("home");
+    }
+
+    public function emailResend(Request $request){
+        $request->user()->sendEmailVerificationNotification();
+        return back();
     }
 
     // Register or Login With Social Media Account
@@ -121,6 +153,11 @@ class AuthController extends Controller
             $user = User::query()->where("email", "=", $providerData->getEmail())->first();
 
             if ($user) {
+
+                if ($user->registration_type === "form") {
+                    return  redirect()->route("login");
+                }
+
                 $userProfile = UserProfile::query()->where("user_id", "=", $user->id)->first();
 
                 if (empty($userProfile->branch) || empty($userProfile->username) || empty($userProfile->phone) || empty($userProfile->address)) {
@@ -130,6 +167,10 @@ class AuthController extends Controller
                 }
 
                 Auth::login($user);
+
+                if (!$user->hasVerifiedEmail()) {
+                    return redirect()->route('verification.notice');
+                }
 
                 return redirect()->intended(route("home"));
             } else {
@@ -214,13 +255,15 @@ class AuthController extends Controller
 
                 $userProfile->update($dataProfile);
 
+                event(new Registered($user));
+
+                Auth::login($user);
+
                 DB::commit();
 
                 session()->forget('PROVIDER_ID');
 
-                Auth::login($user);
-
-                return redirect()->intended(route("home"));
+                return redirect()->route("verification.notice");
             } else {
                 DB::rollBack();
                 return redirect()->back();
@@ -246,11 +289,14 @@ class AuthController extends Controller
             $validated = User::query()->where("email", "=", $request['email'])->first();
 
             if ($validated) {
-                $status = Password::sendResetLink($request->only("email"));
+                if ($validated->registration_type === "social") {
+                    return redirect()->route("login");
+                }
 
+                $status = Password::sendResetLink($request->only("email"));
                 return $status === Password::RESET_LINK_SENT ? back() : back();
             } else {
-                return redirect()->back();
+                return redirect()->route("login");
             }
         }catch (\Exception $e){
             Log::error($e);

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->enum('registration_type', ['form', 'social'])->nullable(false);
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

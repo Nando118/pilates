@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('address')->nullable(false);
             $table->string('profile_picture')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('provider_id')->unique();
             $table->string('access_token')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
