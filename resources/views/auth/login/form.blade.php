@@ -52,3 +52,12 @@
         </p>
     </div>
 @endsection
+
+@push('scripts')
+    Swal.fire({
+    title: 'Error!',
+    text: 'Do you want to continue',
+    icon: 'error',
+    confirmButtonText: 'Cool'
+    })
+@endpush

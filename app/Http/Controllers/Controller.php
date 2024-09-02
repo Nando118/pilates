@@ -19,7 +19,7 @@ class Controller extends BaseController
 
     public function dashboard()
     {
-        return view("dashboard.layout.main-layout", [
+        return view("dashboard.layouts.main-layout", [
             "title_page" => "Pilates | Admin & Coach"
         ]);
     }

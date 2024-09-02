@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Helpers\RedirectByRoleHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CompleteProfileRequest;
 use App\Http\Requests\LoginFormRequest;
@@ -24,6 +25,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class AuthController extends Controller
 {
@@ -39,26 +41,30 @@ class AuthController extends Controller
         $validate = $request->validated();
 
         if ($validate) {
-
             $credentials = $request->only(["email", "password"]);
             $remember = $request->has("remember");
 
             $userCheck = User::query()->where("email", "=", $request["email"])->first();
 
             if ($userCheck) {
+                // Cek apakah email yang digunakan email sosmed atau bukan
                 if ($userCheck->registration_type === "social") {
+                    alert()->info("Hei", "This email is already registered. Try using another email or login with an existing account.");
                     return redirect()->back();
                 }
 
                 if (Auth::attempt($credentials, $remember)) {
-                    return redirect()->intended(route("home"));
+                    return RedirectByRoleHelper::redirectBasedOnRole($request->user());
                 } else {
+                    alert()->error("Oppss...", "Account not found or credentials are invalid.");
                     return redirect()->back();
                 }
             }else{
+                alert()->error("Oppss...", "Account not found or credentials are invalid.");
                 return redirect()->back();
             }
         } else {
+            alert()->error("Oppss...", "An error occurred, the request is invalid.");
             return redirect()->back();
         }
     }
@@ -97,7 +103,7 @@ class AuthController extends Controller
                     "profile_picture" => null
                 ]);
 
-                $role = Role::where('name', 'client')->first();
+                $role = Role::where("name", "admin")->first();
 
                 // Menetapkan role ke pengguna
                 if ($user && $role) {
@@ -113,25 +119,32 @@ class AuthController extends Controller
                 return redirect()->route("verification.notice");
             } else {
                 DB::rollBack();
+                alert()->error("Oppss...", "An error occurred during the registration process, please try again.");
                 return redirect()->back();
             }
         } catch (\Exception $e) {
             Log::error($e);
             DB::rollBack();
+            alert()->error("Oppss...", "An error occurred during the registration process, please try again.");
             return redirect()->back();
         }
     }
 
     public function emailNotice(Request $request){
-        return $request->user()->hasVerifiedEmail()
-            ? redirect()->route("home") : view('auth.email-verify.form', [
+        $user = $request->user();
+
+        if ($user->hasVerifiedEmail()) {
+            return RedirectByRoleHelper::redirectBasedOnRole($user);
+        } else {
+            return view('auth.email-verify.form', [
                 "title_page" => "Pilates | Sign Up"
             ]);
+        }
     }
 
     public function emailVerify(EmailVerificationRequest $request){
         $request->fulfill();
-        return redirect()->route("home");
+        return RedirectByRoleHelper::redirectBasedOnRole($request->user());
     }
 
     public function emailResend(Request $request){
@@ -153,8 +166,9 @@ class AuthController extends Controller
             $user = User::query()->where("email", "=", $providerData->getEmail())->first();
 
             if ($user) {
-
+                // Cek apakah email sosmed yang digunakan sudah pernah didaftarkan atau belum
                 if ($user->registration_type === "form") {
+                    alert()->info("Hei", "This email is already registered. Try using another email or login with an existing account.");
                     return  redirect()->route("login");
                 }
 
@@ -162,17 +176,18 @@ class AuthController extends Controller
 
                 if (empty($userProfile->branch) || empty($userProfile->username) || empty($userProfile->phone) || empty($userProfile->address)) {
                     session(["PROVIDER_ID" => $providerData->getId()]);
-
+                    alert()->info("Hei", "Please complete this form first to complete the registration process.");
                     return redirect()->route("complete-registration");
                 }
 
                 Auth::login($user);
 
                 if (!$user->hasVerifiedEmail()) {
+                    alert()->info("Hei", "Please verify your email first to complete the registration process.");
                     return redirect()->route('verification.notice');
                 }
 
-                return redirect()->intended(route("home"));
+                return RedirectByRoleHelper::redirectBasedOnRole($user);
             } else {
                 DB::beginTransaction();
 
@@ -194,7 +209,7 @@ class AuthController extends Controller
                     "profile_picture" => null
                 ]);
 
-                $role = Role::where('name', 'client')->first();
+                $role = Role::where("name", "client")->first();
 
                 // Menetapkan role ke pengguna
                 if ($user && $role) {
@@ -218,12 +233,14 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             Log::error($e);
             DB::rollBack();
+            alert()->error("Oppss...", "An error occurred during the registration process, please try again.");
             return redirect()->route("login");
         }
     }
 
     public function completeRegistration() {
         if (!session()->has("PROVIDER_ID")) {
+            alert()->error("Oppss...", "An error occurred during the registration process, please try again.");
             return redirect()->route("login");
         }
 
@@ -266,11 +283,13 @@ class AuthController extends Controller
                 return redirect()->route("verification.notice");
             } else {
                 DB::rollBack();
+                alert()->error("Oppss...", "An error occurred during the registration process, please try again.");
                 return redirect()->back();
             }
         }catch (\Exception $e) {
             Log::error($e);
             DB::rollBack();
+            alert()->error("Oppss...", "An error occurred during the registration process, please try again.");
             return redirect()->route("login");
         }
     }
@@ -290,16 +309,19 @@ class AuthController extends Controller
 
             if ($validated) {
                 if ($validated->registration_type === "social") {
+                    alert()->info("Hei", "This email is already registered. Try using another email or login with an existing account.");
                     return redirect()->route("login");
                 }
 
                 $status = Password::sendResetLink($request->only("email"));
                 return $status === Password::RESET_LINK_SENT ? back() : back();
             } else {
+                alert()->error("Oppss...", "An error occurred while resetting the password.");
                 return redirect()->route("login");
             }
         }catch (\Exception $e){
             Log::error($e);
+            alert()->error("Oppss...", "An error occurred while resetting the password.");
             return redirect()->back();
         }
     }
@@ -312,7 +334,8 @@ class AuthController extends Controller
                 "email" => \request("email")
             ]);
         } else {
-            return redirect()->route("home");
+            alert()->error("Oppss...", "An error occurred while resetting the password.");
+            return redirect()->route("password.request");
         }
     }
 
@@ -333,6 +356,7 @@ class AuthController extends Controller
 
             return $status === Password::PASSWORD_RESET ? redirect()->route('login') : back();
         } else {
+            alert()->error("Oppss...", "An error occurred while resetting the password.");
             return redirect()->route("password.request");
         }
     }
