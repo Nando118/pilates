@@ -85,6 +85,7 @@ class AuthController extends Controller
                 DB::beginTransaction();
 
                 $user = User::query()->create([
+                    "name" => $request['name'],
                     "email" => $request['email'],
                     "password" => Hash::make($request['password']),
                     "registration_type" => "form"
@@ -94,8 +95,7 @@ class AuthController extends Controller
 
                 $userProfile = UserProfile::query()->create([
                     "user_id" => $userId,
-                    "branch" => $request['branch'],
-                    "name" => $request['name'],
+                    "branch" => $request['branch'],                    
                     "username" => $request['username'],
                     "gender" => $request['gender'],
                     "phone" => $request['phone'],
@@ -103,7 +103,7 @@ class AuthController extends Controller
                     "profile_picture" => null
                 ]);
 
-                $role = Role::where("name", "admin")->first();
+                $role = Role::where("name", "client")->first();
 
                 // Menetapkan role ke pengguna
                 if ($user && $role) {
@@ -194,14 +194,14 @@ class AuthController extends Controller
                 $user = User::query()->updateOrCreate([
                     "email" => $providerData->email,
                 ], [
+                    "name" => $providerData->name,
                     "registration_type" => "social"
                 ]);
 
                 $userProfile = UserProfile::query()->updateOrCreate([
                     "user_id" => $user->id
                 ], [
-                    "branch" => "",
-                    "name" => $providerData->name,
+                    "branch" => "",                    
                     "username" => "",
                     "gender" => "other",
                     "phone" => "",
@@ -360,4 +360,30 @@ class AuthController extends Controller
             return redirect()->route("password.request");
         }
     }
+
+    public function logout(Request $request)
+    {
+        /**
+         * Cek apakah ada autentikasi user yang sedang berlangsung atau tidak
+         */
+        if (auth()->check()) {
+            /**
+             * Jika ada hapus sesi autentikasi user yang sedang berlangsun saat ini
+             */
+            Auth::logout();
+
+            /**
+             * Buat invalid session login sebelumnya
+             */
+            $request->session()->invalidate();
+
+            /**
+             * Regenerate token csrf baru
+             */
+            $request->session()->regenerateToken();
+        }
+
+        return redirect(route('login'));
+    }
+
 }

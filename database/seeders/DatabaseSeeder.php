@@ -35,12 +35,12 @@ class DatabaseSeeder extends Seeder
 
         $users = [
             [
+                "name" => "Admin User",
                 "email" => "admin@admin.com",
                 "password" => Hash::make("admin@admin.com"),
                 "registration_type" => "form",
                 "profile" => [
-                    "branch" => "Tangerang",
-                    "name" => "Admin User",
+                    "branch" => "Tangerang",                    
                     "username" => "adminuser",
                     "gender" => "male",
                     "phone" => "1234567890",
@@ -50,12 +50,12 @@ class DatabaseSeeder extends Seeder
                 "role" => "admin"
             ],
             [
+                "name" => "Coach User",
                 "email" => "coach@coach.com",
                 "password" => Hash::make("coach@coach.com"),
                 "registration_type" => "form",
                 "profile" => [
-                    "branch" => "Jakarta",
-                    "name" => "Coach User",
+                    "branch" => "Jakarta",                    
                     "username" => "coachuser",
                     "gender" => "female",
                     "phone" => "0987654321",
@@ -65,12 +65,12 @@ class DatabaseSeeder extends Seeder
                 "role" => "coach"
             ],
             [
+                "name" => "Client User",
                 "email" => "client@client.com",
                 "password" => Hash::make("client@client.com"),
                 "registration_type" => "form",
                 "profile" => [
-                    "branch" => "Tangerang",
-                    "name" => "Client User",
+                    "branch" => "Tangerang",                    
                     "username" => "clientuser",
                     "gender" => "male",
                     "phone" => "1122334455",
@@ -84,6 +84,7 @@ class DatabaseSeeder extends Seeder
         foreach ($users as $userData) {
             // Insert data ke tabel users
             $user = User::query()->create([
+                "name" => $userData['name'],
                 "email" => $userData['email'],
                 "email_verified_at" => Carbon::now(),
                 "password" => $userData['password'],
@@ -96,8 +97,7 @@ class DatabaseSeeder extends Seeder
             // Insert data ke tabel user_profiles
             UserProfile::query()->create([
                 "user_id" => $userId,
-                "branch" => $userData['profile']['branch'],
-                "name" => $userData['profile']['name'],
+                "branch" => $userData['profile']['branch'],                
                 "username" => $userData['profile']['username'],
                 "gender" => $userData['profile']['gender'],
                 "phone" => $userData['profile']['phone'],

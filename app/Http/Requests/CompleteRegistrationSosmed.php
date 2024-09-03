@@ -4,14 +4,16 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class RegisterWithNormalFormRequest extends FormRequest
+class CompleteRegistrationSosmed extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return !auth()->check();
+        $googleUserId = session('google_user_id');
+
+        return $googleUserId !== null;
     }
 
     /**
@@ -23,13 +25,10 @@ class RegisterWithNormalFormRequest extends FormRequest
     {
         return [
             "branch" => ["required", "string"],
-            "name" => ["required", "string", "min:3", "max:200"],
             "username" => ["required", "alpha_dash", "min:3", "max:50", "unique:user_profiles,username"],
             "gender" => ["required", "string"],
             "phone" => ["required", "numeric", "min_digits:10", "max_digits:15"],
-            "address" => ["required", "string", "min:3", "max:200"],
-            "email" => ["required", "email:dns", "max:200", "unique:users,email"],
-            "password" => ["required", "string", "min:8", "confirmed"] 
+            "address" => ["required", "string", "min:3", "max:200"]            
         ];
     }
 }

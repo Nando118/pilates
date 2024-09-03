@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Dashboard\HomeDashboardController;
+use App\Http\Controllers\Dashboard\User\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware(['guest'])->group(function () {
+    Route::get("/", [\App\Http\Controllers\Auth\AuthController::class, "login"])->name("login");
     Route::get("/login", [\App\Http\Controllers\Auth\AuthController::class, "login"])->name("login");
     Route::post("/login/submit", [\App\Http\Controllers\Auth\AuthController::class, "loginPost"])->name("login.post");
 
@@ -40,6 +43,18 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/logout', function () {
+        abort(405); // Atau tanggapan lain seperti abort(403) jika Anda ingin menampilkan Forbidden
+    });
+    Route::post("/logout", [\App\Http\Controllers\Auth\AuthController::class, "logout"])->name("logout");
+
     Route::get("/home", [Controller::class, "home"])->name("home");
-    Route::get("/dashboard", [Controller::class, "dashboard"])->name("dashboard");
+
+    Route::get("/dashboard", [HomeDashboardController::class, "index"])->name("dashboard");
+
+    Route::get("/dashboard/users", [UserController::class, "index"])->name("users.index");
+    Route::get("/dashboard/users/data", [UserController::class, "getUsersData"])->name("users.data");
+    Route::get("/dashboard/users/add-new-user", [UserController::class, "create"])->name("users.create");
+    Route::post("/dashboard/users/add-new-user/store", [UserController::class, "store"])->name("users.store");
+    Route::get("/dashboard/users/profile/{id}", [UserController::class, "view"])->name("users.view");
 });

@@ -1,20 +1,24 @@
 @extends('adminlte::page')
 
-@section('title', 'Dashboard')
+@section('title', $title_page)
 
 @section('content_header')
-    <h1>Dashboard</h1>
+    @yield('content_header')
 @stop
 
 @section('content')
-    <p>Welcome to this beautiful admin panel.</p>
+    @yield('content')
 @stop
 
 @section('css')
     {{-- Add here extra stylesheets --}}
     {{-- <link rel="stylesheet" href="/css/admin_custom.css"> --}}
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css" />    
 @stop
 
 @section('js')
-    <script> console.log("Hi, I'm using the Laravel-AdminLTE package!"); </script>
+    @stack('scripts')
+    @include('sweetalert::alert')
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
 @stop

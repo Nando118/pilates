@@ -4,14 +4,14 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class RegisterWithNormalFormRequest extends FormRequest
+class CreateUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return !auth()->check();
+        return auth()->check();
     }
 
     /**
@@ -22,6 +22,7 @@ class RegisterWithNormalFormRequest extends FormRequest
     public function rules(): array
     {
         return [
+            "role" => ["required", "string"],
             "branch" => ["required", "string"],
             "name" => ["required", "string", "min:3", "max:200"],
             "username" => ["required", "alpha_dash", "min:3", "max:50", "unique:user_profiles,username"],
@@ -29,7 +30,7 @@ class RegisterWithNormalFormRequest extends FormRequest
             "phone" => ["required", "numeric", "min_digits:10", "max_digits:15"],
             "address" => ["required", "string", "min:3", "max:200"],
             "email" => ["required", "email:dns", "max:200", "unique:users,email"],
-            "password" => ["required", "string", "min:8", "confirmed"] 
+            "password" => ["required", "string", "min:8", "confirmed"]
         ];
     }
 }

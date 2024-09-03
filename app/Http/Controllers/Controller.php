@@ -15,12 +15,5 @@ class Controller extends BaseController
         return view("home.welcome", [
             "title_page" => "Pilates | User"
         ]);
-    }
-
-    public function dashboard()
-    {
-        return view("dashboard.layouts.main-layout", [
-            "title_page" => "Pilates | Admin & Coach"
-        ]);
-    }
+    }    
 }
