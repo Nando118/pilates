@@ -311,12 +311,29 @@ return [
             'url' => '/dashboard',
             'icon' => 'fas fa-home',
         ],
+        ['header' => 'account_settings'],
         [
             'text' => 'Users',
             'url' => '/dashboard/users',
             'icon' => 'fas fa-fw fa-users',
         ],
-        ['header' => 'account_settings'],
+        ['header' => 'LESSON'],
+        [
+            'text' => 'Lesson',
+            'url' => '/dashboard/lesson',
+            'icon' => 'fas fa-running',
+        ],
+        [
+            'text' => 'Lesson Schedule',
+            'url' => '/dashboard/lesson-schedule',
+            'icon' => 'fas fa-calendar-check',
+        ],
+        ['header' => 'BOOKING'],
+        [
+            'text' => 'Booking',
+            'url' => '/dashboard/booking',
+            'icon' => 'fas fa-calendar-check',
+        ],
         [
             'text' => 'profile',
             'url' => 'admin/settings',

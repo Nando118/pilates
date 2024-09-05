@@ -11,5 +11,7 @@ class RedirectByRoleHelper
         } elseif ($user->hasRole("coach") || $user->hasRole("client")) {
             return redirect()->route("home");
         }
+
+        return abort(403, 'Unauthorized');
     }
 }

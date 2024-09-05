@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_roles', function (Blueprint $table) {
+        Schema::create('bookings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('role_id')->constrained()->onDelete('cascade');
+            $table->foreignId('lesson_schedule_id')->constrained()->onDelete('cascade');
+            $table->enum('status', ['booked', 'waitlist'])->nullable(false);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_roles');
+        Schema::dropIfExists('bookings');
     }
 };

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('social_accounts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Relasi ke users
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('provider');
             $table->string('provider_id')->unique();
             $table->string('access_token')->nullable();
