@@ -3,14 +3,14 @@
 @section('title', $title_page)
 
 @section('content_header')
-    <h1 class="ml-2">Dashboard</h1>
+    <h1 class="ml-2">Bookings</h1>    
 @endsection
 
 @section('content')
     <div class="container-fluid pb-3">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item active" aria-current="page">Home</li>
+                <li class="breadcrumb-item active" aria-current="page">Bookings</li>
             </ol>
         </nav>
 

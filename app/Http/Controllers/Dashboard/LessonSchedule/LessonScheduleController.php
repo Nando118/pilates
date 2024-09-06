@@ -1,12 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Dashboard\Booking;
+namespace App\Http\Controllers\Dashboard\LessonSchedule;
 
 use App\Http\Controllers\Controller;
+use App\Models\LessonSchedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Yajra\DataTables\Facades\DataTables;
 
-class BookingController extends Controller
+class LessonScheduleController extends Controller
 {
     public function __construct()
     {
@@ -20,8 +22,12 @@ class BookingController extends Controller
 
     public function index()
     {
-        return view("dashboard.bookings.index", [
-            "title_page" => "Pilates | Bookings"
+        $title = "Delete Lesson!";
+        $text = "Are you sure you want to delete?";
+        confirmDelete($title, $text);
+
+        return view("dashboard.lesson-schedules.index", [
+            "title_page" => "Pilates | Lesson Schedules"
         ]);
     }
 }

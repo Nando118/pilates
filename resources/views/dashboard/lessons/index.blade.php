@@ -3,17 +3,18 @@
 @section('title', $title_page)
 
 @section('content_header')
-    <h1 class="ml-2">Lesson Schedules</h1>
+    <h1 class="ml-2">Lessons</h1>
 @endsection
 
 @section('content')
     <div class="container-fluid pb-3">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Lesson Schedules</li>
+                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Lessons</li>
             </ol>
         </nav>
+
         <div class="card">            
             <div class="card-body">
                 <div class="table-responsive">
@@ -24,9 +25,6 @@
                                 <th>Created At</th>
                                 <th>Lesson Name</th>
                                 <th>Type</th>
-                                <th>Coach</th>
-                                <th>Start</th>
-                                <th>Time</th>
                                 <th>Quota</th>                                
                                 <th>Action</th>
                             </tr>
@@ -38,11 +36,10 @@
                 </div>
             </div>
             <div class="card-footer">
-                <a href="#" class="btn btn-success">Add New Schedule</a>
+                <a href="{{ route('lessons.create') }}" class="btn btn-success">Add New Lesson</a>
             </div>
         </div>
     </div>
-        
 @endsection
 
 @push("scripts")
@@ -51,9 +48,9 @@
             $('#tbl_list').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: '{{ route('lesson-schedules.data') }}',
+                ajax: '{{ route('lessons.data') }}',
                 language: {
-                    zeroRecords: "There is no lesson schedules data yet",
+                    zeroRecords: "There is no lessons data yet",
                 },
                 columns: [
                     {
@@ -67,11 +64,8 @@
                         }
                     },
                     { data: 'created_at', name: 'created_at', render: DataTable.render.date(), },
-                    { data: 'lessonName', name: 'lessonName' },
-                    { data: 'lessonType', name: 'lessonType' },
-                    { data: 'coachName', name: 'coachName' },
-                    { data: 'start_time', name: 'start_time' },
-                    { data: 'date', name: 'date' },
+                    { data: 'name', name: 'name' },
+                    { data: 'type', name: 'type' },
                     { data: 'quota', name: 'quota' },
                     { data: 'action', name: 'action', orderable: false, searchable: false },               
                 ],

@@ -3,9 +3,11 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Dashboard\Booking\BookingController;
-use App\Http\Controllers\Dashboard\HomeDashboardController;
+use App\Http\Controllers\Dashboard\Home\HomeController;
 use App\Http\Controllers\Dashboard\Lesson\LessonController;
-use App\Http\Controllers\Dashboard\Lesson\LessonScheduleController;
+use App\Http\Controllers\Dashboard\LessonSchedule\LessonScheduleController;
+use App\Http\Controllers\Dashboard\Room\RoomController;
+use App\Http\Controllers\Dashboard\TimeSlot\TimeSlotController;
 use App\Http\Controllers\Dashboard\User\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -55,29 +57,59 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // CLIENT & COACH PAGES
     Route::get("/home", [Controller::class, "home"])->name("home");
 
-    
-    // ADMIN PAGES
-    Route::get("/dashboard", [HomeDashboardController::class, "index"])->name("dashboard");
 
+    // ADMIN PAGES
+    // START HOME ROUTE - ADMIN PAGE
+    Route::get("/dashboard", [HomeController::class, "index"])->name("dashboard");
+    // END HOME ROUTE - ADMIN PAGE
+
+    // START USERS ROUTE - ADMIN PAGE
     Route::get("/dashboard/users", [UserController::class, "index"])->name("users.index");
-    Route::get("/dashboard/users/data", [UserController::class, "getUsersData"])->name("users.data");
+    Route::get("/dashboard/users/data", [UserController::class, "getData"])->name("users.data");
     Route::get("/dashboard/users/add-new-user", [UserController::class, "create"])->name("users.create");
     Route::post("/dashboard/users/add-new-user/store", [UserController::class, "store"])->name("users.store");
-    Route::get("/dashboard/users/profile/{id}", [UserController::class, "view"])->name("users.view");
-    Route::get("/dashboard/users/profile/edit/{id}", [UserController::class, "edit"])->name("users.edit");
-    Route::put("/dashboard/users/profile/edit/{id}/update", [UserController::class, "update"])->name("users.update");
-    Route::delete("/dashboard/users/profile/{id}/delete", [UserController::class, "destroy"])->name("users.delete");
+    Route::get("/dashboard/users/profile/{user}", [UserController::class, "view"])->name("users.view");
+    Route::get("/dashboard/users/profile/edit/{user}", [UserController::class, "edit"])->name("users.edit");
+    Route::put("/dashboard/users/profile/edit/{user}/update", [UserController::class, "update"])->name("users.update");
+    Route::delete("/dashboard/users/profile/{user}/delete", [UserController::class, "destroy"])->name("users.delete");
+    // END USERS ROUTE - ADMIN PAGE
 
-    Route::get("/dashboard/lesson", [LessonController::class, "index"])->name("lessons.index");
-    Route::get("/dashboard/lesson/data", [LessonController::class, "getLessonsData"])->name("lessons.data");
-    Route::get("/dashboard/lesson/add-new-lesson", [LessonController::class, "create"])->name("lessons.create");
-    Route::post("/dashboard/lesson/add-new-lesson/store", [LessonController::class, "store"])->name("lessons.store");
-    Route::get("/dashboard/lesson/edit/{id}", [LessonController::class, "edit"])->name("lessons.edit");
-    Route::put("/dashboard/lesson/edit/{id}/update", [LessonController::class, "update"])->name("lessons.update");
-    Route::delete("/dashboard/lesson/{id}/delete", [LessonController::class, "destroy"])->name("lessons.delete");
+    // START TIME SLOTS ROUTE - ADMIN PAGE
+    Route::get("/dashboard/time-slots", [TimeSlotController::class, "index"])->name("time-slots.index");
+    Route::get("/dashboard/time-slots/data", [TimeSlotController::class, "getData"])->name("time-slots.data");
+    Route::get("/dashboard/time-slots/add-new-time-slot", [TimeSlotController::class, "create"])->name("time-slots.create");
+    Route::post("/dashboard/time-slots/add-new-time-slot/store", [TimeSlotController::class, "store"])->name("time-slots.store");
+    Route::get("/dashboard/time-slots/edit/{timeSlot}", [TimeSlotController::class, "edit"])->name("time-slots.edit");
+    Route::put("/dashboard/time-slots/edit/{timeSlot}/update", [TimeSlotController::class, "update"])->name("time-slots.update");
+    Route::delete("/dashboard/time-slots/{timeSlot}/delete", [TimeSlotController::class, "destroy"])->name("time-slots.delete");
+    // END TIME SLOTS ROUTE - ADMIN PAGE
 
-    Route::get("/dashboard/lesson-schedule", [LessonScheduleController::class, "index"])->name("lesson-schedules.index");
-    Route::get("/dashboard/lesson-schedule/data", [LessonScheduleController::class, "getLessonSchedulesData"])->name("lesson-schedules.data");
+    // START ROOMS ROUTE - ADMIN PAGE
+    Route::get("/dashboard/rooms", [RoomController::class, "index"])->name("rooms.index");
+    Route::get("/dashboard/rooms/data", [RoomController::class, "getData"])->name("rooms.data");
+    Route::get("/dashboard/rooms/create", [RoomController::class, "create"])->name("rooms.create");
+    Route::post("/dashboard/rooms/create/store", [RoomController::class, "store"])->name("rooms.store");
+    Route::get("/dashboard/rooms/edit/{room}", [RoomController::class, "edit"])->name("rooms.edit");
+    Route::put("/dashboard/rooms/edit/{room}/update", [RoomController::class, "update"])->name("rooms.update");
+    Route::delete("/dashboard/rooms/{room}/delete", [RoomController::class, "destroy"])->name("rooms.delete");
+    // END ROOMS ROUTE - ADMIN PAGE
 
-    Route::get("/dashboard/booking", [BookingController::class, "index"])->name("bookings.index");
+    // START LESSONS ROUTE - ADMIN PAGE
+    Route::get("/dashboard/lessons", [LessonController::class, "index"])->name("lessons.index");
+    Route::get("/dashboard/lessons/data", [LessonController::class, "getData"])->name("lessons.data");
+    Route::get("/dashboard/lessons/add-new-lesson", [LessonController::class, "create"])->name("lessons.create");
+    Route::post("/dashboard/lessons/add-new-lesson/store", [LessonController::class, "store"])->name("lessons.store");
+    Route::get("/dashboard/lessons/edit/{lesson}", [LessonController::class, "edit"])->name("lessons.edit");
+    Route::put("/dashboard/lessons/edit/{lesson}/update", [LessonController::class, "update"])->name("lessons.update");
+    Route::delete("/dashboard/lessons/{lesson}/delete", [LessonController::class, "destroy"])->name("lessons.delete");
+    // END LESSONS ROUTE - ADMIN PAGE
+
+    // START LESSON SCHEDULES ROUTE - ADMIN PAGE
+    Route::get("/dashboard/lesson-schedules", [LessonScheduleController::class, "index"])->name("lesson-schedules.index");
+    Route::get("/dashboard/lesson-schedules/data", [LessonScheduleController::class, "getLessonSchedulesData"])->name("lesson-schedules.data");
+    // END LESSON SCHEDULES ROUTE - ADMIN PAGE
+
+    // START BOOKINGS SCHEDULES ROUTE - ADMIN PAGE
+    Route::get("/dashboard/bookings", [BookingController::class, "index"])->name("bookings.index");
+    // END BOOKINGS SCHEDULES ROUTE - ADMIN PAGE
 });

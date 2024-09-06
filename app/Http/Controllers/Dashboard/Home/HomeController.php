@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Dashboard;
+namespace App\Http\Controllers\Dashboard\Home;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
-class HomeDashboardController extends Controller
+class HomeController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
@@ -22,7 +21,7 @@ class HomeDashboardController extends Controller
 
     public function index()
     {
-        return view("dashboard.home.home", [
+        return view("dashboard.homes.index", [
             "title_page" => "Pilates | Dashboard",
             "user" => Auth::user()
         ]);

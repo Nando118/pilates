@@ -3,15 +3,15 @@
 @section('title', $title_page)
 
 @section('content_header')
-    <h1 class="ml-2">Lesson</h1>
+    <h1 class="ml-2">Time Slots</h1>
 @endsection
 
 @section('content')
     <div class="container-fluid pb-3">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Lessons</li>
+                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Time Slots</li>
             </ol>
         </nav>
 
@@ -23,9 +23,8 @@
                             <tr >
                                 <th>No</th>
                                 <th>Created At</th>
-                                <th>Lesson Name</th>
-                                <th>Type</th>
-                                <th>Quota</th>                                
+                                <th>Start Time</th>
+                                <th>End time</th>                           
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -36,7 +35,7 @@
                 </div>
             </div>
             <div class="card-footer">
-                <a href="{{ route('lessons.create') }}" class="btn btn-success">Add New Lesson</a>
+                <a href="{{ route('time-slots.create') }}" class="btn btn-success">Add New Time Slot</a>
             </div>
         </div>
     </div>
@@ -48,9 +47,9 @@
             $('#tbl_list').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: '{{ route('lessons.data') }}',
+                ajax: '{{ route('time-slots.data') }}',
                 language: {
-                    zeroRecords: "There is no lessons data yet",
+                    zeroRecords: "There is no time slot data yet",
                 },
                 columns: [
                     {
@@ -64,9 +63,8 @@
                         }
                     },
                     { data: 'created_at', name: 'created_at', render: DataTable.render.date(), },
-                    { data: 'name', name: 'name' },
-                    { data: 'type', name: 'type' },
-                    { data: 'quota', name: 'quota' },
+                    { data: 'start_time', name: 'start_time' },
+                    { data: 'end_time', name: 'end_time' },
                     { data: 'action', name: 'action', orderable: false, searchable: false },               
                 ],
                 order: [1, 'desc'],

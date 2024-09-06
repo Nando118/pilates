@@ -3,19 +3,19 @@
 @section('title', $title_page)
 
 @section('content_header')
-    <h1 class="ml-2">Add New Lesson</h1>
+    <h1 class="ml-2">Add New Lesson Schedule</h1>
 @endsection
 
 @section('content')
     <div class="container-fluid pb-3">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('lessons.index') }}">Lessons</a></li>                
+                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('lesson-schedules.index') }}">Lessons Schedule</a></li>                
                 @if (isset($lesson_data))
-                    <li class="breadcrumb-item active" aria-current="page">Update Lesson</li>
+                    <li class="breadcrumb-item active" aria-current="page">Update Lesson Schedule</li>
                 @else                
-                    <li class="breadcrumb-item active" aria-current="page">Add New Lesson</li>
+                    <li class="breadcrumb-item active" aria-current="page">Add New Lesson Schedule</li>
                 @endif
             </ol>
         </nav>

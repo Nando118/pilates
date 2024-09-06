@@ -1,0 +1,170 @@
+<?php
+
+namespace App\Http\Controllers\Dashboard\TimeSlot;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\TimeSlotRequest;
+use App\Models\TimeSlot;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
+use Yajra\DataTables\Facades\DataTables;
+
+class TimeSlotController extends Controller
+{
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if (Gate::denies("access-dashboard")) {
+                return abort(403, "Unauthorized");
+            }
+            return $next($request);
+        });
+    }
+
+    public function index()
+    {
+        $title = "Delete Time Slot!";
+        $text = "Are you sure you want to delete?";
+        confirmDelete($title, $text);
+
+        return view("dashboard.time-slots.index", [
+            "title_page" => "Pilates | Time Slots"
+        ]);
+    }
+
+    public function getData()
+    {
+        $timeSlotDatas = TimeSlot::query()->get();
+
+        return DataTables::of($timeSlotDatas)
+            ->addColumn("action", function ($timeSlot) {
+                $btn = '<div class="btn-group mr-1">';
+                $btn .= '<a href="' . route("time-slots.edit", ["timeSlot" => $timeSlot->id]) . '" class="btn btn-warning btn-sm" title="Edit"><i class="fas fa-fw fa-edit"></i></a> ';
+                $btn .= '<a href="' . route("time-slots.delete", ["timeSlot" => $timeSlot->id]) . '" class="btn btn-danger btn-sm" title="Delete" data-confirm-delete="true"><i class="fas fa-fw fa-trash"></i></button> ';
+                $btn .= '</div>';
+                return $btn;
+            })
+            ->make(true);
+    }
+
+    public function create()
+    {
+        $action = route("time-slots.store");
+
+        return view("dashboard.time-slots.form.form", [
+            "title_page" => "Pilates | Add New Time Slot",
+            "action" => $action,
+            "method" => "POST"
+        ]);
+    }
+
+    public function store(TimeSlotRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+
+            $newStartTime = $validated["start_time"];
+            $newEndTime = $validated["end_time"];
+
+            // Cek apakah time slot bentrok dengan yang sudah ada di database
+            $isConflict = TimeSlot::where(function ($query) use ($newStartTime, $newEndTime) {
+                $query->where("start_time", "<", $newEndTime)
+                    ->where("end_time", ">", $newStartTime);
+            })->exists();
+
+            if ($isConflict) {
+                alert()->error("Oppss...", "The created time clashes with an existing time. Please enter another time to avoid a schedule clash.");
+                return redirect()->back()->withInput();
+            }
+
+            DB::beginTransaction();
+
+            // Jika tidak ada bentrok, simpan time slot baru
+            TimeSlot::create([
+                "start_time" => $newStartTime,
+                "end_time" => $newEndTime,
+            ]);
+
+            DB::commit();
+
+            alert()->success("Yeay!", "Successfully added new time slot data.");
+            return redirect()->route("time-slots.index");
+        } catch (\Exception $e) {
+            Log::error("Error adding time slot in TimeSlotController@store: " . $e->getMessage());
+            DB::rollBack();
+            alert()->error("Oppss...", "An error occurred while adding a new time slot data, please try again.");
+            return redirect()->back();
+        }
+    }
+
+    public function edit(TimeSlot $timeSlot)
+    {
+        $action = route("time-slots.update", ["timeSlot" => $timeSlot->id]);
+
+        return view("dashboard.time-slots.form.form", compact("timeSlot", "action"))
+        ->with([
+            "title_page" => "Pilates | Update Time Slot",
+            "method" => "POST"
+        ]);
+    }
+
+    public function update(TimeSlot $timeSlot, TimeSlotRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+
+            $newStartTime = $validated["start_time"];
+            $newEndTime = $validated["end_time"];
+
+            // Cek apakah time slot bentrok dengan yang sudah ada di database
+            $isConflict = TimeSlot::where(function ($query) use ($newStartTime, $newEndTime) {
+                $query->where("start_time", "<", $newEndTime)
+                    ->where("end_time", ">", $newStartTime);
+            })->exists();
+
+            if ($isConflict) {
+                alert()->error("Oppss...", "The created time clashes with an existing time. Please enter another time to avoid a schedule clash.");
+                return redirect()->back()->withInput();
+            }
+
+            DB::beginTransaction();
+            $timeSlot = TimeSlot::findOrFail($timeSlot->id);
+            $timeSlot->start_time = $validated["start_time"];
+            $timeSlot->end_time = $validated["end_time"];
+            $timeSlot->save();
+
+            DB::commit();
+
+            alert()->success("Yeay!", "Successfully updated new time slot data.");
+            return redirect()->route("time-slots.index");
+        } catch (\Exception $e) {
+            Log::error("Error updated time slot in TimeSlotController@update: " . $e->getMessage());
+            DB::rollBack();
+            alert()->error("Oppss...", "An error occurred while updated a new time slot data, please try again.");
+            return redirect()->back();
+        }
+    }
+
+    public function destroy(TimeSlot $timeSlot)
+    {
+        try {
+            DB::beginTransaction();
+
+            $lesson = TimeSlot::findOrFail($timeSlot->id);
+
+            $lesson->delete();
+
+            DB::commit();
+
+            alert()->success("Yeay!", "Successfully deleted time slot data.");
+            return redirect()->route("time-slots.index");
+        } catch (\Exception $e) {
+            Log::error("Error deleted time slot in TimeSlotController@destroy: " . $e->getMessage());
+            DB::rollBack();
+            alert()->error("Oppss...", "An error occurred while deleted time slot data, please try again.");
+            return redirect()->back();
+        }
+    }
+}

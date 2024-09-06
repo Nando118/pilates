@@ -16,8 +16,8 @@ class LessonController extends Controller
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            if (Gate::denies('access-dashboard')) {
-                return abort(403, 'Unauthorized');
+            if (Gate::denies("access-dashboard")) {
+                return abort(403, "Unauthorized");
             }
             return $next($request);
         });
@@ -25,16 +25,16 @@ class LessonController extends Controller
 
     public function index()
     {
-        $title = 'Delete Lesson!';
+        $title = "Delete Lesson!";
         $text = "Are you sure you want to delete?";
         confirmDelete($title, $text);
 
-        return view("dashboard.lesson.index", [
-            "title_page" => "Pilates | Lesson"
+        return view("dashboard.lessons.index", [
+            "title_page" => "Pilates | Lessons"
         ]);
     }
 
-    public function getLessonsData()
+    public function getData()
     {
         $lessonDatas = Lesson::query()->get();
 
@@ -44,10 +44,10 @@ class LessonController extends Controller
         }
 
         return DataTables::of($lessonDatas)
-            ->addColumn('action', function ($lesson) {
+            ->addColumn("action", function ($lesson) {
                 $btn = '<div class="btn-group mr-1">';
-                $btn .= '<a href="'. route("lessons.edit", ["id" => $lesson->id]) .'" class="btn btn-warning btn-sm" title="Edit"><i class="fas fa-fw fa-edit"></i></a> ';
-                $btn .= '<a href="' . route("lessons.delete", ["id" => $lesson->id]) . '" class="btn btn-danger btn-sm" title="Delete" data-confirm-delete="true"><i class="fas fa-fw fa-trash"></i></button> ';
+                $btn .= '<a href="'. route("lessons.edit", ["lesson" => $lesson->id]) .'" class="btn btn-warning btn-sm" title="Edit"><i class="fas fa-fw fa-edit"></i></a> ';
+                $btn .= '<a href="' . route("lessons.delete", ["lesson" => $lesson->id]) . '" class="btn btn-danger btn-sm" title="Delete" data-confirm-delete="true"><i class="fas fa-fw fa-trash"></i></button> ';
                 $btn .= '</div>';
                 return $btn;
             })
@@ -58,7 +58,7 @@ class LessonController extends Controller
     {
         $action = route("lessons.store");
 
-        return view("dashboard.lesson.form.form", [
+        return view("dashboard.lessons.form.form", [
             "title_page" => "Pilates | Add New Lesson",
             "action" => $action,
             "method" => "POST"
@@ -70,83 +70,68 @@ class LessonController extends Controller
         try {
             $validated = $request->validated();
 
-            if ($validated) {
-                DB::beginTransaction();
+            DB::beginTransaction();
 
-                $lesson = Lesson::query()->create([
-                    "name" => $request['name'],
-                    "type" => $request['type'],
-                    "quota" => $request['quota']
-                ]);
+            Lesson::create([
+                "name" => $validated["name"],
+                "type" => $validated["type"],
+                "quota" => $validated["quota"]
+            ]);
 
-                DB::commit();
+            DB::commit();
 
-                alert()->success("Yeay!", "Successfully added new lesson.");
-                return redirect()->route("lessons.index");
-            } else {
-                DB::rollBack();
-                alert()->error("Oppss...", "An error occurred while adding a new lesson, please try again.");
-                return redirect()->back();
-            }
+            alert()->success("Yeay!", "Successfully added new lesson.");
+            return redirect()->route("lessons.index");            
         } catch (\Exception $e) {
-            Log::error($e);
+            Log::error("Error adding lesson in LessonController@store: " . $e->getMessage());
             DB::rollBack();
             alert()->error("Oppss...", "An error occurred while adding a new lesson, please try again.");
             return redirect()->back();
         }
     }
 
-    public function edit($lessonId)
+    public function edit(Lesson $lesson)
     {
-        $action = route("lessons.update", ["id" => $lessonId]);
+        $action = route("lessons.update", $lesson->id);
 
-        $lessonData = Lesson::query()->where("id", "=", $lessonId)->firstOrFail();
-
-        return view("dashboard.lesson.form.form", [
+        return view("dashboard.lessons.form.form", compact("lesson", "action"))
+        ->with([
             "title_page" => "Pilates | Update Lesson",
-            "action" => $action,
-            "method" => "POST",
-            "lesson_data" => $lessonData
+            "method" => "POST"
         ]);
     }
 
-    public function update($lessonId, LessonCreateRequest $request)
+    public function update(Lesson $lesson, LessonCreateRequest $request)
     {
         try {
             $validated = $request->validated();
 
-            if ($validated) {
-                DB::beginTransaction();
+            DB::beginTransaction();
 
-                $user = Lesson::findOrFail($lessonId);
-                $user->name = $validated['name'];
-                $user->type = $validated['type'];
-                $user->quota = $validated['quota'];
-                $user->save();
+            $user = Lesson::findOrFail($lesson->id);
+            $user->name = $validated["name"];
+            $user->type = $validated["type"];
+            $user->quota = $validated["quota"];
+            $user->save();
 
-                DB::commit();
+            DB::commit();
 
-                alert()->success("Yeay!", "Successfully updated lesson data.");
-                return redirect()->route("lessons.index");
-            } else {
-                DB::rollBack();
-                alert()->error("Oppss...", "An error occurred while updating lesson data, please try again.");
-                return redirect()->back();
-            }
+            alert()->success("Yeay!", "Successfully updated lesson data.");
+            return redirect()->route("lessons.index");
         } catch (\Exception $e) {
-            Log::error($e);
+            Log::error("Error updating lesson in LessonController@update: " . $e->getMessage());
             DB::rollBack();
             alert()->error("Oppss...", "An error occurred while updating lesson data, please try again.");
             return redirect()->back();
         }
     }
 
-    public function destroy($id)
+    public function destroy(Lesson $lesson)
     {
         try {
             DB::beginTransaction();
 
-            $lesson = Lesson::findOrFail($id);
+            $lesson = Lesson::findOrFail($lesson->id);
 
             $lesson->delete();
 
@@ -155,7 +140,7 @@ class LessonController extends Controller
             alert()->success("Yeay!", "Successfully deleted lesson data.");
             return redirect()->route("lessons.index");
         } catch (\Exception $e) {
-            Log::error($e);
+            Log::error("Error deleting lesson in LessonController@destroy: " . $e->getMessage());
             DB::rollBack();
             alert()->error("Oppss...", "An error occurred while deleted lesson data, please try again.");
             return redirect()->back();

@@ -7,6 +7,7 @@ namespace Database\Seeders;
 use App\Models\Lesson;
 use App\Models\LessonSchedule;
 use App\Models\Role;
+use App\Models\Room;
 use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Database\Seeder;
@@ -150,6 +151,20 @@ class DatabaseSeeder extends Seeder
                 ]);
 
                 $start = $end_time; // Waktu berikutnya
+            }
+
+            // Buat Rooom
+            $rooms = [
+                [
+                    'name' => 'Room Alpha'
+                ],
+                [
+                    'name' => 'Room Beta'
+                ]
+            ];
+
+            foreach ($rooms as $room) {
+                Room::query()->create($room);
             }
         });
     }
