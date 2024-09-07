@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Dashboard\Room;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\RoomRequest;
+use App\Http\Requests\Dashboard\Rooms\CreateRoomRequest;
+use App\Http\Requests\Dashboard\Rooms\UpdateRoomRequest;
 use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -60,7 +61,7 @@ class RoomController extends Controller
         ]);
     }
 
-    public function store(RoomRequest $request)
+    public function store(CreateRoomRequest $request)
     {
         try {
             $validated = $request->validated();
@@ -94,7 +95,7 @@ class RoomController extends Controller
         ]);
     }
 
-    public function update(Room $room, RoomRequest $request)
+    public function update(Room $room, UpdateRoomRequest $request)
     {
         try {
             $validated = $request->validated();

@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Dashboard\Lessons;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UserEmailCheckRequest extends FormRequest
+class UpdateLessonRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return !auth()->check();
+        return auth()->check();
     }
 
     /**
@@ -22,7 +22,10 @@ class UserEmailCheckRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "email" => ["required", "email:dns"]
+            "id" => ["required", "string"],
+            "name" => ["required", "string", "min:3", "max:25"],
+            "type" => ["required", "string"],
+            "quota" => ["required", "numeric"]
         ];
     }
 }

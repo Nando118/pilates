@@ -3,14 +3,15 @@
 namespace App\Http\Controllers\Dashboard\User;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\CreateUserRequest;
-use App\Http\Requests\UpdateUserRequest;
+use App\Http\Requests\Dashboard\Users\CreateUserRequest;
+use App\Http\Requests\Dashboard\Users\UpdateUserRequest;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Models\UserRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -46,11 +47,14 @@ class UserController extends Controller
         })->get();
 
         return DataTables::of($users)
-            ->addColumn("branch", function ($user) {
-                return ucfirst($user->profile->branch) ?? "N/A";
-            })
+//            ->addColumn("branch", function ($user) {
+//                return ucfirst($user->profile->branch) ?? "N/A";
+//            })
             ->addColumn("gender", function ($user) {
                 return ucfirst($user->profile->gender) ?? "N/A";
+            })
+            ->addColumn("role", function ($user) {
+                return ucfirst($user->roles->pluck("name")->first() ?? "N/A");
             })
             ->addColumn("action", function ($user) {
                 $btn = '<div class="btn-group mr-1">';
@@ -91,14 +95,22 @@ class UserController extends Controller
 
             $userId = $user->id;
 
+            // Menangani upload gambar
+            if ($request->hasFile("profile_picture")) {
+                $imageName = uniqid() . "." . $request->profile_picture->extension();
+                $request->profile_picture->move(public_path("images/profile"), $imageName);
+            } else {
+                $imageName = null; // Atau set ke default image
+            }
+
             UserProfile::create([
                 "user_id" => $userId,
-                "branch" => $validated["branch"],
+//                "branch" => $validated["branch"],
                 "username" => $validated["username"],
                 "gender" => $validated["gender"],
                 "phone" => $validated["phone"],
                 "address" => $validated["address"],
-                "profile_picture" => null
+                "profile_picture" => $imageName
             ]);
 
             $user->roles()->attach($validated["role"]);
@@ -145,7 +157,7 @@ class UserController extends Controller
             "method" => "POST"
         ]);
     }
-    
+
     public function update(User $user, UpdateUserRequest $request)
     {
         try {
@@ -160,7 +172,20 @@ class UserController extends Controller
 
             // Update data di tabel 'profiles'
             $profile = UserProfile::where("user_id", $user->id)->firstOrFail();
-            $profile->branch = $validated["branch"];
+
+            // Menangani upload gambar
+            if ($request->hasFile("profile_picture")) {
+                // Hapus gambar lama jika ada
+                if ($profile->profile_picture) {
+                    File::delete(public_path("images/profile/" . $profile->profile_picture));
+                }
+
+                $imageName = uniqid() . "." . $request->profile_picture->extension();
+                $request->profile_picture->move(public_path("images/profile"), $imageName);
+                $profile->profile_picture = $imageName; // Simpan nama gambar yang baru
+            }
+
+//            $profile->branch = $validated["branch"];
             $profile->gender = $validated["gender"];
             $profile->phone = $validated["phone"];
             $profile->address = $validated["address"];
@@ -180,11 +205,11 @@ class UserController extends Controller
             DB::rollBack();
             alert()->error("Oppss...", "An error occurred while updating user data, please try again.");
             return redirect()->back();
-        }        
+        }
     }
 
     public function destroy(User $user)
-    {        
+    {
         try {
             DB::beginTransaction();
 

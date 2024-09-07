@@ -17,18 +17,18 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('time-slots.index') }}">Time Slots</a></li>                                
+                <li class="breadcrumb-item"><a href="{{ route('time-slots.index') }}">Time Slots</a></li>
                 @if (isset($timeSlot))
                     <li class="breadcrumb-item active" aria-current="page">Update Time Slot</li>
-                @else                
+                @else
                     <li class="breadcrumb-item active" aria-current="page">Add New Time Slot</li>
                 @endif
             </ol>
         </nav>
 
-        <div class="card">            
+        <div class="card">
             <div class="card-body">
-                <form id="form_create_ticket" action="{{ $action }}" method="{{ $method }}">
+                <form id="form_input" action="{{ $action }}" method="{{ $method }}">
                     @csrf
 
                     @if(isset($timeSlot))
@@ -37,7 +37,7 @@
                     @endif
 
                     <div class="mb-3">
-                        <label for="start_time">Time Start</label>
+                        <label for="start_time">Time Start<span style="color: red;">*</span></label>
                         <input type="time" class="form-control @error('start_time') is-invalid @enderror" id="start_time" name="start_time" value="{{ old('start_time') ? old('start_time') : (isset($timeSlot) ? date('H:i', strtotime($timeSlot->start_time)) : '') }}" required>
                         @error('start_time')
                             <div class="invalid-feedback">
@@ -47,16 +47,16 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="end_time">Time End</label>
+                        <label for="end_time">Time End<span style="color: red;">*</span></label>
                         <input type="time" class="form-control @error('end_time') is-invalid @enderror" id="end_time" name="end_time" value="{{ old('end_time') ? old('end_time') : (isset($timeSlot) ? date('H:i', strtotime($timeSlot->end_time)) : '') }}" required>
                         @error('end_time')
                             <div class="invalid-feedback">
                                 {{ $message }}
                             </div>
                         @enderror
-                    </div>                  
-                
-                    <button id="create_lesson" class="btn btn-success" type="submit">
+                    </div>
+
+                    <button id="btn_submit" class="btn btn-success" type="submit">
                         @if (isset($timeSlot))
                             Update
                         @else

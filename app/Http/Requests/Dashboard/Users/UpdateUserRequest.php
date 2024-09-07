@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Dashboard\Users;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class RegisterWithNormalFormRequest extends FormRequest
+class UpdateUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return !auth()->check();
+        return auth()->check();
     }
 
     /**
@@ -22,14 +22,16 @@ class RegisterWithNormalFormRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "branch" => ["required", "string"],
+            "id" => ["required", "string"],
+            "role" => ["required", "string"],
+            // "branch" => ["required", "string"],
             "name" => ["required", "string", "min:3", "max:200"],
-            "username" => ["required", "alpha_dash", "min:3", "max:50", "unique:user_profiles,username"],
+            "username" => ["required", "alpha_dash", "min:3", "max:50"],
             "gender" => ["required", "string"],
             "phone" => ["required", "numeric", "min_digits:10", "max_digits:15"],
             "address" => ["required", "string", "min:3", "max:200"],
-            "email" => ["required", "email:dns", "max:200", "unique:users,email"],
-            "password" => ["required", "string", "min:8", "confirmed"] 
+            "email" => ["required", "email:dns", "max:200"],
+            "profile_picture" => ["nullable", "image", "mimes:jpeg,png,jpg,gif", "max:2048"]
         ];
     }
 }

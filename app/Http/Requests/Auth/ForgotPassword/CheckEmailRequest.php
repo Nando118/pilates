@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Auth\ForgotPassword;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class RoomRequest extends FormRequest
+class CheckEmailRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        return !auth()->check();
     }
 
     /**
@@ -22,7 +22,7 @@ class RoomRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "name" => ["required", "string", "min:3", "max:25", "unique:rooms,name"],
+            "email" => ["required", "email:dns"]
         ];
     }
 }

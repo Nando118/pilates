@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Dashboard\Lesson;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\LessonCreateRequest;
+use App\Http\Requests\Dashboard\Lessons\CreateLessonRequest;
+use App\Http\Requests\Dashboard\Lessons\UpdateLessonRequest;
 use App\Models\Lesson;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -65,7 +66,7 @@ class LessonController extends Controller
         ]);
     }
 
-    public function store(LessonCreateRequest $request)
+    public function store(CreateLessonRequest $request)
     {
         try {
             $validated = $request->validated();
@@ -81,7 +82,7 @@ class LessonController extends Controller
             DB::commit();
 
             alert()->success("Yeay!", "Successfully added new lesson.");
-            return redirect()->route("lessons.index");            
+            return redirect()->route("lessons.index");
         } catch (\Exception $e) {
             Log::error("Error adding lesson in LessonController@store: " . $e->getMessage());
             DB::rollBack();
@@ -101,7 +102,7 @@ class LessonController extends Controller
         ]);
     }
 
-    public function update(Lesson $lesson, LessonCreateRequest $request)
+    public function update(Lesson $lesson, UpdateLessonRequest $request)
     {
         try {
             $validated = $request->validated();

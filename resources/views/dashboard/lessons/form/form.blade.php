@@ -3,7 +3,7 @@
 @section('title', $title_page)
 
 @section('content_header')
-    <h1 class="ml-2">        
+    <h1 class="ml-2">
         @if (isset($lesson))
             Update Lesson
         @else
@@ -17,18 +17,18 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('lessons.index') }}">Lessons</a></li>                
+                <li class="breadcrumb-item"><a href="{{ route('lessons.index') }}">Lessons</a></li>
                 @if (isset($lesson))
                     <li class="breadcrumb-item active" aria-current="page">Update Lesson</li>
-                @else                
+                @else
                     <li class="breadcrumb-item active" aria-current="page">Add New Lesson</li>
                 @endif
             </ol>
         </nav>
 
-        <div class="card">            
+        <div class="card">
             <div class="card-body">
-                <form id="form_create_ticket" action="{{ $action }}" method="{{ $method }}">
+                <form id="form_input" action="{{ $action }}" method="{{ $method }}">
                     @csrf
 
                     @if(isset($lesson))
@@ -37,7 +37,7 @@
                     @endif
 
                     <div class="mb-3">
-                        <label for="name" class="form-label">Name</label>
+                        <label for="name" class="form-label">Name<span style="color: red;">*</span></label>
                         <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" autocomplete="off" value="{{ old('name') ?? (isset($lesson) ? $lesson->name : "") }}" required>
                         @error('name')
                             <div class="invalid-feedback">
@@ -47,7 +47,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="type" class="form-label">Type</label>
+                        <label for="type" class="form-label">Type<span style="color: red;">*</span></label>
                         <select class="form-control" id="type" name="type" required>
                             <option value="" disabled selected>Select Type</option>
                             <option value="reformer" {{ old('type') == "reformer" ? 'selected' : (isset($lesson) && $lesson->type == "reformer" ? 'selected' : '') }}>Reformer</option>
@@ -56,7 +56,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="quota" class="form-label">Quota</label>
+                        <label for="quota" class="form-label">Quota<span style="color: red;">*</span></label>
                         <input type="text" class="form-control @error('quota') is-invalid @enderror" id="quota" name="quota" autocomplete="off" value="{{ old('quota') ?? (isset($lesson) ? $lesson->quota : "") }}" required>
                         @error('quota')
                             <div class="invalid-feedback">
@@ -64,8 +64,8 @@
                             </div>
                         @enderror
                     </div>
-                
-                    <button id="create_lesson" class="btn btn-success" type="submit">
+
+                    <button id="btn_submit" class="btn btn-success" type="submit">
                         @if (isset($lesson))
                             Update
                         @else

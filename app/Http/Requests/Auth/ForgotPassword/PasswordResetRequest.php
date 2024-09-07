@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Auth\ForgotPassword;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class LessonCreateRequest extends FormRequest
+class PasswordResetRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        return !auth()->check();
     }
 
     /**
@@ -22,9 +22,9 @@ class LessonCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "name" => ["required", "string", "min:3", "max:25"],
-            "type" => ["required", "string"],
-            "quota" => ["required", "numeric"]            
+            "token" => ["required"],
+            "email" => ["required", "email"],
+            "password" => ["required", "string", "min:8", "confirmed"]
         ];
     }
 }

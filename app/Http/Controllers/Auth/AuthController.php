@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Auth;
 
 use App\Helpers\RedirectByRoleHelper;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\ForgotPassword\CheckEmailRequest;
+use App\Http\Requests\Auth\ForgotPassword\PasswordResetRequest;
+use App\Http\Requests\Auth\Login\LoginRequest;
+use App\Http\Requests\Auth\Register\RegisterRequest;
+use App\Http\Requests\Auth\Register\RegisterWithProviderRequest;
 use App\Http\Requests\CompleteProfileRequest;
-use App\Http\Requests\LoginFormRequest;
 use App\Http\Requests\RegisterWithNormalFormRequest;
-use App\Http\Requests\RegisterWithProviderRequest;
 use App\Http\Requests\UserEmailCheckRequest;
 use App\Http\Requests\UserPasswordRequest;
 use App\Models\Role;
@@ -25,7 +28,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
-use RealRashid\SweetAlert\Facades\Alert;
 
 class AuthController extends Controller
 {
@@ -36,37 +38,37 @@ class AuthController extends Controller
         ]);
     }
 
-    public function loginPost(LoginFormRequest $request)
+    public function loginPost(LoginRequest $request)
     {
-        $validate = $request->validated();
+        $validated = $request->validated();
+        $credentials = [
+            "email" => $validated["email"],
+            "password" => $validated["password"]
+        ];
+        $remember = $request->has("remember");
 
-        if ($validate) {
-            $credentials = $request->only(["email", "password"]);
-            $remember = $request->has("remember");
+        $userCheck = User::where("email", $credentials["email"])->first();
 
-            $userCheck = User::query()->where("email", "=", $request["email"])->first();
-
-            if ($userCheck) {
-                // Cek apakah email yang digunakan email sosmed atau bukan
-                if ($userCheck->registration_type === "social") {
-                    alert()->info("Hei", "This email is already registered. Try using another email or login with an existing account.");
-                    return redirect()->back();
-                }
-
-                if (Auth::attempt($credentials, $remember)) {
-                    return RedirectByRoleHelper::redirectBasedOnRole($request->user());
-                } else {
-                    alert()->error("Oppss...", "Account not found or credentials are invalid.");
-                    return redirect()->back();
-                }
-            }else{
-                alert()->error("Oppss...", "Account not found or credentials are invalid.");
-                return redirect()->back();
-            }
-        } else {
-            alert()->error("Oppss...", "An error occurred, the request is invalid.");
+        // Jika user tidak ditemukan
+        if (!$userCheck) {
+            alert()->error("Oppss...", "Account not found or credentials are invalid.");
             return redirect()->back();
         }
+
+        // Jika email terdaftar sebagai email sosmed
+        if ($userCheck->registration_type === "social") {
+            alert()->info("Hei", "This email is already registered. Try using another email or login with an existing account.");
+            return redirect()->back();
+        }
+
+        // Autentikasi user
+        if (Auth::attempt($credentials, $remember)) {
+            return RedirectByRoleHelper::redirectBasedOnRole($request->user());
+        }
+
+        // Jika kredensial tidak cocok
+        alert()->error("Oppss...", "Account not found or credentials are invalid.");
+        return redirect()->back();
     }
 
     public function register()
@@ -76,79 +78,90 @@ class AuthController extends Controller
         ]);
     }
 
-    public function registerPost(RegisterWithNormalFormRequest $request)
+    public function registerPost(RegisterRequest $request)
     {
         try {
             $validated = $request->validated();
 
-            if ($validated) {
-                DB::beginTransaction();
+            DB::beginTransaction();
 
-                $user = User::query()->create([
-                    "name" => $request['name'],
-                    "email" => $request['email'],
-                    "password" => Hash::make($request['password']),
-                    "registration_type" => "form"
-                ]);
+            $user = User::create([
+                "name" => $validated["name"],
+                "email" => $validated["email"],
+                "password" => Hash::make($validated["password"]),
+                "registration_type" => "form"
+            ]);
 
-                $userId = $user->id;
+            $userId = $user->id;
 
-                $userProfile = UserProfile::query()->create([
-                    "user_id" => $userId,
-                    "branch" => $request['branch'],                    
-                    "username" => $request['username'],
-                    "gender" => $request['gender'],
-                    "phone" => $request['phone'],
-                    "address" => $request['address'],
-                    "profile_picture" => null
-                ]);
-
-                $role = Role::where("name", "client")->first();
-
-                // Menetapkan role ke pengguna
-                if ($user && $role) {
-                    $user->roles()->attach($role->id);
-                }
-
-                event(new Registered($user));
-
-                Auth::login($user);
-
-                DB::commit();
-
-                return redirect()->route("verification.notice");
+            // Menangani upload gambar
+            if ($request->hasFile("profile_picture")) {
+                $imageName = uniqid() . "." . $request->profile_picture->extension();
+                $request->profile_picture->move(public_path("images/profile"), $imageName);
             } else {
-                DB::rollBack();
-                alert()->error("Oppss...", "An error occurred during the registration process, please try again.");
-                return redirect()->back();
+                $imageName = null; // Atau set ke default image
             }
+
+            $userProfile = UserProfile::create([
+                "user_id" => $userId,
+                // "branch" => $validated["branch"],
+                "username" => $validated["username"],
+                "gender" => $validated["gender"],
+                "phone" => $validated["phone"],
+                "address" => $validated["address"],
+                "profile_picture" => $imageName
+            ]);
+
+            $role = Role::where("name", "client")->first();
+
+            // Menetapkan role ke pengguna
+            if ($user && $role) {
+                $user->roles()->attach($role->id);
+            }
+
+            event(new Registered($user));
+
+            Auth::login($user);
+
+            DB::commit();
+
+            return redirect()->route("verification.notice");
         } catch (\Exception $e) {
-            Log::error($e);
+            Log::error("Error adding new user in AuthController@registerPost: " . $e->getMessage());
             DB::rollBack();
             alert()->error("Oppss...", "An error occurred during the registration process, please try again.");
             return redirect()->back();
         }
     }
 
-    public function emailNotice(Request $request){
+    public function emailNotice(Request $request)
+    {
         $user = $request->user();
 
+        // Jika sudah terverifikasi, langsung redirect berdasarkan role
         if ($user->hasVerifiedEmail()) {
             return RedirectByRoleHelper::redirectBasedOnRole($user);
-        } else {
-            return view('auth.email-verify.form', [
-                "title_page" => "Pilates | Sign Up"
-            ]);
         }
+
+        // Jika belum terverifikasi, tampilkan form verifikasi email
+        return view("auth.email-verify.form", [
+            "title_page" => "Pilates | Sign Up"
+        ]);
     }
 
-    public function emailVerify(EmailVerificationRequest $request){
+    public function emailVerify(EmailVerificationRequest $request)
+    {
         $request->fulfill();
         return RedirectByRoleHelper::redirectBasedOnRole($request->user());
     }
 
-    public function emailResend(Request $request){
+    public function emailResend(Request $request)
+    {
         $request->user()->sendEmailVerificationNotification();
+
+        // Menambahkan pesan notifikasi
+        alert()->success("Success", "Verification email has been resent.");
+
         return back();
     }
 
@@ -162,19 +175,18 @@ class AuthController extends Controller
     {
         try {
             $providerData = Socialite::driver($provider)->user();
-
-            $user = User::query()->where("email", "=", $providerData->getEmail())->first();
+            $user = User::where("email", $providerData->getEmail())->first();
 
             if ($user) {
-                // Cek apakah email sosmed yang digunakan sudah pernah didaftarkan atau belum
+                // Cek jika email terdaftar via form
                 if ($user->registration_type === "form") {
                     alert()->info("Hei", "This email is already registered. Try using another email or login with an existing account.");
-                    return  redirect()->route("login");
+                    return redirect()->route("login");
                 }
 
-                $userProfile = UserProfile::query()->where("user_id", "=", $user->id)->first();
-
-                if (empty($userProfile->branch) || empty($userProfile->username) || empty($userProfile->phone) || empty($userProfile->address)) {
+                // Cek apakah profil user lengkap
+                $userProfile = UserProfile::where("user_id", $user->id)->first();
+                if ($this->isUserProfileIncomplete($userProfile)) {
                     session(["PROVIDER_ID" => $providerData->getId()]);
                     alert()->info("Hei", "Please complete this form first to complete the registration process.");
                     return redirect()->route("complete-registration");
@@ -182,68 +194,73 @@ class AuthController extends Controller
 
                 Auth::login($user);
 
+                // Jika email belum diverifikasi
                 if (!$user->hasVerifiedEmail()) {
                     alert()->info("Hei", "Please verify your email first to complete the registration process.");
                     return redirect()->route('verification.notice');
                 }
 
                 return RedirectByRoleHelper::redirectBasedOnRole($user);
-            } else {
-                DB::beginTransaction();
+            }
 
-                $user = User::query()->updateOrCreate([
-                    "email" => $providerData->email,
-                ], [
+            // Jika user tidak ditemukan, buat user baru
+            DB::beginTransaction();
+
+            $user = User::updateOrCreate(
+                ["email" => $providerData->email],
+                [
                     "name" => $providerData->name,
                     "registration_type" => "social"
-                ]);
+                ]
+            );
 
-                $userProfile = UserProfile::query()->updateOrCreate([
-                    "user_id" => $user->id
-                ], [
-                    "branch" => "",                    
+            $userProfile = UserProfile::updateOrCreate(
+                ["user_id" => $user->id],
+                [
+                    // "branch" => "",
                     "username" => "",
                     "gender" => "other",
                     "phone" => "",
-                    "address" => "",
-                    "profile_picture" => null
-                ]);
+                    "address" => ""
+                ]
+            );
 
-                $role = Role::where("name", "client")->first();
+            // Ambil role client dan tetapkan
+            $role = Role::where("name", "client")->first();
+            if ($role) {
+                $user->roles()->attach($role->id);
+            }
 
-                // Menetapkan role ke pengguna
-                if ($user && $role) {
-                    $user->roles()->attach($role->id);
-                }
-
-                $socialAccount = SocialAccount::query()->updateOrCreate([
-                    "user_id" => $user->id
-                ], [
-                    "provider" => "Google",
+            SocialAccount::updateOrCreate(
+                ["user_id" => $user->id],
+                [
+                    "provider" => $provider,
                     "provider_id" => $providerData->id,
                     "access_token" => $providerData->token
-                ]);
+                ]
+            );
 
-                DB::commit();
+            DB::commit();
 
-                session(["PROVIDER_ID" => $providerData->getId()]);
-
-                return redirect()->route("complete-registration");
-            }
+            session(["PROVIDER_ID" => $providerData->getId()]);
+            return redirect()->route("complete-registration");
         } catch (\Exception $e) {
-            Log::error($e);
+            Log::error("Error adding new social user in AuthController@handleProvideCallback: " . $e->getMessage());
             DB::rollBack();
             alert()->error("Oppss...", "An error occurred during the registration process, please try again.");
             return redirect()->route("login");
         }
     }
 
-    public function completeRegistration() {
+    public function completeRegistration()
+    {
+        // Jika session "PROVIDER_ID" tidak ada, redirect ke login
         if (!session()->has("PROVIDER_ID")) {
-            alert()->error("Oppss...", "An error occurred during the registration process, please try again.");
+            alert()->error("Oppss...", "An error occurred. Please log in to complete your registration.");
             return redirect()->route("login");
         }
 
+        // Tampilkan form complete registration jika session ada
         return view("auth.complete-registration.form", [
             "title_page" => "Pilates | Complete Registration"
         ]);
@@ -252,138 +269,175 @@ class AuthController extends Controller
     public function completeRegistrationPost(RegisterWithProviderRequest $request) {
         try {
             $validated = $request->validated();
+            $providerId = session()->get("PROVIDER_ID");
 
-            if ($validated) {
-                DB::beginTransaction();
-
-                $providerId = session()->get("PROVIDER_ID");
-
-                $socialAccount = SocialAccount::query()->where("provider_id", "=", $providerId)->first();
-                $userProfile = UserProfile::query()->where("user_id", "=", $socialAccount->user_id)->first();
-                $user = User::query()->where("id", "=", $socialAccount->user_id)->first();
-
-                $dataProfile = [
-                    "branch" => $validated['branch'],
-                    "username" => $validated['username'],
-                    "gender" => $validated['gender'],
-                    "phone" => $validated['phone'],
-                    "address" => $validated['address']
-                ];
-
-                $userProfile->update($dataProfile);
-
-                event(new Registered($user));
-
-                Auth::login($user);
-
-                DB::commit();
-
-                session()->forget('PROVIDER_ID');
-
-                return redirect()->route("verification.notice");
-            } else {
-                DB::rollBack();
+            // Early return jika session PROVIDER_ID tidak ada
+            if (!$providerId) {
                 alert()->error("Oppss...", "An error occurred during the registration process, please try again.");
-                return redirect()->back();
+                return redirect()->route("login");
             }
+
+            DB::beginTransaction();
+
+            // Mengambil semua data yang diperlukan sekaligus
+            $socialAccount = SocialAccount::query()->where("provider_id", $providerId)->firstOrFail();
+            $user = $socialAccount->user;
+            $userProfile = $user->profile;
+
+            // Menangani upload gambar
+            if ($request->hasFile("profile_picture")) {
+                $imageName = uniqid() . "." . $request->profile_picture->extension();
+                $request->profile_picture->move(public_path("images/profile"), $imageName);
+            } else {
+                $imageName = null; // Atau set ke default image
+            }
+
+            // Update profile
+            $userProfile->update([
+                // "branch" => $validated["branch"],
+                "username" => $validated["username"],
+                "gender" => $validated["gender"],
+                "phone" => $validated["phone"],
+                "address" => $validated["phone"],
+                "profile_picture" => $imageName
+            ]);
+
+            event(new Registered($user));
+            Auth::login($user);
+
+            DB::commit();
+
+            session()->forget("PROVIDER_ID");
+
+            return redirect()->route("verification.notice");
         }catch (\Exception $e) {
-            Log::error($e);
+            Log::error("Error adding new social user in AuthController@completeRegistrationPost: " . $e->getMessage());
             DB::rollBack();
             alert()->error("Oppss...", "An error occurred during the registration process, please try again.");
             return redirect()->route("login");
         }
     }
 
+    private function isUserProfileIncomplete($userProfile)
+    {
+//        return empty($userProfile->branch) || empty($userProfile->username) ||
+//            empty($userProfile->phone) || empty($userProfile->address);
+
+        return empty($userProfile->username) || empty($userProfile->phone) || empty($userProfile->address);
+    }
+
     // Forgot Password
-    public function forgotPassword() {
+    public function forgotPassword()
+    {
         return view("auth.forgot-password.form", [
             "title_page" => "Pilates | Forgot Password"
         ]);
     }
 
-    public function forgotPasswordEmail(UserEmailCheckRequest $request) {
+    public function forgotPasswordEmail(CheckEmailRequest $request)
+    {
         try {
-            $request->validated();
+            // Validasi dan ambil hasil validasi
+            $validated = $request->validated();
 
-            $validated = User::query()->where("email", "=", $request['email'])->first();
+            // Cek apakah email ada dalam database
+            $user = User::where("email", $validated["email"])->first();
 
-            if ($validated) {
-                if ($validated->registration_type === "social") {
-                    alert()->info("Hei", "This email is already registered. Try using another email or login with an existing account.");
-                    return redirect()->route("login");
-                }
-
-                $status = Password::sendResetLink($request->only("email"));
-                return $status === Password::RESET_LINK_SENT ? back() : back();
-            } else {
-                alert()->error("Oppss...", "An error occurred while resetting the password.");
+            // Early return jika pengguna tidak ditemukan
+            if (!$user) {
+                alert()->error("Oppss...", "An error occurred while resetting the password or the credentials are invalid.");
                 return redirect()->route("login");
             }
+
+            // Cek jenis pendaftaran
+            if ($user->registration_type === "social") {
+                alert()->info("Hei", "This email is already registered. Try using another email or login with an existing account.");
+                return redirect()->route("login");
+            }
+
+            // Kirim link reset password
+            $status = Password::sendResetLink($request->only("email"));
+            alert()->success("Success", "A password reset link has been sent to your email address.");
+
+            return back();
         }catch (\Exception $e){
-            Log::error($e);
+            Log::error("Error resseting password user in AuthController@forgotPasswordEmail: " . $e->getMessage());
             alert()->error("Oppss...", "An error occurred while resetting the password.");
             return redirect()->back();
         }
     }
 
-    public function resetPassword(string $token) {
-        if ($token) {
-            return view("auth.forgot-password.reset-password.form", [
-                "title_page" => "Support Ticket System | Reset Password",
-                "token" => $token,
-                "email" => \request("email")
-            ]);
-        } else {
+    public function resetPassword(string $token)
+    {
+        // Early return jika token tidak ada
+        if (!$token) {
             alert()->error("Oppss...", "An error occurred while resetting the password.");
             return redirect()->route("password.request");
         }
+
+        // Kembalikan view dengan data yang diperlukan
+        return view("auth.forgot-password.reset-password.form", [
+            "title_page" => "Support Ticket System | Reset Password",
+            "token" => $token,
+            "email" => request("email") // Mengambil email dari request
+        ]);
     }
 
-    public function resetPasswordUpdate(UserPasswordRequest $request) {
-        $validated = $request->validated();
+    public function resetPasswordUpdate(PasswordResetRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+            DB::beginTransaction(); // Memulai transaksi
 
-        if ($validated) {
+            // Lakukan reset password
             $status = Password::reset(
-                $request->only('email', 'password', 'token'),
+                $request->only("email", "password", "token"),
                 function (User $user, string $password) {
                     $user->forceFill([
-                        'password' => Hash::make($password)
+                        "password" => Hash::make($password),
                     ])->setRememberToken(Str::random(60));
 
                     $user->save();
                 }
             );
 
-            return $status === Password::PASSWORD_RESET ? redirect()->route('login') : back();
-        } else {
-            alert()->error("Oppss...", "An error occurred while resetting the password.");
+            // Mengembalikan redirect berdasarkan status
+            if ($status === Password::PASSWORD_RESET) {
+                DB::commit(); // Commit jika berhasil
+                alert()->success("Success", "Password has been reset successfully."); // Pesan sukses
+                return redirect()->route("login");
+            } else {
+                DB::rollBack(); // Rollback jika gagal
+                alert()->error("Oppss...", "Failed to reset password."); // Pesan kesalahan
+                return back();
+            }
+
+        } catch (\Exception $e) {
+            Log::error("Error resseting password user in AuthController@resetPasswordUpdate: " . $e->getMessage());
+            DB::rollBack(); // Rollback jika terjadi kesalahan
+            alert()->error("Oppss...", "An error occurred while resetting the password. Please try again.");
             return redirect()->route("password.request");
         }
     }
 
     public function logout(Request $request)
     {
-        /**
-         * Cek apakah ada autentikasi user yang sedang berlangsung atau tidak
-         */
-        if (auth()->check()) {
-            /**
-             * Jika ada hapus sesi autentikasi user yang sedang berlangsun saat ini
-             */
-            Auth::logout();
-
-            /**
-             * Buat invalid session login sebelumnya
-             */
-            $request->session()->invalidate();
-
-            /**
-             * Regenerate token csrf baru
-             */
-            $request->session()->regenerateToken();
+        // Cek apakah ada autentikasi user yang sedang berlangsung
+        if (!auth()->check()) {
+            return redirect(route("login")); // Kembali ke login jika tidak ada user yang terautentikasi
         }
 
-        return redirect(route('login'));
+        // Logout user
+        Auth::logout();
+
+        // Hapus sesi dan regenerate token
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        // Kembali ke halaman login dengan SweetAlert2
+        alert()->success("Success", "You have been logged out successfully."); // Pesan sukses
+
+        return redirect(route("login")); // Kembali ke halaman login
     }
 
 }

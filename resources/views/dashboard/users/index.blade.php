@@ -15,7 +15,7 @@
             </ol>
         </nav>
 
-        <div class="card">            
+        <div class="card">
             <div class="card-body">
                 <div class="table-responsive">
                     <table id="tbl_list" class="table table-striped" width="100%">
@@ -25,8 +25,9 @@
                                 <th>Created At</th>
                                 <th>Name</th>
                                 <th>Email</th>
-                                <th>Branch</th>
+{{--                                <th>Branch</th>--}}
                                 <th>Gender</th>
+                                <th>Role</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -67,9 +68,10 @@
                     { data: 'created_at', name: 'created_at', render: DataTable.render.date(), },
                     { data: 'name', name: 'name' },
                     { data: 'email', name: 'email' },
-                    { data: 'branch', name: 'branch' },
+                    // { data: 'branch', name: 'branch' },
                     { data: 'gender', name: 'gender' },
-                    { data: 'action', name: 'action', orderable: false, searchable: false },               
+                    { data: 'role', name: 'role' },
+                    { data: 'action', name: 'action', orderable: false, searchable: false },
                 ],
                 order: [1, 'desc'],
             });

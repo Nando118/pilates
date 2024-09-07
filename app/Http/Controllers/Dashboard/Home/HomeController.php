@@ -12,8 +12,8 @@ class HomeController extends Controller
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            if (Gate::denies('access-dashboard')) {
-                return abort(403, 'Unauthorized');
+            if (Gate::denies("access-dashboard")) {
+                return abort(403, "Unauthorized");
             }
             return $next($request);
         });

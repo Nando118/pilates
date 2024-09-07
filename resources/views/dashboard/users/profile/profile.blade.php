@@ -19,8 +19,12 @@
         <div class="card">
             <div class="card-header bg-dark text-white">
                 <div class="d-flex align-items-center">
-                <img class="rounded-circle mr-3" src="{{ asset('img/profile/profile_default.jpg') }}" alt="User Avatar" width="50" height="50">
-                <div>                
+                    @if(isset($userData->profile->profile_picture))
+                        <img class="rounded-circle mr-3" src="{{ asset('images/profile/' . $userData->profile->profile_picture) }}" alt="User Avatar" width="50" height="50">
+                    @else
+                        <img class="rounded-circle mr-3" src="{{ asset('img/profile/profile_default.jpg') }}" alt="User Avatar" width="50" height="50">
+                    @endif
+                <div>
                     <h3 class="card-title mb-0">{{ $userData->name }}</h3>
                     <h6 class="card-subtitle">{{ $roleName }}</h6>
                 </div>
@@ -28,9 +32,9 @@
             </div>
             <div class="card-body p-0">
                 <ul class="list-group list-group-flush">
-                <li class="list-group-item d-flex align-items-center">
-                    <i class="fas fa-map-marker-alt mr-2"></i>{{ ucfirst($userData->profile->branch) }}
-                </li>
+{{--                <li class="list-group-item d-flex align-items-center">--}}
+{{--                    <i class="fas fa-map-marker-alt mr-2"></i>{{ ucfirst($userData->profile->branch) }}--}}
+{{--                </li>--}}
                 <li class="list-group-item d-flex align-items-center">
                     <i class="fas fa-venus-mars mr-2"></i>{{ ucfirst($userData->profile->gender) }}
                 </li>

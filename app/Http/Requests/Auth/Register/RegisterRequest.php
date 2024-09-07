@@ -1,19 +1,17 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Auth\Register;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CompleteRegistrationSosmed extends FormRequest
+class RegisterRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        $googleUserId = session('google_user_id');
-
-        return $googleUserId !== null;
+        return !auth()->check();
     }
 
     /**
@@ -24,11 +22,15 @@ class CompleteRegistrationSosmed extends FormRequest
     public function rules(): array
     {
         return [
-            "branch" => ["required", "string"],
+            // "branch" => ["required", "string"],
+            "name" => ["required", "string", "min:3", "max:200"],
             "username" => ["required", "alpha_dash", "min:3", "max:50", "unique:user_profiles,username"],
             "gender" => ["required", "string"],
             "phone" => ["required", "numeric", "min_digits:10", "max_digits:15"],
-            "address" => ["required", "string", "min:3", "max:200"]            
+            "address" => ["required", "string", "min:3", "max:200"],
+            "email" => ["required", "email:dns", "max:200", "unique:users,email"],
+            "profile_picture" => ["nullable", "image", "mimes:jpeg,png,jpg,gif", "max:2048"],
+            "password" => ["required", "string", "min:8", "confirmed"]
         ];
     }
 }

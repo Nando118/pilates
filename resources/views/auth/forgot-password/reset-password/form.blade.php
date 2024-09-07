@@ -4,14 +4,14 @@
 
 @section('content')
     <div class="w-100" style="max-width: 400px;">
-        <form class="bg-white shadow-md rounded p-4" action="{{ route('password.update') }}" method="POST">
+        <form id="form_input" class="bg-white shadow-md rounded p-4" action="{{ route('password.update') }}" method="POST">
             @csrf
             <h2 class="text-left mb-4">Reset Password</h2>
 
             <input type="hidden" class="form-control" id="token" name="token" value="{{ $token }}">
 
             <div class="mb-3">
-                <label for="email" class="form-label @error('email') is-invalid @enderror">Email address</label>
+                <label for="email" class="form-label @error('email') is-invalid @enderror">Email<span style="color: red;">*</span></label>
                 <input type="email" class="form-control" id="email" aria-describedby="emailHelp" name="email" autocomplete="off" value="{{ $email }}" required readonly>
                 @error('email')
                 <div class="invalid-feedback">
@@ -21,7 +21,7 @@
             </div>
 
             <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
+                <label for="password" class="form-label">Password<span style="color: red;">*</span></label>
                 <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" autocomplete="off" required>
                 @error('password')
                     <div class="invalid-feedback">
@@ -31,7 +31,7 @@
             </div>
 
             <div class="mb-4">
-                <label for="password_confirmation" class="form-label">Confirm Password</label>
+                <label for="password_confirmation" class="form-label">Confirm Password<span style="color: red;">*</span></label>
                 <input type="password" class="form-control @error('password_confirmation') is-invalid @enderror" id="password_confirmation" name="password_confirmation" autocomplete="off" required>
                 @error('password_confirmation')
                     <div class="invalid-feedback">
@@ -40,7 +40,7 @@
                 @enderror
             </div>
 
-            <button type="submit" class="btn w-100 btn-dark"><strong>Save</strong></button>
+            <button type="submit" id="btn_submit" class="btn w-100 btn-dark"><strong>Save</strong></button>
 
             <p class="text-center mt-4 mb-0">Already have an account?<a class="link-dark text-decoration-none" href="{{ route('login') }}"> <strong>Sign In</strong></a></p>
         </form>

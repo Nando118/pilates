@@ -13,6 +13,8 @@
         @yield('content')
     </div>
 <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset('vendor/jquery/jquery.js') }}"></script>
+<script src="{{ asset('js/script.js') }}"></script>
 @stack('scripts')
 @include('sweetalert::alert')
 </body>

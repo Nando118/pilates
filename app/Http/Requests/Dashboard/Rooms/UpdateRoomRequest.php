@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Dashboard\Rooms;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UserPasswordRequest extends FormRequest
+class UpdateRoomRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return !auth()->check();
+        return auth()->check();
     }
 
     /**
@@ -22,9 +22,8 @@ class UserPasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "token" => ["required"],
-            "email" => ["required", "email"],
-            "password" => ["required", "string", "min:8", "confirmed"]
+            "id" => ["required", "string"],
+            "name" => ["required", "string", "min:3", "max:25", "unique:rooms,name"],
         ];
     }
 }

@@ -41,7 +41,7 @@ class DatabaseSeeder extends Seeder
                     "password" => Hash::make("admin@admin.com"),
                     "registration_type" => "form",
                     "profile" => [
-                        "branch" => "tangerang",
+//                        "branch" => "tangerang",
                         "username" => "adminuser",
                         "gender" => "male",
                         "phone" => "1234567890",
@@ -56,7 +56,7 @@ class DatabaseSeeder extends Seeder
                     "password" => Hash::make("coach@coach.com"),
                     "registration_type" => "form",
                     "profile" => [
-                        "branch" => "jakarta",
+//                        "branch" => "jakarta",
                         "username" => "coachuser",
                         "gender" => "female",
                         "phone" => "0987654321",
@@ -71,7 +71,7 @@ class DatabaseSeeder extends Seeder
                     "password" => Hash::make("client@client.com"),
                     "registration_type" => "form",
                     "profile" => [
-                        "branch" => "tangerang",
+//                        "branch" => "tangerang",
                         "username" => "clientuser",
                         "gender" => "male",
                         "phone" => "1122334455",
@@ -96,7 +96,7 @@ class DatabaseSeeder extends Seeder
                 // Buat profile user
                 UserProfile::query()->create([
                     "user_id" => $user->id,
-                    "branch" => $userData['profile']['branch'],
+//                    "branch" => $userData['profile']['branch'],
                     "username" => $userData['profile']['username'],
                     "gender" => $userData['profile']['gender'],
                     "phone" => $userData['profile']['phone'],

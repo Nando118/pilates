@@ -23,40 +23,48 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware(['guest'])->group(function () {
-    Route::get("/", [\App\Http\Controllers\Auth\AuthController::class, "login"])->name("login");
-    Route::get("/login", [\App\Http\Controllers\Auth\AuthController::class, "login"])->name("login");
-    Route::post("/login/submit", [\App\Http\Controllers\Auth\AuthController::class, "loginPost"])->name("login.post");
+    // START LOGIN ROUTE - GUEST PAGE
+    Route::get("/", [AuthController::class, "login"])->name("login");
+    Route::get("/login", [AuthController::class, "login"])->name("login");
+    Route::post("/login/submit", [AuthController::class, "loginPost"])->name("login.post");
+    // END LOGIN ROUTE - GUEST PAGE
 
-    Route::get("/register/form", [\App\Http\Controllers\Auth\AuthController::class, "register"])->name("register");
-    Route::post("/register/form/submit", [\App\Http\Controllers\Auth\AuthController::class, "registerPost"])->name("register.submit");
-    Route::get("/register/complete-registration", [\App\Http\Controllers\Auth\AuthController::class, "completeRegistration"])->name("complete-registration");
-    Route::post("/register/complete-registration/submit", [\App\Http\Controllers\Auth\AuthController::class, "completeRegistrationPost"])->name("complete-registration.submit");
+    // START REGISTER ROUTE - GUEST PAGE
+    Route::get("/register/form", [AuthController::class, "register"])->name("register");
+    Route::post("/register/form/submit", [AuthController::class, "registerPost"])->name("register.submit");
+    Route::get("/register/complete-registration", [AuthController::class, "completeRegistration"])->name("complete-registration");
+    Route::post("/register/complete-registration/submit", [AuthController::class, "completeRegistrationPost"])->name("complete-registration.submit");
+    // END REGISTER ROUTE - GUEST PAGE
 
-    Route::get("/auth/{provider}", [\App\Http\Controllers\Auth\AuthController::class, "redirectToProvider"])->name("redirectToProvider");
-    Route::get("/auth/{provider}/callback", [\App\Http\Controllers\Auth\AuthController::class, "handleProvideCallback"])->name("handleProvideCallback");
+    // START REDIRECT PROVIDER ROUTE - GUEST PAGE
+    Route::get("/auth/{provider}", [AuthController::class, "redirectToProvider"])->name("redirectToProvider");
+    Route::get("/auth/{provider}/callback", [AuthController::class, "handleProvideCallback"])->name("handleProvideCallback");
+    // END REDIRECT PROVIDER ROUTE - GUEST PAGE
 
-    Route::get("/forgot-password", [\App\Http\Controllers\Auth\AuthController::class, "forgotPassword"])->name("password.request");
-    Route::post("/forgot-password/send-link", [\App\Http\Controllers\Auth\AuthController::class, "forgotPasswordEmail"])->name("password.email");
-    Route::get("/reset-password/{token}", [\App\Http\Controllers\Auth\AuthController::class, "resetPassword"])->name("password.reset");
-    Route::post("/reset-password/submit", [\App\Http\Controllers\Auth\AuthController::class, "resetPasswordUpdate"])->name("password.update");
+    // START FORGOT PASSWORD ROUTE - GUEST PAGE
+    Route::get("/forgot-password", [AuthController::class, "forgotPassword"])->name("password.request");
+    Route::post("/forgot-password/send-link", [AuthController::class, "forgotPasswordEmail"])->name("password.email");
+    Route::get("/reset-password/{token}", [AuthController::class, "resetPassword"])->name("password.reset");
+    Route::post("/reset-password/submit", [AuthController::class, "resetPasswordUpdate"])->name("password.update");
+    // END FORGOT PASSWORD ROUTE - GUEST PAGE
 });
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/email/verify', [\App\Http\Controllers\Auth\AuthController::class, "emailNotice"])->name('verification.notice');
-    Route::get('/email/verify/{id}/{hash}', [\App\Http\Controllers\Auth\AuthController::class, "emailVerify"])->middleware('signed', 'throttle:6,1')->name('verification.verify');
-    Route::post('/email/resend', [\App\Http\Controllers\Auth\AuthController::class, "emailResend"])->middleware('throttle:6,1')->name('verification.resend');
+    Route::get('/email/verify', [AuthController::class, "emailNotice"])->name('verification.notice');
+    Route::get('/email/verify/{id}/{hash}', [AuthController::class, "emailVerify"])->middleware('signed', 'throttle:6,1')->name('verification.verify');
+    Route::post('/email/resend', [AuthController::class, "emailResend"])->middleware('throttle:6,1')->name('verification.resend');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/logout', function () {
-        abort(405); // Atau tanggapan lain seperti abort(403) jika Anda ingin menampilkan Forbidden
-    });
-    Route::post("/logout", [\App\Http\Controllers\Auth\AuthController::class, "logout"])->name("logout");
-
-
     // CLIENT & COACH PAGES
     Route::get("/home", [Controller::class, "home"])->name("home");
+});
 
+Route::middleware(['auth', 'verified', 'onlyAdmin'])->group(function () {
+    Route::get('/logout', function () {
+        return redirect()->back(); // Atau tanggapan lain seperti abort(403) jika Anda ingin menampilkan Forbidden
+    });
+    Route::post("/logout", [AuthController::class, "logout"])->name("logout");
 
     // ADMIN PAGES
     // START HOME ROUTE - ADMIN PAGE

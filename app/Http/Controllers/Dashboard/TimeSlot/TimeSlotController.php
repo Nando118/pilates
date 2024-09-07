@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Dashboard\TimeSlot;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\TimeSlotRequest;
+use App\Http\Requests\Dashboard\TimeSlots\CreateTimeSlotRequest;
+use App\Http\Requests\Dashboard\TimeSlots\UpdateTimeSlotRequest;
 use App\Models\TimeSlot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -60,7 +61,7 @@ class TimeSlotController extends Controller
         ]);
     }
 
-    public function store(TimeSlotRequest $request)
+    public function store(CreateTimeSlotRequest $request)
     {
         try {
             $validated = $request->validated();
@@ -110,7 +111,7 @@ class TimeSlotController extends Controller
         ]);
     }
 
-    public function update(TimeSlot $timeSlot, TimeSlotRequest $request)
+    public function update(TimeSlot $timeSlot, UpdateTimeSlotRequest $request)
     {
         try {
             $validated = $request->validated();
