@@ -23,9 +23,7 @@ class UpdateLessonRequest extends FormRequest
     {
         return [
             "id" => ["required", "string"],
-            "name" => ["required", "string", "min:3", "max:25"],
-            "type" => ["required", "string"],
-            "quota" => ["required", "numeric"]
+            "name" => ["required", "string", "min:3", "max:25", "unique:lessons,name"]
         ];
     }
 }

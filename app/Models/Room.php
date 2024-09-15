@@ -12,8 +12,8 @@ class Room extends Model
 
     protected $fillable = ['name'];
 
-    public function schedules()
+    public function lessonSchedules()
     {
-        return $this->hasMany(LessonSchedule::class);
+        return $this->hasMany(LessonSchedule::class, "room_id", "id"); // Satu room dapat memiliki banyak lesson schedules
     }
 }

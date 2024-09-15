@@ -15,7 +15,7 @@
             </ol>
         </nav>
 
-        <div class="card">            
+        <div class="card">
             <div class="card-body">
                 <div class="table-responsive">
                     <table id="tbl_list" class="table table-striped" width="100%">
@@ -61,9 +61,9 @@
                             return meta.row + meta.settings._iDisplayStart + 1;
                         }
                     },
-                    { data: 'created_at', name: 'created_at', render: DataTable.render.date(), },
-                    { data: 'name', name: 'name' },
-                    { data: 'action', name: 'action', orderable: false, searchable: false },               
+                    { data: 'created_at', name: 'created_at', render: DataTable.render.date()},
+                    { data: 'name', name: 'name'},
+                    { data: 'action', name: 'action', orderable: false, searchable: false},
                 ],
                 order: [1, 'desc'],
             });

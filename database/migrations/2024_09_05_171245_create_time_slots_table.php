@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->time('start_time')->nullable(false);
             $table->time('end_time')->nullable(false);
+            $table->integer('duration')->nullable(false);
             $table->timestamps();
             $table->softDeletes();
         });

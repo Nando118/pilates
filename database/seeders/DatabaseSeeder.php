@@ -6,6 +6,7 @@ namespace Database\Seeders;
 
 use App\Models\Lesson;
 use App\Models\LessonSchedule;
+use App\Models\LessonType;
 use App\Models\Role;
 use App\Models\Room;
 use App\Models\User;
@@ -108,34 +109,6 @@ class DatabaseSeeder extends Seeder
                 $user->roles()->attach($roles[$userData['role']]->id);
             }
 
-            // Buat Lesson
-            $lessons = [
-                [
-                    'name' => 'All Level',
-                    'type' => 'reformer',
-                    'quota' => 10,
-                ],
-                [
-                    'name' => 'Bootcamp',
-                    'type' => 'reformer',
-                    'quota' => 8,
-                ],
-                [
-                    'name' => 'Booty & Core',
-                    'type' => 'private',
-                    'quota' => 5,
-                ],
-                [
-                    'name' => 'Abs & Back',
-                    'type' => 'private',
-                    'quota' => 7,
-                ],
-            ];
-
-            foreach ($lessons as $lessonData) {
-                Lesson::query()->create($lessonData);
-            }
-
             // Buat Time Slots
             $start = strtotime('09:00');
             $end = strtotime('18:00');
@@ -146,6 +119,7 @@ class DatabaseSeeder extends Seeder
                 DB::table('time_slots')->insert([
                     'start_time' => date('H:i', $start),
                     'end_time' => date('H:i', $end_time),
+                    'duration' => 50,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
@@ -153,7 +127,7 @@ class DatabaseSeeder extends Seeder
                 $start = $end_time; // Waktu berikutnya
             }
 
-            // Buat Rooom
+            // Buat Rooms
             $rooms = [
                 [
                     'name' => 'Room Alpha'
@@ -166,6 +140,72 @@ class DatabaseSeeder extends Seeder
             foreach ($rooms as $room) {
                 Room::query()->create($room);
             }
+
+            // Buat Lesson Types
+            $lessonTypes = [
+                [
+                    'name' => 'Group',
+                    'quota' => 5
+                ],
+                [
+                    'name' => 'Private',
+                    'quota' => 3
+                ]
+            ];
+
+            foreach ($lessonTypes as $lessonType) {
+                LessonType::query()->create($lessonType);
+            }
+
+            // Buat Lesson
+            $lessons = [
+                [
+                    'name' => 'All Level'
+                ],
+                [
+                    'name' => 'Bootcamp'
+                ],
+                [
+                    'name' => 'Booty & Core'
+                ],
+                [
+                    'name' => 'Abs & Back'
+                ]
+            ];
+
+            foreach ($lessons as $lesson) {
+                Lesson::query()->create($lesson);
+            }
+
+            // Buat Schedule
+            $scheduleData = [
+                [
+                    'date' => '2024-09-15',
+                    'time_slot_id' => 1, // ID time_slot yang sesuai
+                    'lesson_id' => 1,    // ID lesson yang sesuai
+                    'lesson_type_id' => 1, // ID lesson_type yang sesuai
+                    'user_id' => 2,      // ID user (coach)
+                    'room_id' => 1,      // ID room yang sesuai
+                    'quota' => 3, // Quota
+                    'status' => 'Available' // Status
+                ],
+                [
+                    'date' => '2024-09-15',
+                    'time_slot_id' => 2,
+                    'lesson_id' => 2,
+                    'lesson_type_id' => 2,
+                    'user_id' => 3,
+                    'room_id' => 2,
+                    'quota' => 2,
+                    'status' => 'Available',
+                ]
+                // Tambahkan lebih banyak jadwal sesuai kebutuhan
+            ];
+
+            foreach ($scheduleData as $schedule) {
+                LessonSchedule::query()->create($schedule);
+            }
+
         });
     }
 }

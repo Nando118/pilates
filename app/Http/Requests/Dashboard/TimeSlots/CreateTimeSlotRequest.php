@@ -23,7 +23,8 @@ class CreateTimeSlotRequest extends FormRequest
     {
         return [
             "start_time" => ["required", "date_format:H:i"],
-            "end_time" => ["required", "date_format:H:i", "after:start_time"]
+            "end_time" => ["required", "date_format:H:i", "after:start_time"],
+            "duration" => ["required", "integer", "min:20"]
         ];
     }
 }

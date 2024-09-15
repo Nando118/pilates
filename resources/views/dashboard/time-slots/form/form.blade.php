@@ -56,6 +56,17 @@
                         @enderror
                     </div>
 
+                    <div class="mb-3">
+                        <label for="duration" class="form-label">Duration<span style="color: red;">*</span></label>
+                        <input type="number" class="form-control @error('duration') is-invalid @enderror" id="duration" name="duration" autocomplete="off" value="{{ old('duration') ?? (isset($timeSlot) ? $timeSlot->duration : "") }}" required>
+                        <div class="form-text" id="basic-addon4">Minimum duration entered is 20 minutes.</div>
+                        @error('duration')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
+
                     <button id="btn_submit" class="btn btn-success" type="submit">
                         @if (isset($timeSlot))
                             Update

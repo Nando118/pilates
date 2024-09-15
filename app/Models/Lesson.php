@@ -11,14 +11,10 @@ class Lesson extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = [
-        'name',
-        'type',
-        'quota'
-    ];
+    protected $fillable = ["name"];
 
     public function schedules(): HasMany
     {
-        return $this->hasMany(LessonSchedule::class, "lesson_id", "id");
+        return $this->hasMany(LessonSchedule::class,"lesson_id", "id");
     }
 }

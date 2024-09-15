@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller
@@ -98,7 +99,11 @@ class UserController extends Controller
             // Menangani upload gambar
             if ($request->hasFile("profile_picture")) {
                 $imageName = uniqid() . "." . $request->profile_picture->extension();
-                $request->profile_picture->move(public_path("images/profile"), $imageName);
+                // Simpan gambar di storage (folder storage/app/public/images/profile)
+                $path = $request->file("profile_picture")->storeAs("images/profile", $imageName, "public");
+
+                // Jika ingin menyimpan path untuk disimpan ke database
+                $imageName = $path; // Simpan path yang bisa diakses via 'storage/images/profile/uniqueimagename.extension'
             } else {
                 $imageName = null; // Atau set ke default image
             }
@@ -177,12 +182,18 @@ class UserController extends Controller
             if ($request->hasFile("profile_picture")) {
                 // Hapus gambar lama jika ada
                 if ($profile->profile_picture) {
-                    File::delete(public_path("images/profile/" . $profile->profile_picture));
+                    // Menghapus file lama dari storage
+                    Storage::disk("public")->delete($profile->profile_picture);
                 }
 
+                // Menyimpan gambar baru di storage
                 $imageName = uniqid() . "." . $request->profile_picture->extension();
-                $request->profile_picture->move(public_path("images/profile"), $imageName);
-                $profile->profile_picture = $imageName; // Simpan nama gambar yang baru
+
+                // Simpan gambar di folder 'images/profile' di storage
+                $path = $request->file("profile_picture")->storeAs("images/profile", $imageName, "public");
+
+                // Simpan path gambar baru di database
+                $profile->profile_picture = $path; // Simpan path seperti 'images/profile/imagename.extension'
             }
 
 //            $profile->branch = $validated["branch"];

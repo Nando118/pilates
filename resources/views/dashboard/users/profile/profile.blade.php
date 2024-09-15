@@ -20,9 +20,9 @@
             <div class="card-header bg-dark text-white">
                 <div class="d-flex align-items-center">
                     @if(isset($userData->profile->profile_picture))
-                        <img class="rounded-circle mr-3" src="{{ asset('images/profile/' . $userData->profile->profile_picture) }}" alt="User Avatar" width="50" height="50">
+                        <img class="rounded-circle mr-3" src="{{ asset('storage/' . $userData->profile->profile_picture) }}" alt="User Avatar" width="50" height="50">
                     @else
-                        <img class="rounded-circle mr-3" src="{{ asset('img/profile/profile_default.jpg') }}" alt="User Avatar" width="50" height="50">
+                        <img class="rounded-circle mr-3" src="{{ asset('storage/images/profile_default/profile_default.jpg') }}" alt="User Avatar" width="50" height="50">
                     @endif
                 <div>
                     <h3 class="card-title mb-0">{{ $userData->name }}</h3>

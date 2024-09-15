@@ -15,7 +15,7 @@
             </ol>
         </nav>
 
-        <div class="card">            
+        <div class="card">
             <div class="card-body">
                 <div class="table-responsive">
                     <table id="tbl_list" class="table table-striped" width="100%">
@@ -24,7 +24,8 @@
                                 <th>No</th>
                                 <th>Created At</th>
                                 <th>Start Time</th>
-                                <th>End time</th>                           
+                                <th>End time</th>
+                                <th>Duration</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -62,10 +63,11 @@
                             return meta.row + meta.settings._iDisplayStart + 1;
                         }
                     },
-                    { data: 'created_at', name: 'created_at', render: DataTable.render.date(), },
-                    { data: 'start_time', name: 'start_time' },
-                    { data: 'end_time', name: 'end_time' },
-                    { data: 'action', name: 'action', orderable: false, searchable: false },               
+                    { data: 'created_at', name: 'created_at', render: DataTable.render.date()},
+                    { data: 'start_time', name: 'start_time'},
+                    { data: 'end_time', name: 'end_time'},
+                    { data: 'duration', name: 'duration'},
+                    { data: 'action', name: 'action', orderable: false, searchable: false},
                 ],
                 order: [1, 'desc'],
             });

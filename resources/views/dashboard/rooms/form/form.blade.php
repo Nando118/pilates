@@ -19,7 +19,7 @@
                 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
                 <li class="breadcrumb-item"><a href="{{ route('time-slots.index') }}">Rooms</a></li>
                 @if (isset($room))
-                    <li class="breadcrumb-item active" aria-current="page">Update Room</li>>
+                    <li class="breadcrumb-item active" aria-current="page">Update Room</li>
                 @else
                     <li class="breadcrumb-item active" aria-current="page">Add New Room</li>
                 @endif

@@ -2,13 +2,13 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Dashboard\Booking\BookingController;
 use App\Http\Controllers\Dashboard\Home\HomeController;
 use App\Http\Controllers\Dashboard\Lesson\LessonController;
-use App\Http\Controllers\Dashboard\LessonSchedule\LessonScheduleController;
 use App\Http\Controllers\Dashboard\Room\RoomController;
 use App\Http\Controllers\Dashboard\TimeSlot\TimeSlotController;
 use App\Http\Controllers\Dashboard\User\UserController;
+use App\Http\Controllers\Dashboard\LessonType\LessonTypeController;
+use App\Http\Controllers\Dashboard\LessonSchedule\LessonScheduleController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -92,6 +92,16 @@ Route::middleware(['auth', 'verified', 'onlyAdmin'])->group(function () {
     Route::delete("/dashboard/time-slots/{timeSlot}/delete", [TimeSlotController::class, "destroy"])->name("time-slots.delete");
     // END TIME SLOTS ROUTE - ADMIN PAGE
 
+    // START LESSON TYPES ROUTE - ADMIN PAGE
+    Route::get("/dashboard/lesson-types", [LessonTypeController::class, "index"])->name("lesson-types.index");
+    Route::get("/dashboard/lesson-types/data", [LessonTypeController::class, "getData"])->name("lesson-types.data");
+    Route::get("/dashboard/lesson-types/add-new-lesson-type", [LessonTypeController::class, "create"])->name("lesson-types.create");
+    Route::post("/dashboard/lesson-types/add-new-lesson-type/store", [LessonTypeController::class, "store"])->name("lesson-types.store");
+    Route::get("/dashboard/lesson-types/edit/{lessonType}", [LessonTypeController::class, "edit"])->name("lesson-types.edit");
+    Route::put("/dashboard/lesson-types/edit/{lessonType}/update", [LessonTypeController::class, "update"])->name("lesson-types.update");
+    Route::delete("/dashboard/lesson-types/{lessonType}/delete", [LessonTypeController::class, "destroy"])->name("lesson-types.delete");
+    // END LESSON TYPES ROUTE - ADMIN PAGE
+
     // START ROOMS ROUTE - ADMIN PAGE
     Route::get("/dashboard/rooms", [RoomController::class, "index"])->name("rooms.index");
     Route::get("/dashboard/rooms/data", [RoomController::class, "getData"])->name("rooms.data");
@@ -102,22 +112,18 @@ Route::middleware(['auth', 'verified', 'onlyAdmin'])->group(function () {
     Route::delete("/dashboard/rooms/{room}/delete", [RoomController::class, "destroy"])->name("rooms.delete");
     // END ROOMS ROUTE - ADMIN PAGE
 
-    // START LESSONS ROUTE - ADMIN PAGE
+    // START LESSON ROUTE - ADMIN PAGE
     Route::get("/dashboard/lessons", [LessonController::class, "index"])->name("lessons.index");
     Route::get("/dashboard/lessons/data", [LessonController::class, "getData"])->name("lessons.data");
-    Route::get("/dashboard/lessons/add-new-lesson", [LessonController::class, "create"])->name("lessons.create");
-    Route::post("/dashboard/lessons/add-new-lesson/store", [LessonController::class, "store"])->name("lessons.store");
+    Route::get("/dashboard/lessons/create", [LessonController::class, "create"])->name("lessons.create");
+    Route::post("/dashboard/lessons/create/store", [LessonController::class, "store"])->name("lessons.store");
     Route::get("/dashboard/lessons/edit/{lesson}", [LessonController::class, "edit"])->name("lessons.edit");
     Route::put("/dashboard/lessons/edit/{lesson}/update", [LessonController::class, "update"])->name("lessons.update");
     Route::delete("/dashboard/lessons/{lesson}/delete", [LessonController::class, "destroy"])->name("lessons.delete");
-    // END LESSONS ROUTE - ADMIN PAGE
+    // END LESSON ROUTE - ADMIN PAGE
 
     // START LESSON SCHEDULES ROUTE - ADMIN PAGE
     Route::get("/dashboard/lesson-schedules", [LessonScheduleController::class, "index"])->name("lesson-schedules.index");
-    Route::get("/dashboard/lesson-schedules/data", [LessonScheduleController::class, "getLessonSchedulesData"])->name("lesson-schedules.data");
+    Route::get("/dashboard/lesson-schedules/data", [LessonScheduleController::class, "getData"])->name("lesson-schedules.data");
     // END LESSON SCHEDULES ROUTE - ADMIN PAGE
-
-    // START BOOKINGS SCHEDULES ROUTE - ADMIN PAGE
-    Route::get("/dashboard/bookings", [BookingController::class, "index"])->name("bookings.index");
-    // END BOOKINGS SCHEDULES ROUTE - ADMIN PAGE
 });

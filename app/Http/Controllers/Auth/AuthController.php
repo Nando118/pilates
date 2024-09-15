@@ -97,7 +97,11 @@ class AuthController extends Controller
             // Menangani upload gambar
             if ($request->hasFile("profile_picture")) {
                 $imageName = uniqid() . "." . $request->profile_picture->extension();
-                $request->profile_picture->move(public_path("images/profile"), $imageName);
+                // Simpan gambar di storage (folder storage/app/public/images/profile)
+                $path = $request->file("profile_picture")->storeAs("images/profile", $imageName, "public");
+
+                // Jika ingin menyimpan path untuk disimpan ke database
+                $imageName = $path; // Simpan path yang bisa diakses via 'storage/images/profile/uniqueimagename.extension'
             } else {
                 $imageName = null; // Atau set ke default image
             }
@@ -287,7 +291,11 @@ class AuthController extends Controller
             // Menangani upload gambar
             if ($request->hasFile("profile_picture")) {
                 $imageName = uniqid() . "." . $request->profile_picture->extension();
-                $request->profile_picture->move(public_path("images/profile"), $imageName);
+                // Simpan gambar di storage (folder storage/app/public/images/profile)
+                $path = $request->file("profile_picture")->storeAs("images/profile", $imageName, "public");
+
+                // Jika ingin menyimpan path untuk disimpan ke database
+                $imageName = $path; // Simpan path yang bisa diakses via 'storage/images/profile/uniqueimagename.extension'
             } else {
                 $imageName = null; // Atau set ke default image
             }

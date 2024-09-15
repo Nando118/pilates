@@ -15,7 +15,7 @@
             </ol>
         </nav>
 
-        <div class="card">            
+        <div class="card">
             <div class="card-body">
                 <div class="table-responsive">
                     <table id="tbl_list" class="table table-striped" width="100%">
@@ -23,9 +23,7 @@
                             <tr >
                                 <th>No</th>
                                 <th>Created At</th>
-                                <th>Lesson Name</th>
-                                <th>Type</th>
-                                <th>Quota</th>                                
+                                <th>Name</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -36,7 +34,7 @@
                 </div>
             </div>
             <div class="card-footer">
-                <a href="{{ route('lessons.create') }}" class="btn btn-success">Add New Lesson</a>
+                <a href="{{ route('lessons.create') }}" class="btn btn-success">Add Lesson</a>
             </div>
         </div>
     </div>
@@ -50,7 +48,7 @@
                 serverSide: true,
                 ajax: '{{ route('lessons.data') }}',
                 language: {
-                    zeroRecords: "There is no lessons data yet",
+                    zeroRecords: "There is no lesson data yet",
                 },
                 columns: [
                     {
@@ -63,11 +61,9 @@
                             return meta.row + meta.settings._iDisplayStart + 1;
                         }
                     },
-                    { data: 'created_at', name: 'created_at', render: DataTable.render.date(), },
-                    { data: 'name', name: 'name' },
-                    { data: 'type', name: 'type' },
-                    { data: 'quota', name: 'quota' },
-                    { data: 'action', name: 'action', orderable: false, searchable: false },               
+                    { data: 'created_at', name: 'created_at', render: DataTable.render.date()},
+                    { data: 'name', name: 'name'},
+                    { data: 'action', name: 'action', orderable: false, searchable: false},
                 ],
                 order: [1, 'desc'],
             });

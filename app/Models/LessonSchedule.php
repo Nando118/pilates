@@ -5,48 +5,46 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class LessonSchedule extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
-    protected $fillable = [
-        'lesson_id',
-        'user_id',
-        'date',
-        'start_time',
-        'end_time',
-        'quota'
-    ];
+    protected $fillable = ["date", "time_slot_id", "lesson_id", "lesson_type_id", "user_id", "room_id", "quota", "status"];
 
-    public function lesson()
+    public function timeSlot(): BelongsTo
     {
-        return $this->belongsTo(Lesson::class);
+        return $this->belongsTo(TimeSlot::class, "time_slot_id", "id");
     }
 
-    public function user()
+    // Metode untuk memeriksa ketersediaan time slot
+    public static function isTimeSlotAvailable($date, $timeSlotId, $roomId)
     {
-        return $this->belongsTo(User::class);
+        // Cek jika ada lesson_schedule dengan waktu dan ruangan yang sama
+        return !self::where('date', $date)
+            ->where('time_slot_id', $timeSlotId)
+            ->where('room_id', $roomId)
+            ->exists();
     }
 
-    public function room()
+    public function lesson(): BelongsTo
     {
-        return $this->belongsTo(Room::class);
+        return $this->belongsTo(Lesson::class, "lesson_id", "id");
     }
 
-    public function timeSlot()
+    public function lessonType(): BelongsTo
     {
-        return $this->belongsTo(TimeSlot::class);
+        return $this->belongsTo(LessonType::class, "lesson_type_id", "id");
     }
 
-    public function bookings()
+    public function user(): BelongsTo
     {
-        return $this->hasMany(Booking::class);
+        return $this->belongsTo(User::class, "user_id", "id");
     }
 
-    public function waitlists()
+    public function room(): BelongsTo
     {
-        return $this->hasMany(Waitlist::class);
+        return $this->belongsTo(Room::class,"room_id", "id");
     }
 }

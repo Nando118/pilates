@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('waitlists', function (Blueprint $table) {
+        Schema::create('lesson_types', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('lesson_schedule_id')->constrained()->onDelete('cascade');
+            $table->string('name')->unique()->nullable(false);
+            $table->integer('quota')->nullable(false);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('waitlists');
+        Schema::dropIfExists('lesson_types');
     }
 };

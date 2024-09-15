@@ -309,7 +309,32 @@ return [
         [
             'text' => 'Dashboard',
             'url' => '/dashboard',
-            'icon' => 'fas fa-fw fa-home',
+            'icon' => 'fas fa-fw fa-tachometer-alt',
+        ],
+        ['header' => 'MASTER DATAS'],
+        [
+            'text' => 'Lesson',
+            'icon' => 'fas fa-fw far fa-cog',
+            'submenu' => [
+                [
+                    'text' => 'Lessons',
+                    'url' => '/dashboard/lessons',
+                ],
+                [
+                    'text' => 'Lesson Types',
+                    'url' => '/dashboard/lesson-types',
+                ],
+            ],
+        ],
+        [
+            'text' => 'Time Slots',
+            'url' => '/dashboard/time-slots',
+            'icon' => 'fas fa-fw far fa-cog',
+        ],
+        [
+            'text' => 'Rooms',
+            'url' => '/dashboard/rooms',
+            'icon' => 'fas fa-fw far fa-cog',
         ],
         ['header' => 'account_settings'],
         [
@@ -317,34 +342,11 @@ return [
             'url' => '/dashboard/users',
             'icon' => 'fas fa-fw fa-users',
         ],
-        ['header' => 'TIME SETTINGS'],
-        [
-            'text' => 'Time Slots',
-            'url' => '/dashboard/time-slots',
-            'icon' => 'fas fa-fw far fa-clock',
-        ],
-        ['header' => 'ROOM SETTINGS'],
-        [
-            'text' => 'Rooms',
-            'url' => '/dashboard/rooms',
-            'icon' => 'fas fa-fw far fa-door-open',
-        ],
-        ['header' => 'LESSON SETTINGS'],
-        [
-            'text' => 'Lessons',
-            'url' => '/dashboard/lessons',
-            'icon' => 'fas fa-fw fa-running',
-        ],
+        ['header' => 'SCHEDULES'],
         [
             'text' => 'Lesson Schedules',
             'url' => '/dashboard/lesson-schedules',
-            'icon' => 'fas fa-fw fa-calendar-check',
-        ],
-        ['header' => 'BOOKINGS'],
-        [
-            'text' => 'Bookings',
-            'url' => '/dashboard/bookings',
-            'icon' => 'fas fa-fw fa-calendar-check',
+            'icon' => 'fas fa-fw fa-calendar',
         ],
         [
             'text' => 'profile',

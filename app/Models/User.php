@@ -72,18 +72,14 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->roles()->where("name", $roleName)->exists();
     }
 
-    public function lessonSchedules(): HasMany
+    public function lessonSchedules()
     {
-        return $this->hasMany(LessonSchedule::class, "user_id", "id");
+        return $this->hasMany(LessonSchedule::class,"user_id", "id");
     }
 
-    public function bookings(): HasMany
+    // Jika ingin memfilter hanya untuk role 'coach'
+    public function isCoach()
     {
-        return $this->hasMany(Booking::class, "user_id", "id");
-    }
-
-    public function waitlists(): HasMany
-    {
-        return $this->hasMany(Waitlist::class, "user_id", "id");
+        return $this->roles()->where('name', 'coach')->exists();
     }
 }

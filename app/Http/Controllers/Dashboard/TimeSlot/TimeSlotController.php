@@ -7,6 +7,7 @@ use App\Http\Requests\Dashboard\TimeSlots\CreateTimeSlotRequest;
 use App\Http\Requests\Dashboard\TimeSlots\UpdateTimeSlotRequest;
 use App\Models\TimeSlot;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
@@ -66,8 +67,16 @@ class TimeSlotController extends Controller
         try {
             $validated = $request->validated();
 
-            $newStartTime = $validated["start_time"];
-            $newEndTime = $validated["end_time"];
+            $newStartTime = Carbon::createFromFormat("H:i", $validated["start_time"]);
+            $newEndTime = Carbon::createFromFormat("H:i", $validated["end_time"]);
+            $duration = $validated["duration"];
+
+            $availableDuration = $newStartTime->diffInMinutes($newEndTime);
+
+            if ($duration > $availableDuration) {
+                alert()->error("Oppss...", "The duration cannot be more than the time available between Start Time and End Time.");
+                return redirect()->back()->withInput();
+            }
 
             // Cek apakah time slot bentrok dengan yang sudah ada di database
             $isConflict = TimeSlot::where(function ($query) use ($newStartTime, $newEndTime) {
@@ -76,7 +85,7 @@ class TimeSlotController extends Controller
             })->exists();
 
             if ($isConflict) {
-                alert()->error("Oppss...", "The created time clashes with an existing time. Please enter another time to avoid a schedule clash.");
+                alert()->error("Oppss...", "The created time already exists or conflicts with an existing time. Please enter another time to avoid schedule conflicts.");
                 return redirect()->back()->withInput();
             }
 
@@ -86,6 +95,7 @@ class TimeSlotController extends Controller
             TimeSlot::create([
                 "start_time" => $newStartTime,
                 "end_time" => $newEndTime,
+                "duration" => $duration,
             ]);
 
             DB::commit();
@@ -116,8 +126,16 @@ class TimeSlotController extends Controller
         try {
             $validated = $request->validated();
 
-            $newStartTime = $validated["start_time"];
-            $newEndTime = $validated["end_time"];
+            $newStartTime = Carbon::createFromFormat("H:i", $validated["start_time"]);
+            $newEndTime = Carbon::createFromFormat("H:i", $validated["end_time"]);
+            $duration = $validated["duration"];
+
+            $availableDuration = $newStartTime->diffInMinutes($newEndTime);
+
+            if ($duration > $availableDuration) {
+                alert()->error("Oppss...", "The duration cannot be more than the time available between Start Time and End Time.");
+                return redirect()->back()->withInput();
+            }
 
             // Cek apakah time slot bentrok dengan yang sudah ada di database
             $isConflict = TimeSlot::where(function ($query) use ($newStartTime, $newEndTime) {
@@ -134,6 +152,7 @@ class TimeSlotController extends Controller
             $timeSlot = TimeSlot::findOrFail($timeSlot->id);
             $timeSlot->start_time = $validated["start_time"];
             $timeSlot->end_time = $validated["end_time"];
+            $timeSlot->duration = $validated["duration"];
             $timeSlot->save();
 
             DB::commit();

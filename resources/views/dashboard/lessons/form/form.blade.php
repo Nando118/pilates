@@ -4,7 +4,7 @@
 
 @section('content_header')
     <h1 class="ml-2">
-        @if (isset($lesson))
+        @if (isset($lessonType))
             Update Lesson
         @else
             Add New Lesson
@@ -21,7 +21,7 @@
                 @if (isset($lesson))
                     <li class="breadcrumb-item active" aria-current="page">Update Lesson</li>
                 @else
-                    <li class="breadcrumb-item active" aria-current="page">Add New Lesson</li>
+                    <li class="breadcrumb-item active" aria-current="page">Add Lesson</li>
                 @endif
             </ol>
         </nav>
@@ -40,25 +40,6 @@
                         <label for="name" class="form-label">Name<span style="color: red;">*</span></label>
                         <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" autocomplete="off" value="{{ old('name') ?? (isset($lesson) ? $lesson->name : "") }}" required>
                         @error('name')
-                            <div class="invalid-feedback">
-                                {{ $message }}
-                            </div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="type" class="form-label">Type<span style="color: red;">*</span></label>
-                        <select class="form-control" id="type" name="type" required>
-                            <option value="" disabled selected>Select Type</option>
-                            <option value="reformer" {{ old('type') == "reformer" ? 'selected' : (isset($lesson) && $lesson->type == "reformer" ? 'selected' : '') }}>Reformer</option>
-                            <option value="private" {{ old('type') == "private" ? 'selected' : (isset($lesson) && $lesson->type == "private" ? 'selected' : '') }}>Private</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="quota" class="form-label">Quota<span style="color: red;">*</span></label>
-                        <input type="text" class="form-control @error('quota') is-invalid @enderror" id="quota" name="quota" autocomplete="off" value="{{ old('quota') ?? (isset($lesson) ? $lesson->quota : "") }}" required>
-                        @error('quota')
                             <div class="invalid-feedback">
                                 {{ $message }}
                             </div>
