@@ -3,7 +3,12 @@
 namespace App\Http\Controllers\Dashboard\LessonSchedule;
 
 use App\Http\Controllers\Controller;
+use App\Models\Lesson;
 use App\Models\LessonSchedule;
+use App\Models\LessonType;
+use App\Models\Room;
+use App\Models\TimeSlot;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Yajra\DataTables\Facades\DataTables;
@@ -62,5 +67,29 @@ class LessonScheduleController extends Controller
             })
             ->rawColumns(["time", "lesson", "action"])
             ->make(true);
+    }
+
+    public function create()
+    {
+        $action = route("lesson-schedules.store");
+
+        $timeSlots = TimeSlot::get();
+        $lessons = Lesson::get();
+        $lessonTypes = LessonType::get();
+        $coachUsers = User::with("profile")->whereHas("roles", function ($query) {
+            $query->where("name", "coach");
+        })->get();
+        $rooms = Room::get();
+
+        return view("dashboard.lesson-schedules.form.form", [
+            "title_page" => "Pilates | Add Lesson Schedules",
+            "timeSlots" => $timeSlots,
+            "lessons" => $lessons,
+            "lessonTypes" => $lessonTypes,
+            "coachUsers" => $coachUsers,
+            "rooms" => $rooms,
+            "action" => $action,
+            "method" => "POST"
+        ]);
     }
 }

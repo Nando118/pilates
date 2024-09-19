@@ -38,7 +38,7 @@
                 </div>
             </div>
             <div class="card-footer">
-                <a href="#" class="btn btn-success">Add Lesson Schedule</a>
+                <a href="{{ route('lesson-schedules.create') }}" class="btn btn-success">Add Lesson Schedule</a>
             </div>
         </div>
     </div>
