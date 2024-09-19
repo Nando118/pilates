@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Dashboard\LessonSchedule;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Dashboard\LessonSchedules\CreateLessonSchedulesRequest;
 use App\Models\Lesson;
 use App\Models\LessonSchedule;
 use App\Models\LessonType;
@@ -91,5 +92,11 @@ class LessonScheduleController extends Controller
             "action" => $action,
             "method" => "POST"
         ]);
+    }
+
+    public function store(CreateLessonSchedulesRequest $request)
+    {
+        $validated = $request->validated();
+        dd($validated);
     }
 }

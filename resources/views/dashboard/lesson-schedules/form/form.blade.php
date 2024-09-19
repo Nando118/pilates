@@ -37,9 +37,14 @@
                     @endif
 
                     <div class="mb-3">
-                        <label for="name" class="form-label">Date<span style="color: red;">*</span></label>
-                        <input type="date" class="form-control @error('name') is-invalid @enderror" id="name" name="name" autocomplete="off" value="{{ old('name') ?? (isset($lesson) ? $lesson->name : "") }}" required>
-                        @error('name')
+                        <label for="date" class="form-label">Date<span style="color: red;">*</span></label>
+                        <div class="input-group date" data-provide="datepicker">
+                            <input type="text" class="form-control @error('date') is-invalid @enderror" id="date" name="date" autocomplete="off" value="{{ old('date') ?? (isset($lesson) ? $lesson->name : "") }}" required>
+                            <div class="input-group-addon">
+                                <span class="glyphicon glyphicon-th"></span>
+                            </div>
+                        </div>
+                        @error('date')
                             <div class="invalid-feedback">
                                 {{ $message }}
                             </div>
@@ -57,7 +62,7 @@
                             @endforeach
                         </select>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="lesson" class="form-label">Lesson<span style="color: red;">*</span></label>
                         <select class="form-control dropdown-form-select" id="lesson" name="lesson" required>
@@ -81,7 +86,7 @@
                             @endforeach
                         </select>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="coach_user" class="form-label">Coach<span style="color: red;">*</span></label>
                         <select class="form-control dropdown-form-select" id="coach_user" name="coach_user" required>
@@ -108,7 +113,7 @@
 
                     <div class="mb-3">
                         <label for="quota" class="form-label">Quota<span style="color: red;">*</span></label>
-                        <input type="number" class="form-control @error('quota') is-invalid @enderror" id="quota" name="quota" autocomplete="off" value="{{ old('quota') ?? (isset($lessonType) ? $lessonType->quota : "") }}" required>
+                        <input type="number" class="form-control @error('quota') is-invalid @enderror" id="quota" name="quota" autocomplete="off" value="{{ old('quota') ?? (isset($lessonSchedule) ? $lessonSchedule->quota : "") }}" required>
                         @error('quota')
                             <div class="invalid-feedback">
                                 {{ $message }}
@@ -131,8 +136,28 @@
 
 @push("scripts")
     <script>
+        $(document).ready(function(){
+            $('.date').datepicker({
+                format: 'yyyy/mm/dd', // Mengatur format menjadi 2020/12/23
+                autoclose: true,      // Agar otomatis menutup setelah tanggal dipilih
+                todayHighlight: true,  // Agar hari ini di highlight
+                startDate: Date(),
+            });
+        });
+
         $(document).ready(function() {
-            $('.dropdown-form-select').select2();
+            $('.dropdown-form-select').select2({
+                theme: 'bootstrap4',
+            });
+        });
+
+        $(document).ready(function(){
+            $('#lesson_type').change(function() {
+                // Ambil data-quota dari opsi yang dipilih
+                var selectedQuota = $(this).find(':selected').data('quota');
+                // Set nilai quota ke input field
+                $('#quota').val(selectedQuota);
+            });
         });
     </script>
 @endpush
