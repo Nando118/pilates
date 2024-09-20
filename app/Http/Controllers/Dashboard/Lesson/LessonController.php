@@ -8,6 +8,7 @@ use App\Http\Requests\Dashboard\Lessons\UpdateLessonRequest;
 use App\Models\Lesson;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 
 class LessonController extends Controller

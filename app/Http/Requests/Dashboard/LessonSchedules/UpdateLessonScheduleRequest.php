@@ -4,7 +4,7 @@ namespace App\Http\Requests\Dashboard\LessonSchedules;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreateLessonSchedulesRequest extends FormRequest
+class UpdateLessonScheduleRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

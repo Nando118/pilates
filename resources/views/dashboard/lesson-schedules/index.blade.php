@@ -42,6 +42,36 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal HTML -->
+    <div class="modal fade" id="bookingModal" tabindex="-1" role="dialog" aria-labelledby="bookingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bookingModalLabel">Add Booking</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="bookingForm" method="POST">
+                        @csrf
+                        <div id="nameFields">
+                            <!-- Nama fields akan ditambahkan di sini dengan JavaScript -->
+                        </div>
+                        <input type="hidden" name="lesson_schedule_id" id="lessonScheduleId">
+                        <button type="button" class="btn btn-secondary" id="addNameField">Add Participant Field</button>
+                        <span id="fieldCountMessage" class="ml-2"></span>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="submitBooking">Save Booking</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @push("scripts")
@@ -74,8 +104,76 @@
                     { data: 'status', name: 'status', className: 'align-middle'},
                     { data: 'action', name: 'action', orderable: false, searchable: false, className: 'align-middle'},
                 ],
-                order: [1, 'desc'],
+                order: [
+                    [1, 'desc'],
+                    [2, 'desc']
+                ],
             });
+
+            // Event handler untuk tombol Add Booking
+            // Inisialisasi variabel untuk menghitung jumlah field yang ditambahkan
+            let addedFieldsCount = 0;
+            let maxQuota;
+
+            $(document).on("click", ".add-booking-btn", function (e) {
+                e.preventDefault();
+                
+                var lessonScheduleId = $(this).data("id");
+                maxQuota = $(this).data("quota");
+
+                $("#nameFields").empty();
+                $("#lessonScheduleId").val(lessonScheduleId);
+                addedFieldsCount = 0; // Reset jumlah field saat modal dibuka
+
+                $("#bookingModal").modal("show");
+                updateFieldCountMessage();
+            });
+
+            $("#addNameField").on("click", function () {
+                if (addedFieldsCount < maxQuota) {
+                    addedFieldsCount++;
+                    $("#nameFields").append(`
+                        <div class="form-group">
+                            <label for="name${addedFieldsCount}">Participant ${addedFieldsCount}</label>
+                            <input type="text" class="form-control" id="name${addedFieldsCount}" name="names[]" required>
+                        </div>
+                    `);
+                    updateFieldCountMessage();
+                } else {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Maximum quota reached!',
+                        text: 'You cannot add more fields than the maximum quota.',
+                    });
+                }
+            });
+
+            $("#submitBooking").on("click", function () {
+                $.ajax({
+                    url: '/bookings/store',
+                    method: "POST",
+                    data: $("#bookingForm").serialize(),
+                    success: function (response) {
+                        $("#bookingModal").modal("hide");
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Booking saved successfully!',
+                        });
+                        $('#tbl_list').DataTable().ajax.reload(); // Reload data table after success
+                    },
+                    error: function (xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'An error occurred while saving the booking.',
+                        });
+                    }
+                });
+            });
+
+            function updateFieldCountMessage() {
+                $("#fieldCountMessage").text(`Fields added: ${addedFieldsCount}/${maxQuota}`);
+            }
         });
     </script>
 @endpush

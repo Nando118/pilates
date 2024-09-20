@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Dashboard\Booking\BookingController;
 use App\Http\Controllers\Dashboard\Home\HomeController;
 use App\Http\Controllers\Dashboard\Lesson\LessonController;
 use App\Http\Controllers\Dashboard\Room\RoomController;
@@ -127,5 +128,15 @@ Route::middleware(['auth', 'verified', 'onlyAdmin'])->group(function () {
     Route::get("/dashboard/lesson-schedules/data", [LessonScheduleController::class, "getData"])->name("lesson-schedules.data");
     Route::get("/dashboard/lesson-schedules/create", [LessonScheduleController::class, "create"])->name("lesson-schedules.create");
     Route::post("/dashboard/lesson-schedules/create/store", [LessonScheduleController::class, "store"])->name("lesson-schedules.store");
+    Route::get("/dashboard/lesson-schedules/edit/{lessonSchedule}", [LessonScheduleController::class, "edit"])->name("lesson-schedules.edit");
+    Route::put("/dashboard/lesson-schedules/edit/{lessonSchedule}/update", [LessonScheduleController::class, "update"])->name("lesson-schedules.update");
+    Route::delete("/dashboard/lesson-schedules/{lessonSchedule}/delete", [LessonScheduleController::class, "destroy"])->name("lesson-schedules.delete");
     // END LESSON SCHEDULES ROUTE - ADMIN PAGE
+
+    // START BOOKINGS ROUTE - ADMIN PAGE
+    Route::get("/dashboard/bookings", [BookingController::class, "index"])->name("bookings.index");
+    Route::get("/dashboard/bookings/data", [BookingController::class, "getData"])->name("bookings.data");
+    // Route::get("/dashboard/bookings/create", [BookingController::class, "create"])->name("bookings.create");
+    Route::post("/dashboard/bookings/create/store", [BookingController::class, "store"])->name("bookings.store");
+    // END BOOKINGS ROUTE - ADMIN PAGE
 });

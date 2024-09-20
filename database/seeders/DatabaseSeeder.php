@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
+use App\Models\Booking;
 use App\Models\Lesson;
 use App\Models\LessonSchedule;
 use App\Models\LessonType;
@@ -77,6 +78,51 @@ class DatabaseSeeder extends Seeder
                         "gender" => "male",
                         "phone" => "1122334455",
                         "address" => "Client Address",
+                        "profile_picture" => null
+                    ],
+                    "role" => 'client'
+                ],
+                [
+                    "name" => "Coach User 2",
+                    "email" => "coach2@coach.com",
+                    "password" => Hash::make("coach2@coach.com"),
+                    "registration_type" => "form",
+                    "profile" => [
+                        //                        "branch" => "jakarta",
+                        "username" => "coachuser2",
+                        "gender" => "male",
+                        "phone" => "0987654321",
+                        "address" => "Coach 2 Address",
+                        "profile_picture" => null
+                    ],
+                    "role" => 'coach'
+                ],
+                [
+                    "name" => "Client User 2",
+                    "email" => "client2@client.com",
+                    "password" => Hash::make("client2@client.com"),
+                    "registration_type" => "form",
+                    "profile" => [
+                        //                        "branch" => "tangerang",
+                        "username" => "clientuser2",
+                        "gender" => "female",
+                        "phone" => "1122334455",
+                        "address" => "Client 2 Address",
+                        "profile_picture" => null
+                    ],
+                    "role" => 'client'
+                ],
+                [
+                    "name" => "Client User 3",
+                    "email" => "client3@client.com",
+                    "password" => Hash::make("client3@client.com"),
+                    "registration_type" => "form",
+                    "profile" => [
+                        //                        "branch" => "tangerang",
+                        "username" => "clientuser3",
+                        "gender" => "female",
+                        "phone" => "1122334455",
+                        "address" => "Client 3 Address",
                         "profile_picture" => null
                     ],
                     "role" => 'client'
@@ -194,7 +240,7 @@ class DatabaseSeeder extends Seeder
                     'time_slot_id' => 2,
                     'lesson_id' => 2,
                     'lesson_type_id' => 2,
-                    'user_id' => 3,
+                    'user_id' => 2,
                     'room_id' => 2,
                     'quota' => 2,
                     'status' => 'Available',
@@ -204,6 +250,30 @@ class DatabaseSeeder extends Seeder
 
             foreach ($scheduleData as $schedule) {
                 LessonSchedule::query()->create($schedule);
+            }
+
+            // Tambahkan data bookings
+            $bookings = [
+                [
+                    'lesson_schedule_id' => 1, // ID lesson_schedule yang sesuai
+                    'booked_by_name' => 'Friend A', // Nama yang melakukan booking
+                    'user_id' => 1, // ID user (jika ada, bisa null)
+                ],
+                [
+                    'lesson_schedule_id' => 1,
+                    'booked_by_name' => 'Friend B',
+                    'user_id' => null, // Tidak terdaftar
+                ],
+                [
+                    'lesson_schedule_id' => 2,
+                    'booked_by_name' => 'Friend C',
+                    'user_id' => 3, // ID user terdaftar
+                ],
+                // Tambahkan lebih banyak data booking sesuai kebutuhan
+            ];
+
+            foreach ($bookings as $booking) {
+                Booking::query()->create($booking);
             }
 
         });

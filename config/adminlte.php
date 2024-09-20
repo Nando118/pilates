@@ -348,6 +348,12 @@ return [
             'url' => '/dashboard/lesson-schedules',
             'icon' => 'fas fa-fw fa-calendar',
         ],
+        ['header' => 'BOOKINGS'],
+        [
+            'text' => 'Booking Lists',
+            'url' => '/dashboard/bookings',
+            'icon' => 'fas fa-fw fa-calendar',
+        ],
         [
             'text' => 'profile',
             'url' => 'admin/settings',

@@ -80,6 +80,11 @@ class User extends Authenticatable implements MustVerifyEmail
     // Jika ingin memfilter hanya untuk role 'coach'
     public function isCoach()
     {
-        return $this->roles()->where('name', 'coach')->exists();
+        return $this->roles()->where("name", "coach")->exists();
+    }
+
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class, "user_id", "id");
     }
 }
