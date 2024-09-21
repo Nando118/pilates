@@ -39,7 +39,7 @@
                     <div class="mb-3">
                         <label for="date" class="form-label">Date<span style="color: red;">*</span></label>
                         <div class="input-group date" data-provide="datepicker">
-                            <input type="text" class="form-control @error('date') is-invalid @enderror" id="date" name="date" autocomplete="off" value="{{ old('date') ?? (isset($lessonSchedule) ? $lessonSchedule->date : "") }}" required>
+                            <input type="text" class="form-control @error('date') is-invalid @enderror" id="date" name="date" autocomplete="off" value="{{ old('date') ?? (isset($lessonSchedule) ? date("Y/m/d", strtotime($lessonSchedule->date)) : "") }}" required>
                             <div class="input-group-addon">
                                 <span class="glyphicon glyphicon-th"></span>
                             </div>

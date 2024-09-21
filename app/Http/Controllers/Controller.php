@@ -12,8 +12,8 @@ class Controller extends BaseController
 
     public function home()
     {
-        return view("home.welcome", [
+        return view("home.home.index", [
             "title_page" => "Pilates | User"
         ]);
-    }    
+    }
 }

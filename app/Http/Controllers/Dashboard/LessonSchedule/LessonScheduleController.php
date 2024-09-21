@@ -50,7 +50,7 @@ class LessonScheduleController extends Controller
                 $duration = $lessonSchedule->timeSlot->duration ?? 0; // Pastikan Anda memiliki kolom duration di timeSlot
 
                 // Format waktu dan durasi
-                return "<strong>" . $startTime . "</strong>" . "<br>" . $duration . " Menit";
+                return "<strong>" . date("H:i", strtotime($startTime)) . "</strong>" . "<br>" . $duration . " Minute";
             })
             ->addColumn("lesson", function ($lessonSchedule) {
                 $lessonName = ucfirst($lessonSchedule->lesson->name ?? "N/A");
@@ -64,7 +64,7 @@ class LessonScheduleController extends Controller
             })
             ->addColumn("action", function ($lessonSchedule) {
                 $btn = '<div class="btn-group mr-1">';
-                $btn .= '<button class="btn btn-primary btn-sm add-booking-btn" data-id="' . $lessonSchedule->id . '" data-quota="' . $lessonSchedule->quota . '" title="Add Booking"><i class="fas fa-user-plus"></i></button> ';
+                $btn .= '<a href="' . route("bookings.create", ["bookings" => $lessonSchedule->id]) . '" class="btn btn-primary btn-sm" title="Booking"><i class="fas fa-fw fa-user-plus"></i></a> ';
                 $btn .= '<a href="' . route("lesson-schedules.edit", ["lessonSchedule" => $lessonSchedule->id]) . '" class="btn btn-warning btn-sm" title="Edit"><i class="fas fa-fw fa-edit"></i></a> ';
                 $btn .= '<a href="' . route("lesson-schedules.delete", ["lessonSchedule" => $lessonSchedule->id]) . '" class="btn btn-danger btn-sm" title="Delete" data-confirm-delete="true"><i class="fas fa-fw fa-trash"></i></button> ';
                 $btn .= '</div>';
@@ -102,7 +102,7 @@ class LessonScheduleController extends Controller
     {
         try {
             $validated = $request->validated();
-            
+
             DB::beginTransaction();
 
             $date = $validated["date"];
@@ -242,7 +242,6 @@ class LessonScheduleController extends Controller
             alert()->error("Oppss...", "An error occurred while updating the lesson schedule data, please try again.");
             return redirect()->back();
         }
-
     }
 
     public function destroy(LessonSchedule $lessonSchedule)

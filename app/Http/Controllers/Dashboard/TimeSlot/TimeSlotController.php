@@ -41,6 +41,21 @@ class TimeSlotController extends Controller
         $timeSlotDatas = TimeSlot::query()->get();
 
         return DataTables::of($timeSlotDatas)
+            ->addColumn("start_time", function ($timeSlotData) {
+                $startTime = $timeSlotData->start_time ?? "N/A";
+
+                return date("H:i", strtotime($startTime));
+            })
+            ->addColumn("end_time", function ($timeSlotData) {
+                $endTime = $timeSlotData->end_time ?? "N/A";
+
+                return date("H:i", strtotime($endTime));
+            })
+            ->addColumn("duration", function ($timeSlotData) {
+                $duration = $timeSlotData->duration ?? "N/A";
+
+                return $duration . " Minute";
+            })
             ->addColumn("action", function ($timeSlot) {
                 $btn = '<div class="btn-group mr-1">';
                 $btn .= '<a href="' . route("time-slots.edit", ["timeSlot" => $timeSlot->id]) . '" class="btn btn-warning btn-sm" title="Edit"><i class="fas fa-fw fa-edit"></i></a> ';

@@ -22,6 +22,7 @@ class UpdateLessonScheduleRequest extends FormRequest
     public function rules(): array
     {
         return [
+            "id" => ["required", "string"],
             "date" => ["required", "date", "after_or_equal:today"],
             "time_slot" => ["required", "integer", "exists:time_slots,id"],
             "lesson" => ["required", "integer", "exists:lessons,id"],

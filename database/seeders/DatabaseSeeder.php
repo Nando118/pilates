@@ -47,82 +47,82 @@ class DatabaseSeeder extends Seeder
                         "username" => "adminuser",
                         "gender" => "male",
                         "phone" => "1234567890",
-                        "address" => "Admin Address",
+                        "address" => "Tangerang",
                         "profile_picture" => null
                     ],
                     "role" => 'admin'
                 ],
                 [
-                    "name" => "Coach User",
-                    "email" => "coach@coach.com",
-                    "password" => Hash::make("coach@coach.com"),
+                    "name" => "Justin",
+                    "email" => "justin@coach.com",
+                    "password" => Hash::make("justin@coach.com"),
                     "registration_type" => "form",
                     "profile" => [
 //                        "branch" => "jakarta",
-                        "username" => "coachuser",
-                        "gender" => "female",
+                        "username" => "coachjustin",
+                        "gender" => "male",
                         "phone" => "0987654321",
-                        "address" => "Coach Address",
+                        "address" => "Jakarta",
                         "profile_picture" => null
                     ],
                     "role" => 'coach'
                 ],
                 [
-                    "name" => "Client User",
-                    "email" => "client@client.com",
-                    "password" => Hash::make("client@client.com"),
+                    "name" => "Adam Levin",
+                    "email" => "adam.levin@client.com",
+                    "password" => Hash::make("adam.levin@client.com"),
                     "registration_type" => "form",
                     "profile" => [
 //                        "branch" => "tangerang",
-                        "username" => "clientuser",
+                        "username" => "adamlevin",
                         "gender" => "male",
                         "phone" => "1122334455",
-                        "address" => "Client Address",
+                        "address" => "California",
                         "profile_picture" => null
                     ],
                     "role" => 'client'
                 ],
                 [
-                    "name" => "Coach User 2",
-                    "email" => "coach2@coach.com",
-                    "password" => Hash::make("coach2@coach.com"),
+                    "name" => "Helga",
+                    "email" => "helga@coach.com",
+                    "password" => Hash::make("helga@coach.com"),
                     "registration_type" => "form",
                     "profile" => [
                         //                        "branch" => "jakarta",
-                        "username" => "coachuser2",
-                        "gender" => "male",
+                        "username" => "helga",
+                        "gender" => "female",
                         "phone" => "0987654321",
-                        "address" => "Coach 2 Address",
+                        "address" => "Tangerang",
                         "profile_picture" => null
                     ],
                     "role" => 'coach'
                 ],
                 [
-                    "name" => "Client User 2",
-                    "email" => "client2@client.com",
-                    "password" => Hash::make("client2@client.com"),
+                    "name" => "Sumiko",
+                    "email" => "sumiko@client.com",
+                    "password" => Hash::make("sumiko@client.com"),
                     "registration_type" => "form",
                     "profile" => [
                         //                        "branch" => "tangerang",
-                        "username" => "clientuser2",
+                        "username" => "sumikojp",
                         "gender" => "female",
                         "phone" => "1122334455",
-                        "address" => "Client 2 Address",
+                        "address" => "Yokohama",
                         "profile_picture" => null
                     ],
                     "role" => 'client'
                 ],
                 [
-                    "name" => "Client User 3",
-                    "email" => "client3@client.com",
-                    "password" => Hash::make("client3@client.com"),
+                    "name" => "Tatang",
+                    "email" => "mastatang@client.com",
+                    "password" => Hash::make("mastatang@client.com"),
                     "registration_type" => "form",
                     "profile" => [
                         //                        "branch" => "tangerang",
-                        "username" => "clientuser3",
-                        "gender" => "female",
+                        "username" => "mastatang",
+                        "gender" => "male",
                         "phone" => "1122334455",
-                        "address" => "Client 3 Address",
+                        "address" => "Bandung",
                         "profile_picture" => null
                     ],
                     "role" => 'client'
@@ -226,7 +226,7 @@ class DatabaseSeeder extends Seeder
             // Buat Schedule
             $scheduleData = [
                 [
-                    'date' => '2024-09-15',
+                    'date' => now(),
                     'time_slot_id' => 1, // ID time_slot yang sesuai
                     'lesson_id' => 1,    // ID lesson yang sesuai
                     'lesson_type_id' => 1, // ID lesson_type yang sesuai
@@ -236,13 +236,23 @@ class DatabaseSeeder extends Seeder
                     'status' => 'Available' // Status
                 ],
                 [
-                    'date' => '2024-09-15',
+                    'date' => now(),
                     'time_slot_id' => 2,
                     'lesson_id' => 2,
                     'lesson_type_id' => 2,
                     'user_id' => 2,
                     'room_id' => 2,
                     'quota' => 2,
+                    'status' => 'Available',
+                ],
+                [
+                    'date' => now(),
+                    'time_slot_id' => 3,
+                    'lesson_id' => 4,
+                    'lesson_type_id' => 1,
+                    'user_id' => 4,
+                    'room_id' => 1,
+                    'quota' => 4,
                     'status' => 'Available',
                 ]
                 // Tambahkan lebih banyak jadwal sesuai kebutuhan
@@ -253,28 +263,28 @@ class DatabaseSeeder extends Seeder
             }
 
             // Tambahkan data bookings
-            $bookings = [
-                [
-                    'lesson_schedule_id' => 1, // ID lesson_schedule yang sesuai
-                    'booked_by_name' => 'Friend A', // Nama yang melakukan booking
-                    'user_id' => 1, // ID user (jika ada, bisa null)
-                ],
-                [
-                    'lesson_schedule_id' => 1,
-                    'booked_by_name' => 'Friend B',
-                    'user_id' => null, // Tidak terdaftar
-                ],
-                [
-                    'lesson_schedule_id' => 2,
-                    'booked_by_name' => 'Friend C',
-                    'user_id' => 3, // ID user terdaftar
-                ],
-                // Tambahkan lebih banyak data booking sesuai kebutuhan
-            ];
-
-            foreach ($bookings as $booking) {
-                Booking::query()->create($booking);
-            }
+//            $bookings = [
+//                [
+//                    'lesson_schedule_id' => 1, // ID lesson_schedule yang sesuai
+//                    'booked_by_name' => 'Friend A', // Nama yang melakukan booking
+//                    'user_id' => 1, // ID user (jika ada, bisa null)
+//                ],
+//                [
+//                    'lesson_schedule_id' => 1,
+//                    'booked_by_name' => 'Friend B',
+//                    'user_id' => null, // Tidak terdaftar
+//                ],
+//                [
+//                    'lesson_schedule_id' => 2,
+//                    'booked_by_name' => 'Friend C',
+//                    'user_id' => 3, // ID user terdaftar
+//                ],
+//                // Tambahkan lebih banyak data booking sesuai kebutuhan
+//            ];
+//
+//            foreach ($bookings as $booking) {
+//                Booking::query()->create($booking);
+//            }
 
         });
     }

@@ -136,7 +136,8 @@ Route::middleware(['auth', 'verified', 'onlyAdmin'])->group(function () {
     // START BOOKINGS ROUTE - ADMIN PAGE
     Route::get("/dashboard/bookings", [BookingController::class, "index"])->name("bookings.index");
     Route::get("/dashboard/bookings/data", [BookingController::class, "getData"])->name("bookings.data");
-    // Route::get("/dashboard/bookings/create", [BookingController::class, "create"])->name("bookings.create");
-    Route::post("/dashboard/bookings/create/store", [BookingController::class, "store"])->name("bookings.store");
+    Route::get("/dashboard/bookings/{bookings}/create", [BookingController::class, "create"])->name("bookings.create");
+    Route::post("/dashboard/bookings/{bookings}/create/store", [BookingController::class, "store"])->name("bookings.store");
+    Route::delete("/dashboard/bookings/{bookings}/delete", [BookingController::class, "destroy"])->name("bookings.delete");
     // END BOOKINGS ROUTE - ADMIN PAGE
 });
