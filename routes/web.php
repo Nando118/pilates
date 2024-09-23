@@ -10,6 +10,8 @@ use App\Http\Controllers\Dashboard\TimeSlot\TimeSlotController;
 use App\Http\Controllers\Dashboard\User\UserController;
 use App\Http\Controllers\Dashboard\LessonType\LessonTypeController;
 use App\Http\Controllers\Dashboard\LessonSchedule\LessonScheduleController;
+use App\Http\Controllers\Home\Home\HomeUserController;
+use App\Http\Controllers\Home\LessonSchedule\UserLessonScheduleController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -56,17 +58,27 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/email/resend', [AuthController::class, "emailResend"])->middleware('throttle:6,1')->name('verification.resend');
 });
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'onlyCoachClient'])->group(function () {
     // CLIENT & COACH PAGES
-    Route::get("/home", [Controller::class, "home"])->name("home");
+    // START HOME ROUTE - CLIENT & COACH PAGES
+    Route::get("/home", [HomeUserController::class, "index"])->name("home");
+    // END HOME ROUTE - CLIENT & COACH PAGES
+
+    // START HOME ROUTE - CLIENT & COACH PAGES
+    Route::get("/home/lesson-schedules", [UserLessonScheduleController::class, "index"])->name("user-lesson-schedules.index");
+    Route::get("/home/lesson-schedules/bookings/{bookings}/create", [UserLessonScheduleController::class, "create"])->name("user-lesson-schedules.create");
+    Route::post("/home/lesson-schedules/bookings/{bookings}/create/store", [UserLessonScheduleController::class, "store"])->name("user-lesson-schedules.store");
+    // END HOME ROUTE - CLIENT & COACH PAGES
 });
 
-Route::middleware(['auth', 'verified', 'onlyAdmin'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function (){
     Route::get('/logout', function () {
         return redirect()->back(); // Atau tanggapan lain seperti abort(403) jika Anda ingin menampilkan Forbidden
     });
     Route::post("/logout", [AuthController::class, "logout"])->name("logout");
+});
 
+Route::middleware(['auth', 'verified', 'onlyAdmin'])->group(function () {
     // ADMIN PAGES
     // START HOME ROUTE - ADMIN PAGE
     Route::get("/dashboard", [HomeController::class, "index"])->name("dashboard");

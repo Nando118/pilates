@@ -224,35 +224,56 @@ class DatabaseSeeder extends Seeder
             }
 
             // Buat Schedule
+            $startDate = Carbon::now(); 
             $scheduleData = [
                 [
-                    'date' => now(),
+                    'date' => $startDate->copy(),
                     'time_slot_id' => 1, // ID time_slot yang sesuai
                     'lesson_id' => 1,    // ID lesson yang sesuai
                     'lesson_type_id' => 1, // ID lesson_type yang sesuai
                     'user_id' => 2,      // ID user (coach)
                     'room_id' => 1,      // ID room yang sesuai
-                    'quota' => 3, // Quota
+                    'quota' => 6, // Quota
                     'status' => 'Available' // Status
                 ],
                 [
-                    'date' => now(),
-                    'time_slot_id' => 2,
+                    'date' => $startDate->copy(),
+                    'time_slot_id' => 1,
                     'lesson_id' => 2,
                     'lesson_type_id' => 2,
-                    'user_id' => 2,
+                    'user_id' => 4,
                     'room_id' => 2,
-                    'quota' => 2,
+                    'quota' => 3,
                     'status' => 'Available',
                 ],
                 [
-                    'date' => now(),
-                    'time_slot_id' => 3,
+                    'date' => $startDate->copy(),
+                    'time_slot_id' => 2,
                     'lesson_id' => 4,
                     'lesson_type_id' => 1,
                     'user_id' => 4,
                     'room_id' => 1,
-                    'quota' => 4,
+                    'quota' => 5,
+                    'status' => 'Available',
+                ],
+                [
+                    'date' => $startDate->copy()->addDays(1),
+                    'time_slot_id' => 1,
+                    'lesson_id' => 4,
+                    'lesson_type_id' => 1,
+                    'user_id' => 2,
+                    'room_id' => 1,
+                    'quota' => 5,
+                    'status' => 'Available',
+                ],
+                [
+                    'date' => $startDate->copy()->addDays(1),
+                    'time_slot_id' => 3,
+                    'lesson_id' => 2,
+                    'lesson_type_id' => 2,
+                    'user_id' => 4,
+                    'room_id' => 2,
+                    'quota' => 3,
                     'status' => 'Available',
                 ]
                 // Tambahkan lebih banyak jadwal sesuai kebutuhan

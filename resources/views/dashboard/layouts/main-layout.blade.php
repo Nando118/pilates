@@ -14,9 +14,9 @@
     {{-- Add here extra stylesheets --}}
     {{-- <link rel="stylesheet" href="/css/admin_custom.css"> --}}
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css" />
-    <link href="{{ asset("/libs/select2/css/select2.css") }}" rel="stylesheet" />
-    <link href="{{ asset("/libs/select2/css/select2-bootstrap4.min.css") }}" rel="stylesheet" />
-    <link href="{{ asset("/libs/bootstrap-datepicker/css/bootstrap-datepicker.standalone.css") }}" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ asset("/libs/select2/css/select2.css") }}" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ asset("/libs/select2/css/select2-bootstrap4.min.css") }}" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ asset("/libs/bootstrap-datepicker/css/bootstrap-datepicker.standalone.css") }}" rel="stylesheet" />
 @stop
 
 @section('js')

@@ -31,5 +31,11 @@ class AuthServiceProvider extends ServiceProvider
             }
             return false;
         });
+        Gate::define('access-user-home', function (User $user) {
+            if ($user->hasRole("client") || $user->hasRole("coach")) {
+                return true;
+            }
+            return false;
+        });
     }
 }

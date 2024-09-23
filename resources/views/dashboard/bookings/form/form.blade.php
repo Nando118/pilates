@@ -115,9 +115,6 @@
                     // Update kuota yang tersisa
                     remainingQuota -= 1; // Kurangi kuota setelah memilih nama
                 }
-
-                // Tampilkan kuota yang tersisa di console (opsional)
-                console.log("Remaining Quota:", remainingQuota);
             });
 
             // Inisialisasi Select2 untuk elemen yang sudah ada saat halaman dimuat
