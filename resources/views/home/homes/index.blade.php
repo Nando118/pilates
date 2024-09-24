@@ -21,14 +21,14 @@
 @endpush
 
 @section('content')
-    <div class="w-100" style="max-width: 400px;">    
+    <div class="w-100" style="max-width: 400px;">
         <!-- Scrollable Content Section with Cards -->
         <div class="scrollable-content p-3">
             <div class="container-fluid">
                 <div class="card mb-3">
                     <div class="card-header">HOMES</div>
                     <div class="card-body">
-                        <p>This is some text within a card body.</p>
+                        <p>{{ $users->name }}</p>
                         <p>This is some text within a card body.</p>
                         <p>This is some text within a card body.</p>
                         <p>This is some text within a card body.</p>

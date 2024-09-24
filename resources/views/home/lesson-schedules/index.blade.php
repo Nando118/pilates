@@ -77,11 +77,13 @@
                                     <br>
                                     {{ ucfirst(optional($lessonSchedule->room)->name ?? 'N/A') }}
                                 </td>
-                                <td class="text-center">
-                                    <a href="{{ route('user-lesson-schedules.create', ['bookings' => $lessonSchedule->id]) }}" class="btn btn-primary btn-sm" title="Booking">
-                                        <i class="fas fa-fw fa-user-plus"></i>
-                                    </a>
-                                </td>
+                                @can('access-client-menu')
+                                    <td class="text-center">
+                                        <a href="{{ route('user-lesson-schedules.create', ['bookings' => $lessonSchedule->id]) }}" class="btn btn-primary btn-sm" title="Booking">
+                                            <i class="fas fa-fw fa-user-plus"></i>
+                                        </a>
+                                    </td>
+                                @endcan                                
                             </tr>
                         @endforeach
                     </tbody>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Home\Home;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class HomeUserController extends Controller
@@ -21,7 +22,8 @@ class HomeUserController extends Controller
     public function index()
     {
         return view("home.homes.index", [
-            "title_page" => "Pilates | Home"
+            "title_page" => "Pilates | Home",
+            "users" => Auth::user(),
         ]);
     }
 }

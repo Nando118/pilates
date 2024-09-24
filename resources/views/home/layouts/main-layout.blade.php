@@ -15,12 +15,12 @@
 </head>
 <body>
     <div class="d-flex align-items-center justify-content-center min-vh-100 bg-light">
-        <div class="w-100" style="max-width: 400px;">
+        <div class="w-100" style="max-width: 430px;">
             <!-- Sticky Navbar -->
-            <nav class="navbar navbar-light bg-light sticky-top">
+            <nav class="navbar sticky-top bg-dark" data-bs-theme="dark">
                 <div class="container-fluid">
                     <a class="navbar-brand" href="#"><strong>Pilates</strong></a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -29,11 +29,18 @@
                                 <a class="nav-link" href="{{ route('home') }}">Home</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#">Profile</a>
+                                <a class="nav-link" href="{{ route('my-profile.index') }}">My Profile</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">My Lessons</a>
-                            </li>
+                            @can("access-client-menu")                        
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('my-lesson-schedules.index') }}">My Lessons</a>
+                                </li>
+                            @endcan
+                            @can("access-coach-menu")                        
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#">My Schedule</a>
+                                </li>
+                            @endcan                            
                             <li class="nav-item">
                                 <!-- Form Logout -->
                                 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: inline;">
@@ -46,16 +53,21 @@
                 </div>
             </nav>
             
-            <div class="my-2" style="background-color: #FAF7F0;">
+            <div class="py-2 d-flex align-items-center justify-content-center" style="background-color: #FAF7F0;">
                 @yield('content')
             </div>
 
             <!-- Sticky Footer Navigation -->
-            <nav class="navbar navbar-light bg-light sticky-bottom">
+            <nav class="navbar sticky-bottom bg-dark" data-bs-theme="dark">
                 <div class="container-fluid justify-content-around">
                     <a class="navbar-brand" href="{{ route('home') }}"><i class="fas fa-home"></i></a>
                     <a class="navbar-brand" href="{{ route('user-lesson-schedules.index') }}"><i class="fas fa-calendar"></i></a>
-                    <a class="navbar-brand" href="#"><i class="fas fa-clock"></i></a>
+                    @can("access-client-menu")                        
+                        <a class="navbar-brand" href="{{ route('my-lesson-schedules.index') }}"><i class="fas fa-clock"></i></a>
+                    @endcan
+                    @can("access-coach-menu")                        
+                        <a class="navbar-brand" href="#"><i class="fas fa-calendar-check"></i></a>
+                    @endcan
                 </div>
             </nav>
         </div>
