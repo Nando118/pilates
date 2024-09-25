@@ -38,7 +38,7 @@
                             @endcan
                             @can("access-coach-menu")                        
                                 <li class="nav-item">
-                                    <a class="nav-link" href="#">My Schedule</a>
+                                    <a class="nav-link" href="{{ route('my-schedules.index') }}">My Schedule</a>
                                 </li>
                             @endcan                            
                             <li class="nav-item">
@@ -66,7 +66,7 @@
                         <a class="navbar-brand" href="{{ route('my-lesson-schedules.index') }}"><i class="fas fa-clock"></i></a>
                     @endcan
                     @can("access-coach-menu")                        
-                        <a class="navbar-brand" href="#"><i class="fas fa-calendar-check"></i></a>
+                        <a class="navbar-brand" href="{{ route('my-schedules.index') }}"><i class="fas fa-calendar-check"></i></a>
                     @endcan
                 </div>
             </nav>

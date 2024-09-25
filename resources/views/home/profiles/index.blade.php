@@ -37,21 +37,29 @@
                 <h6 class="card-subtitle mb-3"><em>{{ '@' . $userData->profile->username }}</em></h6>
 
                 <!-- Jarak Sebelum Detail Profil -->
-                <div class="mt-4">
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-venus-mars"></i>
-                        <span>{{ ucfirst($userData->profile->gender) }}</span>
+                <div class="mt-4" style="font-size: 0.9rem;">
+                    <div class="mb-3">
+                        {{-- <i class="fas fa-envelope"></i> --}}
+                        <strong><em>Email Address</em></strong>
+                        <div>{{ ucfirst($userData->email) }}</div>
                     </div>
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-phone mr-2"></i>
-                        <span>{{ $userData->profile->phone }}</span>
+                    <div class="mb-3">
+                        {{-- <i class="fas fa-venus-mars"></i> --}}
+                        <strong><em>Gender</em></strong>
+                        <div>{{ ucfirst($userData->profile->gender) }}</div>
                     </div>
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-home mr-2"></i>
-                        <span>{{ ucfirst($userData->profile->address) }}</span>
+                    <div class="mb-3">
+                        {{-- <i class="fas fa-phone"></i> --}}
+                        <strong><em>Phone Number</em></strong>
+                        <div>{{ $userData->profile->phone }}</div>
                     </div>
+                    <div class="mb-3">
+                        {{-- <i class="fas fa-home"></i> --}}
+                        <strong><em>Address</em></strong>
+                        <div>{{ ucfirst($userData->profile->address) }}</div>
+                    </div>
+                    <a class="btn btn-warning mt-3" href="{{ route('my-profile.edit') }}" role="button"><strong>Edit Profile</strong></a>
                 </div>
-                <a class="btn btn-warning mt-3" href="#" role="button"><strong>Edit Profile</strong></a>
             </div>
         </div>
     </div>

@@ -13,6 +13,7 @@ use App\Http\Controllers\Dashboard\LessonSchedule\LessonScheduleController;
 use App\Http\Controllers\Home\Home\HomeUserController;
 use App\Http\Controllers\Home\LessonSchedule\UserLessonScheduleController;
 use App\Http\Controllers\Home\MyLesson\MyLessonController;
+use App\Http\Controllers\Home\MySchedule\MyScheduleController;
 use App\Http\Controllers\Home\Profile\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -71,7 +72,7 @@ Route::middleware(['auth', 'verified', 'onlyCoachClient'])->group(function () {
     Route::get("/home/lesson-schedules/bookings/{bookings}/create", [UserLessonScheduleController::class, "create"])->name("user-lesson-schedules.create");
     Route::post("/home/lesson-schedules/bookings/{bookings}/create/store", [UserLessonScheduleController::class, "store"])->name("user-lesson-schedules.store");
     // END LESSON SCHEDULES ROUTE - CLIENT & COACH PAGES
-    
+
     // START MY LESSONS ROUTE - CLIENT & COACH PAGES
     Route::get("/home/my-lesson-schedules", [MyLessonController::class, "index"])->name("my-lesson-schedules.index");
     Route::delete("/home/my-lesson-schedules/{bookings}/delete", [MyLessonController::class, "destroy"])->name("my-lesson-schedules.delete");
@@ -79,10 +80,16 @@ Route::middleware(['auth', 'verified', 'onlyCoachClient'])->group(function () {
 
     // START PROFILE ROUTE - CLIENT & COACH PAGES
     Route::get("/home/my-profile", [ProfileController::class, "index"])->name("my-profile.index");
+    Route::get("/home/my-profile/edit", [ProfileController::class, "edit"])->name("my-profile.edit");
+    Route::put("/home/my-profile/edit/update", [ProfileController::class, "update"])->name("my-profile.update");
     // END PROFILE ROUTE - CLIENT & COACH PAGES
+
+    // START MY SCHEDULES ROUTE - CLIENT & COACH PAGES
+    Route::get("/home/my-schedules", [MyScheduleController::class, "index"])->name("my-schedules.index");
+    // END MY SCHEDULES ROUTE - CLIENT & COACH PAGES
 });
 
-Route::middleware(['auth', 'verified'])->group(function (){
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/logout', function () {
         return redirect()->back(); // Atau tanggapan lain seperti abort(403) jika Anda ingin menampilkan Forbidden
     });
