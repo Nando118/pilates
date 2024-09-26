@@ -35,4 +35,22 @@ class MyScheduleController extends Controller
             "lessonScheduleDatas" => $lessonScheduleDatas
         ]);
     }
+
+    public function getData($id)
+    {
+        // Cari lesson schedule berdasarkan ID
+        $lessonSchedule = LessonSchedule::with("bookings")->find($id);
+
+        // Jika lesson schedule tidak ditemukan, return 404
+        if (!$lessonSchedule) {
+            alert()->error("Oppss...", "Lesson schedule not found.");
+        }
+
+        // Dapatkan data peserta
+        $participants = $lessonSchedule->bookings()->with("user")->get();
+
+        // Return data peserta dalam bentuk JSON
+        return response()->json(["participants" => $participants]);
+    }
+
 }

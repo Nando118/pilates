@@ -86,6 +86,7 @@ Route::middleware(['auth', 'verified', 'onlyCoachClient'])->group(function () {
 
     // START MY SCHEDULES ROUTE - CLIENT & COACH PAGES
     Route::get("/home/my-schedules", [MyScheduleController::class, "index"])->name("my-schedules.index");
+    Route::get("/home/my-schedules/{id}/participants", [MyScheduleController::class, "getData"])->name("my-schedules.data");
     // END MY SCHEDULES ROUTE - CLIENT & COACH PAGES
 });
 
