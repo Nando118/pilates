@@ -65,6 +65,16 @@ class UserLessonScheduleController extends Controller
             // Dapatkan lesson_schedule dengan locking
             $lessonSchedule = LessonSchedule::where("id", $validated["id"])->lockForUpdate()->first();
 
+            // Cek apakah tanggal dan waktu sudah lewat
+            $currentDateTime = now(); // Waktu saat ini
+            $lessonStartTime = \Carbon\Carbon::parse($lessonSchedule->date . ' ' . $lessonSchedule->timeSlot->start_time);
+
+            if ($currentDateTime->greaterThanOrEqualTo($lessonStartTime)) {
+                // Jika sudah lewat, rollback dan kirim alert
+                alert()->warning("Warning", "Cannot book this lesson because it has already started.");
+                return redirect()->back();
+            }
+
             // Cek apakah kuota masih tersedia
             if ($lessonSchedule->quota <= 0) {
                 // Jika kuota sudah habis, rollback dan kirim alert
@@ -127,4 +137,5 @@ class UserLessonScheduleController extends Controller
             return redirect()->back();
         }
     }
+
 }

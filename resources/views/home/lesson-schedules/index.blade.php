@@ -79,9 +79,21 @@
                                 </td>
                                 @can('access-client-menu')
                                     <td class="text-center">
-                                        <a href="{{ route('user-lesson-schedules.create', ['bookings' => $lessonSchedule->id]) }}" class="btn btn-primary btn-sm" title="Booking">
-                                            <i class="fas fa-fw fa-user-plus"></i>
-                                        </a>
+                                        @php
+                                            // Mendapatkan waktu mulai pelajaran
+                                            $lessonStartTime = \Carbon\Carbon::parse($lessonSchedule->date . ' ' . $lessonSchedule->timeSlot->start_time);
+                                            $currentDateTime = now();
+                                        @endphp
+
+                                        @if($currentDateTime->greaterThanOrEqualTo($lessonStartTime))
+                                            <button class="btn btn-primary btn-sm" title="Cannot Delete" disabled>
+                                                <i class="fas fa-fw fa-user-plus"></i>
+                                            </button>
+                                        @else
+                                            <a href="{{ route('user-lesson-schedules.create', ['bookings' => $lessonSchedule->id]) }}" class="btn btn-primary btn-sm" title="Booking">
+                                                <i class="fas fa-fw fa-user-plus"></i>
+                                            </a>
+                                        @endif                                        
                                     </td>
                                 @endcan                                
                             </tr>

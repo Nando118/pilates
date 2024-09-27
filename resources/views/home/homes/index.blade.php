@@ -25,15 +25,20 @@
         <!-- Scrollable Content Section with Cards -->
         <div class="scrollable-content p-3">
             <div class="container-fluid">
-                <div class="card mb-3">
-                    <div class="card-header">HOMES</div>
-                    <div class="card-body">
-                        <p>{{ $users->name }}</p>
-                        <p>This is some text within a card body.</p>
-                        <p>This is some text within a card body.</p>
-                        <p>This is some text within a card body.</p>
-                    </div>
-                </div>                
+                <div class="mb-5">
+                    <!-- Tampilkan Nama Pengguna dan Tanggal -->
+                    <h4>Hello, {{ '@' . $user->profile->username }}, today is the best day for exercise!</h4>
+                    <p>{{ $currentDate }}</p>
+                </div>
+
+                <figure class="text-center">
+                    <blockquote class="blockquote">
+                        <p>&ldquo;{{ $randomQuote }}&rdquo;</p>
+                    </blockquote>
+                    <figcaption class="blockquote-footer">
+                        <cite title="Source Title">Pilates Wisdom</cite>
+                    </figcaption>
+                </figure>           
             </div>
         </div>        
     </div>

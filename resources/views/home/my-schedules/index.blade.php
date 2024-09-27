@@ -57,6 +57,7 @@
                             <tr>
                                 <th>Time</th>
                                 <th>Lesson</th>
+                                <th>Room</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -81,9 +82,12 @@
                                     <td>
                                         <strong>{{ ucfirst($lessonSchedule->lesson->name ?? 'N/A') }} / {{ ucfirst($lessonSchedule->lessonType->name ?? 'N/A') }}</strong><br>
                                         {{ ucfirst($lessonSchedule->user->name ?? 'N/A') }}
-                                    </td> 
+                                    </td>
                                     <td>
-                                        <a href="#" class="btn btn-primary btn-sm" title="View Participants" data-id="{{ $lessonSchedule->id }}">
+                                        <strong>{{ ucfirst($lessonSchedule->room->name ?? 'N/A') }}</strong>
+                                    </td>
+                                    <td>
+                                        <a href="{{ route('my-schedules.view', ["lessonSchedule" => $lessonSchedule->id]) }}" class="btn btn-primary btn-sm" title="View Participants">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                     </td>
@@ -92,28 +96,7 @@
                         </tbody>
                     </table>
                 @endif  
-            </div> 
-
-            <!-- Modal untuk View Participants -->
-            <div class="modal fade" id="participantsModal" tabindex="-1" aria-labelledby="participantsModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="participantsModalLabel">Participants</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <!-- Peserta akan ditampilkan di sini -->
-                            <ul id="participantsList" class="list-group">
-                                <!-- List of participants will be appended here -->
-                            </ul>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            </div>                    
         </div>  
     </div>
 @endsection
@@ -173,41 +156,7 @@
                 } else {
                     $('#noLessonPlaceholder').hide();
                 }
-            }
-
-            // Event listener untuk tombol "View Participants"
-            $('body').on('click', '.btn-view-participants', function(e) {
-                e.preventDefault();
-
-                // Dapatkan ID dari lesson schedule
-                const lessonScheduleId = $(this).data('id');
-
-                // Kirim permintaan AJAX untuk mendapatkan data peserta
-                $.ajax({
-                    url: `/lesson-schedule/${lessonScheduleId}/participants`,
-                    method: 'GET',
-                    success: function(response) {
-                        // Kosongkan list peserta sebelumnya
-                        $('#participantsList').empty();
-
-                        // Cek apakah ada peserta
-                        if (response.participants.length > 0) {
-                            // Loop data peserta dan tampilkan di modal
-                            response.participants.forEach(participant => {
-                                $('#participantsList').append(`<li class="list-group-item">${participant.user.name}</li>`);
-                            });
-                        } else {
-                            $('#participantsList').append('<li class="list-group-item">No participants found.</li>');
-                        }
-
-                        // Tampilkan modal
-                        $('#participantsModal').modal('show');
-                    },
-                    error: function(xhr) {
-                        alert('Error fetching participants.');
-                    }
-                });
-            });
+            }      
         });
     </script>
 @endpush

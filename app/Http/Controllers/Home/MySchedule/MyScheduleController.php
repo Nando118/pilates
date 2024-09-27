@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Home\MySchedule;
 
 use App\Http\Controllers\Controller;
+use App\Models\Booking;
 use App\Models\LessonSchedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,8 +27,8 @@ class MyScheduleController extends Controller
         $coach_id = Auth::id();
 
         // Ambil data lesson schedules berdasarkan user_id coach
-        $lessonScheduleDatas = LessonSchedule::where('user_id', $coach_id)
-            ->with(['timeSlot', 'lesson', 'lessonType', 'room', 'user'])
+        $lessonScheduleDatas = LessonSchedule::where("user_id", $coach_id)
+            ->with(["timeSlot", "lesson", "lessonType", "room", "user"])
             ->get();
 
         return view("home.my-schedules.index", [
@@ -36,21 +37,24 @@ class MyScheduleController extends Controller
         ]);
     }
 
-    public function getData($id)
+    public function view(LessonSchedule $lessonSchedule)
     {
-        // Cari lesson schedule berdasarkan ID
-        $lessonSchedule = LessonSchedule::with("bookings")->find($id);
+        $coach_id = Auth::id();
 
-        // Jika lesson schedule tidak ditemukan, return 404
-        if (!$lessonSchedule) {
-            alert()->error("Oppss...", "Lesson schedule not found.");
-        }
+        // Ambil data lesson schedules berdasarkan user_id (coach)
+        $lessonScheduleDatas = LessonSchedule::where("user_id", $coach_id)
+        ->with(["timeSlot", "lesson", "lessonType", "room", "user"]) // relasi yang dibutuhkan
+        ->get();
 
-        // Dapatkan data peserta
-        $participants = $lessonSchedule->bookings()->with("user")->get();
+        // Ambil data bookings berdasarkan lesson_schedule_id
+        $bookings = Booking::where("lesson_schedule_id", $lessonSchedule->id)
+        ->with("user") // pastikan mengambil data user dari relasi booking
+        ->get();
 
-        // Return data peserta dalam bentuk JSON
-        return response()->json(["participants" => $participants]);
+        return view("home.my-schedules.participants.index", [
+            "title_page" => "Pilates | Participants",
+            "lessonSchedule" => $lessonSchedule, // Kirimkan data lesson schedule
+            "bookings" => $bookings // Kirimkan data bookings ke view
+        ]);
     }
-
 }

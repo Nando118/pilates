@@ -195,32 +195,36 @@ class LessonScheduleController extends Controller
             // Ambil lesson schedule yang akan diupdate
             $lessonSchedule = LessonSchedule::findOrFail($lessonSchedule->id);
 
-            // 1. Cek apakah ruangan tersedia untuk waktu yang sama, kecuali ruangan yang sama yang sedang diupdate
-            $isRoomAvailable = LessonSchedule::isTimeSlotAvailable($date, $timeSlotId, $roomId, $lessonSchedule->id);
+            if ($roomId != $lessonSchedule->room_id) {
+                // 1. Cek apakah ruangan tersedia untuk waktu yang sama, kecuali ruangan yang sama yang sedang diupdate
+                $isRoomAvailable = LessonSchedule::isTimeSlotAvailable($date, $timeSlotId, $roomId, $lessonSchedule->id);
 
-            if (!$isRoomAvailable) {
-                DB::rollBack();
-                alert()->error("Oppss...", "Room is not available for the selected time, please select a different room or time.");
-                return redirect()->back()->withInput();
+                if (!$isRoomAvailable) {
+                    DB::rollBack();
+                    alert()->error("Oppss...", "Room is not available for the selected time, please select a different room or time.");
+                    return redirect()->back()->withInput();
+                }
             }
 
-            // 2. Cek apakah coach sudah terjadwal dalam rentang waktu yang sama, kecuali coach yang sama yang sedang diupdate
-            $isCoachAvailable = LessonSchedule::where("user_id", $coachId)
-                ->where("date", $date)
-                ->where("id", '!=', $lessonSchedule->id) // Pastikan tidak memeriksa jadwal yang sama
-                ->whereHas("timeSlot", function ($query) use ($timeSlotId) {
-                    $timeSlot = TimeSlot::find($timeSlotId);
-                    $query->where("start_time", "<", $timeSlot->end_time)
-                        ->where("end_time", ">", $timeSlot->start_time);
-                })
-                ->exists();
+            if ($coachId != $lessonSchedule->user_id) {
+                // 2. Cek apakah coach sudah terjadwal dalam rentang waktu yang sama, kecuali coach yang sama yang sedang diupdate
+                $isCoachAvailable = LessonSchedule::where("user_id", $coachId)
+                    ->where("date", $date)
+                    ->where("id", '!=', $lessonSchedule->id) // Pastikan tidak memeriksa jadwal yang sama
+                    ->whereHas("timeSlot", function ($query) use ($timeSlotId) {
+                        $timeSlot = TimeSlot::find($timeSlotId);
+                        $query->where("start_time", "<", $timeSlot->end_time)
+                            ->where("end_time", ">", $timeSlot->start_time);
+                    })
+                    ->exists();
 
-            if ($isCoachAvailable) {
-                DB::rollBack();
-                alert()->error("Oppss...", "Coach is already scheduled at the selected time, please select a different time.");
-                return redirect()->back()->withInput();
+                if ($isCoachAvailable) {
+                    DB::rollBack();
+                    alert()->error("Oppss...", "Coach is already scheduled at the selected time, please select a different time.");
+                    return redirect()->back()->withInput();
+                }
             }
-
+            
             // 3. Jika semua validasi lolos, update jadwal
             $lessonSchedule->update([
                 "date" => $validated["date"],

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\LessonSchedule;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -47,12 +48,22 @@ class MyLessonController extends Controller
             DB::beginTransaction();
 
             // Ambil data booking berdasarkan id dari request
-            $bookings = Booking::findOrFail($bookings->id); // Di sini gunakan $id yang dikirimkan ke function
+            $bookings = Booking::findOrFail($bookings->id);
 
             // Ambil lesson schedule terkait dari booking yang akan dihapus
             $lessonSchedule = LessonSchedule::where("id", "=", $bookings->lesson_schedule_id)->first();
 
             if ($lessonSchedule) {
+                // Periksa apakah waktu mulai sudah lewat
+                $currentDateTime = now(); // Waktu saat ini
+                $lessonStartTime = Carbon::parse($lessonSchedule->date . ' ' . $lessonSchedule->timeSlot->start_time);
+
+                if ($currentDateTime->greaterThanOrEqualTo($lessonStartTime)) {
+                    // Jika sudah lewat, tampilkan pesan kesalahan
+                    alert()->error("Oppss...", "Booking cannot be deleted because the lesson has already started.");
+                    return redirect()->back();
+                }
+
                 // Kembalikan kuota yang sudah terpakai
                 $lessonSchedule->quota += 1;
 
@@ -60,7 +71,8 @@ class MyLessonController extends Controller
                 $lessonSchedule->save();
             } else {
                 // Jika lesson schedule tidak ditemukan
-                throw new \Exception('Lesson schedule not found.');
+                alert()->error("Oppss...", "An error occurred while canceling the lesson schedule booking for this user, please try again.");
+                return redirect()->back();
             }
 
             // Soft delete booking
@@ -84,4 +96,5 @@ class MyLessonController extends Controller
             return redirect()->back();
         }
     }
+
 }
