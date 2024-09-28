@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Home\Bookings\UserCreateBookingsRequest;
 use App\Models\Booking;
 use App\Models\LessonSchedule;
+use App\Models\LessonType;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -27,10 +28,12 @@ class UserLessonScheduleController extends Controller
     public function index()
     {
         $lessonScheduleDatas = LessonSchedule::with(['timeSlot', 'lesson', 'lessonType', 'user', 'room'])->get();
+        $lessonTypes = LessonType::get();
 
         return view("home.lesson-schedules.index", [
             "title_page" => "Pilates | Lesson Schedules",
-            "lessonScheduleDatas" => $lessonScheduleDatas
+            "lessonScheduleDatas" => $lessonScheduleDatas,
+            "lessonTypes" => $lessonTypes
         ]);
     }
 

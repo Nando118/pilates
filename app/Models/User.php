@@ -87,4 +87,10 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Booking::class, "user_id", "id");
     }
+
+    // Relasi ke tabel certifications
+    public function coachCertifications(): HasMany
+    {
+        return $this->hasMany(CoachCertification::class, "user_id", "id");
+    }
 }

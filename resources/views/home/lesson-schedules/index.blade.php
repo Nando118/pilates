@@ -8,7 +8,7 @@
         .scrollable-content {
             height: 100vh;
             overflow-y: auto;
-            
+
             /* Menyembunyikan scrollbar */
             scrollbar-width: none; /* Untuk Firefox */
             -ms-overflow-style: none; /* Untuk Internet Explorer dan Edge lama */
@@ -28,19 +28,20 @@
             <div class="input-group mb-3">
                 <span class="input-group-text" id="date-filter" style="width: 40px; display: flex; justify-content: center; align-items: center;"><i class="fas fa-calendar"></i></span>
                 <input type="text" id="datePicker" class="form-control" placeholder="Select Date" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" aria-describedby="date-filter">
-            </div>          
-            
+            </div>
+
             <!-- Group Dropdown -->
             <div class="input-group mb-3">
                 <span class="input-group-text" id="basic-addon1" style="width: 40px; display: flex; justify-content: center; align-items: center;"><i class="fas fa-users"></i></span>
                 <select id="groupFilter" class="form-control" aria-describedby="basic-addon1">
                     <option value="All">All Groups</option>
-                    <option value="Private">Private</option>
-                    <option value="Group">Group</option>
+                    @foreach($lessonTypes as $lessonType)
+                        <option value="{{ $lessonType->name }}">{{ $lessonType->name }}</option>
+                    @endforeach
                 </select>
-            </div>            
+            </div>
         </div>
-        
+
         <!-- Scrollable Content Section with Cards -->
         <div class="scrollable-content pb-3">
             <div class="container-fluid">
@@ -55,7 +56,7 @@
                         @foreach ($lessonScheduleDatas as $lessonSchedule)
                             @php
                                 // Mengambil nilai date dari model lessonSchedule
-                                $lessonDate = $lessonSchedule->date ?? 'N/A'; 
+                                $lessonDate = $lessonSchedule->date ?? 'N/A';
                                 $group = ucfirst(optional($lessonSchedule->lessonType)->name ?? 'N/A'); // Ambil nama group
                             @endphp
                             <!-- Sesuaikan data-date untuk filter -->
@@ -93,9 +94,9 @@
                                             <a href="{{ route('user-lesson-schedules.create', ['bookings' => $lessonSchedule->id]) }}" class="btn btn-primary btn-sm" title="Booking">
                                                 <i class="fas fa-fw fa-user-plus"></i>
                                             </a>
-                                        @endif                                        
+                                        @endif
                                     </td>
-                                @endcan                                
+                                @endcan
                             </tr>
                         @endforeach
                     </tbody>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Home\MyLesson;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\LessonSchedule;
+use App\Models\LessonType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -34,10 +35,13 @@ class MyLessonController extends Controller
         $myBookings = Booking::where("user_id", $user_id)
             ->with(["lessonSchedule.lesson", "lessonSchedule.lessonType", "lessonSchedule.user", "lessonSchedule.timeSlot", "user.profile"]) // Eager load relasi yang diperlukan
             ->get();
-        
+
+        $lessonTypes = LessonType::get();
+
         return view("home.my-lesson-schedules.index", [
             "title_page" => "Pilates | My Lesson Schedules",
-            "myBookings" => $myBookings
+            "myBookings" => $myBookings,
+            "lessonTypes" => $lessonTypes
         ]);
     }
 

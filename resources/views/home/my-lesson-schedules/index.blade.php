@@ -8,7 +8,7 @@
         .scrollable-content {
             height: 100vh;
             overflow-y: auto;
-            
+
             /* Menyembunyikan scrollbar */
             scrollbar-width: none; /* Untuk Firefox */
             -ms-overflow-style: none; /* Untuk Internet Explorer dan Edge lama */
@@ -31,7 +31,7 @@
                 </span>
                 <input type="text" id="datePicker" class="form-control" placeholder="Select Date" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" aria-describedby="date-filter">
             </div>
-            
+
             <!-- Group Dropdown -->
             <div class="input-group mb-3">
                 <span class="input-group-text" id="group-filter" style="width: 40px; display: flex; justify-content: center; align-items: center;">
@@ -39,8 +39,9 @@
                 </span>
                 <select id="groupFilter" class="form-control" aria-describedby="group-filter">
                     <option value="All">All Groups</option>
-                    <option value="Private">Private</option>
-                    <option value="Group">Group</option>
+                    @foreach($lessonTypes as $lessonType)
+                        <option value="{{ $lessonType->name }}">{{ $lessonType->name }}</option>
+                    @endforeach
                 </select>
             </div>
         </div>
@@ -108,9 +109,9 @@
                             @endforeach
                         </tbody>
                     </table>
-                @endif  
-            </div> 
-        </div>  
+                @endif
+            </div>
+        </div>
     </div>
 @endsection
 

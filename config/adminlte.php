@@ -342,6 +342,11 @@ return [
             'url' => '/dashboard/users',
             'icon' => 'fas fa-fw fa-users',
         ],
+        [
+            'text' => 'Coach Certifications',
+            'url' => '/dashboard/coach-certifications',
+            'icon' => 'fas fa-fw fa-certificate',
+        ],
         ['header' => 'SCHEDULES'],
         [
             'text' => 'Lesson Schedules',

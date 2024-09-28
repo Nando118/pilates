@@ -15,6 +15,8 @@ use App\Http\Controllers\Home\LessonSchedule\UserLessonScheduleController;
 use App\Http\Controllers\Home\MyLesson\MyLessonController;
 use App\Http\Controllers\Home\MySchedule\MyScheduleController;
 use App\Http\Controllers\Home\Profile\ProfileController;
+use App\Http\Controllers\Dashboard\CoachCertification\CoachCertificationController;
+use App\Http\Controllers\Home\Coach\CoachController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -88,6 +90,10 @@ Route::middleware(['auth', 'verified', 'onlyCoachClient'])->group(function () {
     Route::get("/home/my-schedules", [MyScheduleController::class, "index"])->name("my-schedules.index");
     Route::get("/home/my-schedules/{lessonSchedule}/participants", [MyScheduleController::class, "view"])->name("my-schedules.view");
     // END MY SCHEDULES ROUTE - CLIENT & COACH PAGES
+
+    // START COACHES ROUTE - CLIENT & COACH PAGES
+    Route::get("/home/coaches", [CoachController::class, "index"])->name("coaches.index");
+    // END COACHES ROUTE - CLIENT & COACH PAGES
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -171,4 +177,14 @@ Route::middleware(['auth', 'verified', 'onlyAdmin'])->group(function () {
     Route::post("/dashboard/bookings/{bookings}/create/store", [BookingController::class, "store"])->name("bookings.store");
     Route::delete("/dashboard/bookings/{bookings}/delete", [BookingController::class, "destroy"])->name("bookings.delete");
     // END BOOKINGS ROUTE - ADMIN PAGE
+
+    // START COACH CERTIFICATION ROUTE - ADMIN PAGE
+    Route::get("/dashboard/coach-certifications", [CoachCertificationController::class, "index"])->name("coach-certifications.index");
+    Route::get("/dashboard/coach-certifications/data", [CoachCertificationController::class, "getData"])->name("coach-certifications.data");
+    Route::get("/dashboard/coach-certifications/add-coach-certifications", [CoachCertificationController::class, "create"])->name("coach-certifications.create");
+    Route::post("/dashboard/coach-certifications/add-coach-certifications/store", [CoachCertificationController::class, "store"])->name("coach-certifications.store");
+    Route::get("/dashboard/coach-certifications/edit/{coachCertification}", [CoachCertificationController::class, "edit"])->name("coach-certifications.edit");
+    Route::put("/dashboard/coach-certifications/edit/{coachCertification}/update", [CoachCertificationController::class, "update"])->name("coach-certifications.update");
+    Route::delete("/dashboard/coach-certifications/{coachCertification}/delete", [CoachCertificationController::class, "destroy"])->name("coach-certifications.delete");
+    // END COACH CERTIFICATION ROUTE - ADMIN PAGE
 });

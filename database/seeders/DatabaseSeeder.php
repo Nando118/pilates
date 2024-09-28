@@ -5,6 +5,7 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 use App\Models\Booking;
+use App\Models\CoachCertification;
 use App\Models\Lesson;
 use App\Models\LessonSchedule;
 use App\Models\LessonType;
@@ -190,7 +191,7 @@ class DatabaseSeeder extends Seeder
             // Buat Lesson Types
             $lessonTypes = [
                 [
-                    'name' => 'Group',
+                    'name' => 'Reformer',
                     'quota' => 5
                 ],
                 [
@@ -224,7 +225,7 @@ class DatabaseSeeder extends Seeder
             }
 
             // Buat Schedule
-            $startDate = Carbon::now(); 
+            $startDate = Carbon::now();
             $scheduleData = [
                 [
                     'date' => $startDate->copy(),
@@ -283,30 +284,37 @@ class DatabaseSeeder extends Seeder
                 LessonSchedule::query()->create($schedule);
             }
 
-            // Tambahkan data bookings
-//            $bookings = [
-//                [
-//                    'lesson_schedule_id' => 1, // ID lesson_schedule yang sesuai
-//                    'booked_by_name' => 'Friend A', // Nama yang melakukan booking
-//                    'user_id' => 1, // ID user (jika ada, bisa null)
-//                ],
-//                [
-//                    'lesson_schedule_id' => 1,
-//                    'booked_by_name' => 'Friend B',
-//                    'user_id' => null, // Tidak terdaftar
-//                ],
-//                [
-//                    'lesson_schedule_id' => 2,
-//                    'booked_by_name' => 'Friend C',
-//                    'user_id' => 3, // ID user terdaftar
-//                ],
-//                // Tambahkan lebih banyak data booking sesuai kebutuhan
-//            ];
-//
-//            foreach ($bookings as $booking) {
-//                Booking::query()->create($booking);
-//            }
+            // Certification
+            // Seeder Coach Certifications
+            $certifications = [
+                'Bachelor of Physiotherapy',
+                'STOTT Intensive Mat Pilates (IMP)',
+                'STOTT Intensive Reformer (IR)',
+                'STOTT Intensive Chair Cadilac & Barrel (ICCB)',
+                'Optimization Lumbo-Pelvic Region',
+                'Total Barre Amplified',
+                'Pre Natal Pilates Reformer',
+                'Pre Natal Pilates Cadillac'
+            ];
 
+            // Tambahkan 3-5 sertifikasi random untuk coach
+            for ($i = 0; $i < rand(3, 5); $i++) {
+                CoachCertification::query()->create([
+                    'user_id' => 2,
+                    'certification_name' => $certifications[array_rand($certifications)],
+                    'date_received' => now()->subYears(rand(1, 5)),
+                    'issuing_organization' => 'Japan Conditioning Academy'
+                ]);
+            }
+
+            for ($i = 0; $i < rand(3, 5); $i++) {
+                CoachCertification::query()->create([
+                    'user_id' => 4,
+                    'certification_name' => $certifications[array_rand($certifications)],
+                    'date_received' => now()->subYears(rand(1, 5)),
+                    'issuing_organization' => 'Pilates Institute'
+                ]);
+            }
         });
     }
 }

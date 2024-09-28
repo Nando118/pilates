@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Home\MySchedule;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\LessonSchedule;
+use App\Models\LessonType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -31,9 +32,12 @@ class MyScheduleController extends Controller
             ->with(["timeSlot", "lesson", "lessonType", "room", "user"])
             ->get();
 
+        $lessonTypes = LessonType::get();
+
         return view("home.my-schedules.index", [
             "title_page" => "Pilates | My Schedules",
-            "lessonScheduleDatas" => $lessonScheduleDatas
+            "lessonScheduleDatas" => $lessonScheduleDatas,
+            "lessonTypes" => $lessonTypes
         ]);
     }
 

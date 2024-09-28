@@ -31,16 +31,21 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('my-profile.index') }}">My Profile</a>
                             </li>
-                            @can("access-client-menu")                        
+                            @can("access-client-menu")
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('my-lesson-schedules.index') }}">My Lessons</a>
                                 </li>
                             @endcan
-                            @can("access-coach-menu")                        
+                            @can("access-client-menu")
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('coaches.index') }}">Coaches</a>
+                                </li>
+                            @endcan
+                            @can("access-coach-menu")
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('my-schedules.index') }}">My Schedule</a>
                                 </li>
-                            @endcan                            
+                            @endcan
                             <li class="nav-item">
                                 <!-- Form Logout -->
                                 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: inline;">
@@ -52,7 +57,7 @@
                     </div>
                 </div>
             </nav>
-            
+
             <div class="py-2 d-flex align-items-center justify-content-center" style="background-color: #FAF7F0;">
                 @yield('content')
             </div>
@@ -62,10 +67,10 @@
                 <div class="container-fluid justify-content-around">
                     <a class="navbar-brand" href="{{ route('home') }}"><i class="fas fa-home"></i></a>
                     <a class="navbar-brand" href="{{ route('user-lesson-schedules.index') }}"><i class="fas fa-calendar"></i></a>
-                    @can("access-client-menu")                        
+                    @can("access-client-menu")
                         <a class="navbar-brand" href="{{ route('my-lesson-schedules.index') }}"><i class="fas fa-clock"></i></a>
                     @endcan
-                    @can("access-coach-menu")                        
+                    @can("access-coach-menu")
                         <a class="navbar-brand" href="{{ route('my-schedules.index') }}"><i class="fas fa-calendar-check"></i></a>
                     @endcan
                 </div>
