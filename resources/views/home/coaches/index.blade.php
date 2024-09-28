@@ -50,15 +50,22 @@
                         <div class="card-body pt-0 pb-2 px-4">
                             <div class="certification-header">Certifications:</div>
                             <ul class="list-group list-group-flush p-3">
-                                @foreach($coach->coachCertifications as $certification)
+                                @if($coach->coachCertifications)
+                                    @foreach($coach->coachCertifications as $certification)
+                                        <li class="certification-item">
+                                            <strong>{{ $certification->certification_name }}</strong>
+                                            <br>
+                                            @isset($certification->issuing_organization)
+                                                <em>{{ $certification->issuing_organization }} - {{ date('Y', strtotime($certification->date_received ?? 'N/A')) }}</em>
+                                            @endisset
+                                        </li>
+                                    @endforeach
+                                @else
                                     <li class="certification-item">
-                                        <strong>{{ $certification->certification_name }}</strong>
-                                        <br>
-                                        @isset($certification->issuing_organization)
-                                            <em>{{ $certification->issuing_organization }} - {{ date('Y', strtotime($certification->date_received ?? 'N/A')) }}</em>
-                                        @endisset
+                                        <strong>-</strong>
                                     </li>
-                            @endforeach
+                                @endif
+                            </ul>
                         </div>
                     </div>
                 @endforeach
