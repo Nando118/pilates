@@ -27,6 +27,7 @@
                                 <th>Email</th>
 {{--                                <th>Branch</th>--}}
                                 <th>Gender</th>
+                                <th>Platform</th>
                                 <th>Role</th>
                                 <th>Action</th>
                             </tr>
@@ -70,10 +71,22 @@
                     { data: 'email', name: 'email'},
                     // { data: 'branch', name: 'branch' },
                     { data: 'gender', name: 'gender'},
+                    { data: 'platform', name: 'platform'},
                     { data: 'role', name: 'role'},
                     { data: 'action', name: 'action', orderable: false, searchable: false},
                 ],
                 order: [1, 'desc'],
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        text: '<i class="fas fa-file-excel mr-1"></i> Export to Excel',
+                        className: 'btn btn-success',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    }
+                ]
             });
         });
     </script>

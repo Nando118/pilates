@@ -27,18 +27,49 @@
             <div class="container-fluid">
                 <div class="mb-5">
                     <!-- Tampilkan Nama Pengguna dan Tanggal -->
-                    <h4>Hello, {{ '@' . $user->profile->username }}, today is the best day for exercise!</h4>
-                    <p>{{ $currentDate }}</p>
+                    <p class="h5">Hi <em>{{ '@' . $user->profile->username }}</em>, today is the best day for exercise!</p>
+                    <p class="lead">{{ $currentDate }}</p>
                 </div>
 
-                <figure class="text-center">
+                <figure class="text-center mb-5">
                     <blockquote class="blockquote">
                         <p>&ldquo;{{ $randomQuote }}&rdquo;</p>
                     </blockquote>
                     <figcaption class="blockquote-footer">
                         <cite title="Source Title">Pilates Wisdom</cite>
                     </figcaption>
-                </figure>           
+                </figure>    
+                
+                <div class="card text-bg-dark">
+                    <div class="card-header">
+                        <strong>Today Lessons</strong>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        @if($myBookings->isEmpty())
+                            <li class="list-group-item">There is no lesson today</li>                            
+                        @else
+                            @foreach ($myBookings as $myBooking)
+                                <li class="list-group-item d-flex justify-content-between align-items-start">
+                                    <!-- Kolom Jam -->
+                                    <div class="me-3">
+                                        <span class="badge bg-primary">
+                                            {{ date('H:i', strtotime($myBooking->lessonSchedule->timeSlot->start_time ?? 'N/A')) }} - 
+                                            {{ date('H:i', strtotime($myBooking->lessonSchedule->timeSlot->end_time ?? 'N/A')) }}
+                                        </span>
+                                    </div>
+
+                                    <!-- Kolom Detail -->
+                                    <div class="flex-grow-1">
+                                        <strong>{{ $myBooking->lessonSchedule->lesson->name ?? 'N/A' }}</strong> / 
+                                        <span>{{ $myBooking->lessonSchedule->lessonType->name ?? 'N/A' }}</span><br>
+                                        <em>Instructor: <strong>{{ $myBooking->lessonSchedule->user->name ?? 'N/A' }}</strong></em><br>
+                                        Room: <strong>{{ $myBooking->lessonSchedule->room->name ?? 'N/A' }}</strong>
+                                    </div>
+                                </li>
+                            @endforeach
+                        @endif                                    
+                    </ul>
+                </div>
             </div>
         </div>        
     </div>

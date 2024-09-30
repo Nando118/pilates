@@ -54,6 +54,10 @@ class UserController extends Controller
             ->addColumn("gender", function ($user) {
                 return ucfirst($user->profile->gender) ?? "N/A";
             })
+            ->addColumn("platform", function ($user) {
+                $socialAccount = $user->socialAccounts->first(); // Ambil akun pertama (jika ada)
+                return $socialAccount ? ucfirst($socialAccount->provider) : "-"; // Tampilkan provider atau N/A jika tidak ada
+            })
             ->addColumn("role", function ($user) {
                 return ucfirst($user->roles->pluck("name")->first() ?? "N/A");
             })
