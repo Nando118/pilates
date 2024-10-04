@@ -177,6 +177,12 @@ class AuthController extends Controller
 
     public function handleProvideCallback($provider)
     {
+        // Cek apakah ada kesalahan dalam permintaan (parameter 'code' hilang)
+        if (!request()->has("code")) {
+            alert()->info("Info", "Authentication was successfully canceled. Please login or try again.");
+            return redirect()->route("login");
+        }
+
         try {
             $providerData = Socialite::driver($provider)->user();
             $user = User::where("email", $providerData->getEmail())->first();
