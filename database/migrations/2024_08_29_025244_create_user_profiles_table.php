@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('username')->unique()->nullable(false);
             $table->enum('gender', ['male', 'female', 'other'])->nullable(false);
             $table->string('phone')->nullable(false);
-            $table->string('address')->nullable(false);
+            $table->string('address')->nullable()->default("-");
             $table->string('profile_picture')->nullable();
             $table->timestamps();
             $table->softDeletes();

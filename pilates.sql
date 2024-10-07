@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 04, 2024 at 04:37 AM
+-- Generation Time: Oct 07, 2024 at 12:13 PM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.2.0
 
@@ -54,6 +54,20 @@ CREATE TABLE `coach_certifications` (
   `deleted_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `coach_certifications`
+--
+
+INSERT INTO `coach_certifications` (`id`, `user_id`, `certification_name`, `date_received`, `issuing_organization`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 2, 'STOTT Intensive Mat Pilates (IMP)', '2019-10-07', 'Japan Conditioning Academy', '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(2, 2, 'Bachelor of Physiotherapy', '2023-10-07', 'Japan Conditioning Academy', '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(3, 2, 'STOTT Intensive Reformer (IR)', '2023-10-07', 'Japan Conditioning Academy', '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(4, 2, 'Pre Natal Pilates Reformer', '2022-10-07', 'Japan Conditioning Academy', '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(5, 4, 'Pre Natal Pilates Cadillac', '2019-10-07', 'Pilates Institute', '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(6, 4, 'STOTT Intensive Chair Cadilac & Barrel (ICCB)', '2019-10-07', 'Pilates Institute', '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(7, 4, 'Optimization Lumbo-Pelvic Region', '2019-10-07', 'Pilates Institute', '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(8, 4, 'STOTT Intensive Chair Cadilac & Barrel (ICCB)', '2021-10-07', 'Pilates Institute', '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -84,6 +98,16 @@ CREATE TABLE `lessons` (
   `deleted_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `lessons`
+--
+
+INSERT INTO `lessons` (`id`, `name`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 'All Level', '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(2, 'Bootcamp', '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(3, 'Booty & Core', '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(4, 'Abs & Back', '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -105,6 +129,17 @@ CREATE TABLE `lesson_schedules` (
   `deleted_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `lesson_schedules`
+--
+
+INSERT INTO `lesson_schedules` (`id`, `date`, `time_slot_id`, `lesson_id`, `lesson_type_id`, `user_id`, `room_id`, `quota`, `status`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, '2024-10-07', 1, 1, 1, 2, 1, 6, 'Available', '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(2, '2024-10-07', 1, 2, 2, 4, 2, 3, 'Available', '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(3, '2024-10-07', 2, 4, 1, 4, 1, 5, 'Available', '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(4, '2024-10-08', 1, 4, 1, 2, 1, 5, 'Available', '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(5, '2024-10-08', 3, 2, 2, 4, 2, 3, 'Available', '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -119,6 +154,14 @@ CREATE TABLE `lesson_types` (
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `lesson_types`
+--
+
+INSERT INTO `lesson_types` (`id`, `name`, `quota`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 'Reformer', 5, '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(2, 'Private', 3, '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL);
 
 -- --------------------------------------------------------
 
@@ -203,9 +246,9 @@ CREATE TABLE `roles` (
 --
 
 INSERT INTO `roles` (`id`, `name`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 'admin', '2024-10-04 02:36:47', '2024-10-04 02:36:47', NULL),
-(2, 'coach', '2024-10-04 02:36:47', '2024-10-04 02:36:47', NULL),
-(3, 'client', '2024-10-04 02:36:47', '2024-10-04 02:36:47', NULL);
+(1, 'admin', '2024-10-07 10:13:26', '2024-10-07 10:13:26', NULL),
+(2, 'coach', '2024-10-07 10:13:26', '2024-10-07 10:13:26', NULL),
+(3, 'client', '2024-10-07 10:13:26', '2024-10-07 10:13:26', NULL);
 
 -- --------------------------------------------------------
 
@@ -220,6 +263,14 @@ CREATE TABLE `rooms` (
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `rooms`
+--
+
+INSERT INTO `rooms` (`id`, `name`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 'Room Alpha', '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(2, 'Room Beta', '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL);
 
 -- --------------------------------------------------------
 
@@ -254,6 +305,21 @@ CREATE TABLE `time_slots` (
   `deleted_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `time_slots`
+--
+
+INSERT INTO `time_slots` (`id`, `start_time`, `end_time`, `duration`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, '09:00:00', '10:00:00', 50, '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(2, '10:00:00', '11:00:00', 50, '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(3, '11:00:00', '12:00:00', 50, '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(4, '12:00:00', '13:00:00', 50, '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(5, '13:00:00', '14:00:00', 50, '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(6, '14:00:00', '15:00:00', 50, '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(7, '15:00:00', '16:00:00', 50, '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(8, '16:00:00', '17:00:00', 50, '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(9, '17:00:00', '18:00:00', 50, '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -278,7 +344,12 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `registration_type`, `remember_token`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 'Admin User', 'admin@admin.com', '2024-10-04 02:36:48', '$2y$12$RzhntmqLhoVsK/kysfesuOKykd1fCfVkM0QCFoZ6g9O7SN4WuA0l6', 'form', NULL, '2024-10-04 02:36:48', '2024-10-04 02:36:48', NULL);
+(1, 'Admin User', 'admin@admin.com', '2024-10-07 10:13:27', '$2y$12$THZOiLi7vBzfyB8FoG/UM.1jpN1YyyuSTePVvKYN7Sb1oU/RFtE6e', 'form', NULL, '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(2, 'Justin', 'justin@coach.com', '2024-10-07 10:13:27', '$2y$12$PhSeKwvFriTfdEYe4Im3XemvX7KcAuhvDWRiTvSulLtrsROszGdC6', 'form', NULL, '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(3, 'Adam Levin', 'adam.levin@client.com', '2024-10-07 10:13:27', '$2y$12$/JWmBKgiR/kHCXmyEpBbT.k84HdgNin4ikBBiHHrF8hv01CP/dem.', 'form', NULL, '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(4, 'Helga', 'helga@coach.com', '2024-10-07 10:13:27', '$2y$12$JbUQfBzyj.6OSw34j0ZyJOTC7iRu4QQ3nW9dRs8X9SgXG3QSRj/F2', 'form', NULL, '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(5, 'Sumiko', 'sumiko@client.com', '2024-10-07 10:13:27', '$2y$12$OPGCeXxGQKZCAGC73zLD7.ibZ7UavGl1Y6C1pybc9Rn6f3VpZUJBq', 'form', NULL, '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(6, 'Tatang', 'mastatang@client.com', '2024-10-07 10:13:27', '$2y$12$2q7t1z5o8AXovLX4nXC/ju7yvfcIHyU3pifo7gzisg/yAKccu8..i', 'form', NULL, '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL);
 
 -- --------------------------------------------------------
 
@@ -292,7 +363,7 @@ CREATE TABLE `user_profiles` (
   `username` varchar(255) NOT NULL,
   `gender` enum('male','female','other') NOT NULL,
   `phone` varchar(255) NOT NULL,
-  `address` varchar(255) NOT NULL,
+  `address` varchar(255) DEFAULT '-',
   `profile_picture` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -304,7 +375,12 @@ CREATE TABLE `user_profiles` (
 --
 
 INSERT INTO `user_profiles` (`id`, `user_id`, `username`, `gender`, `phone`, `address`, `profile_picture`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 1, 'adminuser', 'male', '1234567890', 'Tangerang', NULL, '2024-10-04 02:36:48', '2024-10-04 02:36:48', NULL);
+(1, 1, 'adminuser', 'male', '1234567890', 'Tangerang', NULL, '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(2, 2, 'coachjustin', 'male', '0987654321', 'Jakarta', NULL, '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(3, 3, 'adamlevin', 'male', '1122334455', 'California', NULL, '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(4, 4, 'helga', 'female', '0987654321', 'Tangerang', NULL, '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(5, 5, 'sumikojp', 'female', '1122334455', 'Yokohama', NULL, '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL),
+(6, 6, 'mastatang', 'male', '1122334455', 'Bandung', NULL, '2024-10-07 10:13:27', '2024-10-07 10:13:27', NULL);
 
 -- --------------------------------------------------------
 
@@ -326,7 +402,12 @@ CREATE TABLE `user_roles` (
 --
 
 INSERT INTO `user_roles` (`id`, `user_id`, `role_id`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 1, 1, NULL, NULL, NULL);
+(1, 1, 1, NULL, NULL, NULL),
+(2, 2, 2, NULL, NULL, NULL),
+(3, 3, 3, NULL, NULL, NULL),
+(4, 4, 2, NULL, NULL, NULL),
+(5, 5, 3, NULL, NULL, NULL),
+(6, 6, 3, NULL, NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -464,7 +545,7 @@ ALTER TABLE `bookings`
 -- AUTO_INCREMENT for table `coach_certifications`
 --
 ALTER TABLE `coach_certifications`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `failed_jobs`
@@ -476,19 +557,19 @@ ALTER TABLE `failed_jobs`
 -- AUTO_INCREMENT for table `lessons`
 --
 ALTER TABLE `lessons`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `lesson_schedules`
 --
 ALTER TABLE `lesson_schedules`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `lesson_types`
 --
 ALTER TABLE `lesson_types`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `migrations`
@@ -512,7 +593,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT for table `rooms`
 --
 ALTER TABLE `rooms`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `social_accounts`
@@ -524,25 +605,25 @@ ALTER TABLE `social_accounts`
 -- AUTO_INCREMENT for table `time_slots`
 --
 ALTER TABLE `time_slots`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `user_profiles`
 --
 ALTER TABLE `user_profiles`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `user_roles`
 --
 ALTER TABLE `user_roles`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Constraints for dumped tables

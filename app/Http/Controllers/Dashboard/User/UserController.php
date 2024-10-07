@@ -48,9 +48,9 @@ class UserController extends Controller
         })->get();
 
         return DataTables::of($users)
-//            ->addColumn("branch", function ($user) {
-//                return ucfirst($user->profile->branch) ?? "N/A";
-//            })
+            //            ->addColumn("branch", function ($user) {
+            //                return ucfirst($user->profile->branch) ?? "N/A";
+            //            })
             ->addColumn("gender", function ($user) {
                 return ucfirst($user->profile->gender) ?? "N/A";
             })
@@ -63,9 +63,9 @@ class UserController extends Controller
             })
             ->addColumn("action", function ($user) {
                 $btn = '<div class="btn-group mr-1">';
-                $btn .= '<a href="'. route("users.edit", ["user" => $user->id]) .'" class="btn btn-warning btn-sm" title="Edit"><i class="fas fa-fw fa-edit"></i></a> ';
+                $btn .= '<a href="' . route("users.edit", ["user" => $user->id]) . '" class="btn btn-warning btn-sm" title="Edit"><i class="fas fa-fw fa-edit"></i></a> ';
                 $btn .= '<a href="' . route("users.view", ["user" => $user->id]) . '" class="btn btn-info btn-sm" title="View"><i class="fas fa-fw fa-eye"></i></a> ';
-                $btn .= '<a href="'. route("users.delete", ["user" => $user->id]) . '" class="btn btn-danger btn-sm" title="Delete" data-confirm-delete="true"><i class="fas fa-fw fa-trash"></i></button> ';
+                $btn .= '<a href="' . route("users.delete", ["user" => $user->id]) . '" class="btn btn-danger btn-sm" title="Delete" data-confirm-delete="true"><i class="fas fa-fw fa-trash"></i></button> ';
                 $btn .= '</div>';
                 return $btn;
             })
@@ -114,11 +114,11 @@ class UserController extends Controller
 
             UserProfile::create([
                 "user_id" => $userId,
-//                "branch" => $validated["branch"],
+                //                "branch" => $validated["branch"],
                 "username" => $validated["username"],
                 "gender" => $validated["gender"],
                 "phone" => $validated["phone"],
-                "address" => $validated["address"],
+                "address" => isset($validated["address"]) && !empty($validated["address"]) ? $validated["address"] : null,
                 "profile_picture" => $imageName
             ]);
 
@@ -146,7 +146,7 @@ class UserController extends Controller
 
         // Kirim data ke view menggunakan compact
         return view("dashboard.users.profile.profile", compact("userData", "roleName"))
-        ->with("title_page", "Pilates | User Profile");
+            ->with("title_page", "Pilates | User Profile");
     }
 
     public function edit(User $user)
@@ -161,10 +161,10 @@ class UserController extends Controller
         $action = route("users.update", $user->id);
 
         return view("dashboard.users.form.form", compact("user", "action", "roleId"))
-        ->with([
-            "title_page" => "Pilates | Update User Profile",
-            "method" => "POST"
-        ]);
+            ->with([
+                "title_page" => "Pilates | Update User Profile",
+                "method" => "POST"
+            ]);
     }
 
     public function update(User $user, UpdateUserRequest $request)
@@ -200,10 +200,10 @@ class UserController extends Controller
                 $profile->profile_picture = $path; // Simpan path seperti 'images/profile/imagename.extension'
             }
 
-//            $profile->branch = $validated["branch"];
+            //            $profile->branch = $validated["branch"];
             $profile->gender = $validated["gender"];
             $profile->phone = $validated["phone"];
-            $profile->address = $validated["address"];
+            $profile->address = isset($validated["address"]) && !empty($validated["address"]) ? $validated["address"] : null;
             $profile->save();
 
             // Update data di tabel 'user_roles'

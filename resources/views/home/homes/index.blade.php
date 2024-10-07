@@ -42,32 +42,57 @@
                 
                 <div class="card text-bg-dark">
                     <div class="card-header">
-                        <strong>Today Lessons</strong>
+                        @if($isCoach)
+                            <strong>This Month's Lessons You Teach</strong> <!-- Judul untuk coach -->
+                        @else
+                            <strong>This Month's Lessons You Booked</strong> <!-- Judul untuk client -->
+                        @endif
                     </div>
                     <ul class="list-group list-group-flush">
-                        @if($myBookings->isEmpty())
-                            <li class="list-group-item">There is no lesson today</li>                            
+                        @if($myLessons->isEmpty())
+                            <li class="list-group-item">
+                                @if($isCoach)
+                                    You have no lessons to teach this month.
+                                @else
+                                    You have no lessons booked this month.
+                                @endif
+                            </li>
                         @else
-                            @foreach ($myBookings as $myBooking)
+                            @foreach ($myLessons as $myLesson)
                                 <li class="list-group-item d-flex justify-content-between align-items-start">
                                     <!-- Kolom Jam -->
                                     <div class="me-3">
                                         <span class="badge bg-primary">
-                                            {{ date('H:i', strtotime($myBooking->lessonSchedule->timeSlot->start_time ?? 'N/A')) }} - 
-                                            {{ date('H:i', strtotime($myBooking->lessonSchedule->timeSlot->end_time ?? 'N/A')) }}
+                                            @if($isCoach)
+                                                {{ date('H:i', strtotime($myLesson->timeSlot->start_time ?? 'N/A')) }} - 
+                                                {{ date('H:i', strtotime($myLesson->timeSlot->end_time ?? 'N/A')) }}
+                                            @else
+                                                {{ date('H:i', strtotime($myLesson->lessonSchedule->timeSlot->start_time ?? 'N/A')) }} - 
+                                                {{ date('H:i', strtotime($myLesson->lessonSchedule->timeSlot->end_time ?? 'N/A')) }}
+                                            @endif
+                                        </span>
+                                        <br>
+                                        <span style="font-size: 0.7rem">
+                                            <strong>{{ \Carbon\Carbon::parse($myLesson->date)->translatedFormat('l, d F Y') }}</strong><br>
                                         </span>
                                     </div>
 
                                     <!-- Kolom Detail -->
                                     <div class="flex-grow-1">
-                                        <strong>{{ $myBooking->lessonSchedule->lesson->name ?? 'N/A' }}</strong> / 
-                                        <span>{{ $myBooking->lessonSchedule->lessonType->name ?? 'N/A' }}</span><br>
-                                        <em>Instructor: <strong>{{ $myBooking->lessonSchedule->user->name ?? 'N/A' }}</strong></em><br>
-                                        Room: <strong>{{ $myBooking->lessonSchedule->room->name ?? 'N/A' }}</strong>
+                                        @if($isCoach)
+                                            <strong>{{ $myLesson->lesson->name ?? 'N/A' }}</strong> / 
+                                            <span>{{ $myLesson->lessonType->name ?? 'N/A' }}</span><br>                                            
+                                            Room: <strong>{{ $myLesson->room->name ?? 'N/A' }}</strong>
+                                        @else
+                                            <strong>{{ $myLesson->lessonSchedule->lesson->name ?? 'N/A' }}</strong> / 
+                                            <span>{{ $myLesson->lessonSchedule->lessonType->name ?? 'N/A' }}</span><br>                                            
+                                            <em>Instructor: <strong>{{ $myLesson->lessonSchedule->user->name ?? 'N/A' }}</strong></em><br>
+                                            Room: <strong>{{ $myLesson->lessonSchedule->room->name ?? 'N/A' }}</strong>
+                                        @endif
                                     </div>
                                 </li>
                             @endforeach
-                        @endif                                    
+                        @endif
                     </ul>
                 </div>
             </div>

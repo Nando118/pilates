@@ -29,7 +29,7 @@ class UpdateUserRequest extends FormRequest
             "username" => ["required", "alpha_dash", "min:3", "max:50"],
             "gender" => ["required", "string"],
             "phone" => ["required", "numeric", "min_digits:10", "max_digits:15"],
-            "address" => ["required", "string", "min:3", "max:200"],
+            "address" => ["nullable", "string", "min:3", "max:200"],
             "email" => ["required", "email:dns", "max:200"],
             "profile_picture" => ["nullable", "image", "mimes:jpeg,png,jpg,gif", "max:2048"]
         ];

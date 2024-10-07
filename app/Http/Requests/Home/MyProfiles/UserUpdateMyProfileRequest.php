@@ -26,7 +26,7 @@ class UserUpdateMyProfileRequest extends FormRequest
             "name" => ["required", "string", "min:3", "max:200"],
             "gender" => ["required", "string"],
             "phone" => ["required", "numeric", "min_digits:10", "max_digits:15"],
-            "address" => ["required", "string", "min:3", "max:200"],
+            "address" => ["nullable", "string", "min:3", "max:200"],
             "profile_picture" => ["nullable", "image", "mimes:jpeg,png,jpg,gif", "max:2048"]
         ];
     }

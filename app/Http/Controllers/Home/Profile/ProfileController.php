@@ -100,7 +100,7 @@ class ProfileController extends Controller
             
             $profile->gender = $validated["gender"];
             $profile->phone = $validated["phone"];
-            $profile->address = $validated["address"];
+            $profile->address = isset($validated["address"]) && !empty($validated["address"]) ? $validated["address"] : null;
             $profile->save();
 
             DB::commit();

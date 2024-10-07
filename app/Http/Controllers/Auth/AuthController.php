@@ -112,7 +112,7 @@ class AuthController extends Controller
                 "username" => $validated["username"],
                 "gender" => $validated["gender"],
                 "phone" => $validated["phone"],
-                "address" => $validated["address"],
+                "address" => isset($validated["address"]) && !empty($validated["address"]) ? $validated["address"] : null,
                 "profile_picture" => $imageName
             ]);
 
@@ -276,7 +276,8 @@ class AuthController extends Controller
         ]);
     }
 
-    public function completeRegistrationPost(RegisterWithProviderRequest $request) {
+    public function completeRegistrationPost(RegisterWithProviderRequest $request)
+    {
         try {
             $validated = $request->validated();
             $providerId = session()->get("PROVIDER_ID");
@@ -312,7 +313,7 @@ class AuthController extends Controller
                 "username" => $validated["username"],
                 "gender" => $validated["gender"],
                 "phone" => $validated["phone"],
-                "address" => $validated["phone"],
+                "address" => isset($validated["address"]) && !empty($validated["address"]) ? $validated["address"] : null,
                 "profile_picture" => $imageName
             ]);
 
@@ -324,7 +325,7 @@ class AuthController extends Controller
             session()->forget("PROVIDER_ID");
 
             return redirect()->route("verification.notice");
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             Log::error("Error adding new social user in AuthController@completeRegistrationPost: " . $e->getMessage());
             DB::rollBack();
             alert()->error("Oppss...", "An error occurred during the registration process, please try again.");
@@ -334,10 +335,10 @@ class AuthController extends Controller
 
     private function isUserProfileIncomplete($userProfile)
     {
-//        return empty($userProfile->branch) || empty($userProfile->username) ||
-//            empty($userProfile->phone) || empty($userProfile->address);
+        //        return empty($userProfile->branch) || empty($userProfile->username) ||
+        //            empty($userProfile->phone) || empty($userProfile->address);
 
-        return empty($userProfile->username) || empty($userProfile->phone) || empty($userProfile->address);
+        return empty($userProfile->username) || empty($userProfile->phone);
     }
 
     // Forgot Password
@@ -374,7 +375,7 @@ class AuthController extends Controller
             alert()->success("Success", "A password reset link has been sent to your email address.");
 
             return back();
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             Log::error("Error resseting password user in AuthController@forgotPasswordEmail: " . $e->getMessage());
             alert()->error("Oppss...", "An error occurred while resetting the password.");
             return redirect()->back();
@@ -425,7 +426,6 @@ class AuthController extends Controller
                 alert()->error("Oppss...", "Failed to reset password."); // Pesan kesalahan
                 return back();
             }
-
         } catch (\Exception $e) {
             Log::error("Error resseting password user in AuthController@resetPasswordUpdate: " . $e->getMessage());
             DB::rollBack(); // Rollback jika terjadi kesalahan
@@ -453,5 +453,4 @@ class AuthController extends Controller
 
         return redirect(route("login")); // Kembali ke halaman login
     }
-
 }

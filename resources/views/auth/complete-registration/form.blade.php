@@ -47,8 +47,8 @@
             </div>
 
             <div class="mb-3">
-                <label for="address" class="form-label">Address<span style="color: red;">*</span></label>
-                <textarea class="form-control @error('address') is-invalid @enderror" id="address" rows="3" name="address" autocomplete="off" required>{{ old('address') }}</textarea>
+                <label for="address" class="form-label">Address</label>
+                <textarea class="form-control @error('address') is-invalid @enderror" id="address" rows="3" name="address" autocomplete="off">{{ old('address') }}</textarea>
                 @error('address')
                     <div class="invalid-feedback">
                         {{ $message }}

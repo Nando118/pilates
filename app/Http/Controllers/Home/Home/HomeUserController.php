@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Home\Home;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\LessonSchedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -40,30 +41,47 @@ class HomeUserController extends Controller
         // Waktu saat ini
         $currentDate = Carbon::now()->translatedFormat('l, d F Y');
 
-        // Ambil tanggal hari ini
-        $today = Carbon::now()->toDateString();
+        // Ambil awal dan akhir bulan ini
+        $startOfMonth = Carbon::now()->startOfMonth()->toDateString();
+        $endOfMonth = Carbon::now()->endOfMonth()->toDateString();
 
-        // Ambil data booking berdasarkan user_id dan tanggal saat ini di lessonSchedule
-        $myBookings = Booking::where("user_id", $user->id)
-        ->whereHas('lessonSchedule', function ($query) use ($today) {
-            $query->whereDate('date', $today); // Filter berdasarkan tanggal di lessonSchedule
-        })
-        ->with([
-            "lessonSchedule.lesson",
-            "lessonSchedule.lessonType",
-            "lessonSchedule.user",
-            "lessonSchedule.timeSlot",
-            "lessonSchedule.room",
-            "user.profile"
-        ]) // Eager load relasi yang diperlukan
-        ->get();
+        // Cek apakah user adalah coach
+        $isCoach = $user->roles->contains('name', 'coach'); // Pastikan role check sesuai dengan implementasi Anda
+
+        if ($isCoach) {
+            // Jika user adalah coach, ambil lessons yang dia ajarkan dalam bulan ini
+            $myLessons = LessonSchedule::where("user_id", $user->id)
+                ->whereBetween('date', [$startOfMonth, $endOfMonth]) // Ambil pelajaran bulan ini
+                ->with([
+                    "lesson",
+                    "lessonType",
+                    "timeSlot",
+                    "room"
+                ]) // Eager load relasi yang diperlukan
+                ->get();
+        } else {
+            // Jika user adalah client, ambil lessons yang sudah dibooking bulan ini
+            $myLessons = Booking::where("user_id", $user->id)
+                ->whereHas('lessonSchedule', function ($query) use ($startOfMonth, $endOfMonth) {
+                    $query->whereBetween('date', [$startOfMonth, $endOfMonth]); // Filter berdasarkan tanggal di lessonSchedule
+                })
+                ->with([
+                    "lessonSchedule.lesson",
+                    "lessonSchedule.lessonType",
+                    "lessonSchedule.timeSlot",
+                    "lessonSchedule.room",
+                    "lessonSchedule.user"
+                ]) // Eager load relasi yang diperlukan
+                ->get();
+        }
 
         return view("home.homes.index", [
             "title_page" => "Pilates | Home",
             "user" => $user,
             "randomQuote" => $randomQuote, // Kirimkan quote ke view
             "currentDate" => $currentDate,
-            "myBookings" => $myBookings
+            "myLessons" => $myLessons, // Sesuaikan variable agar bisa digunakan di view
+            "isCoach" => $isCoach // Kirim variabel isCoach untuk pengecekan di view
         ]);
     }
 }
