@@ -29,7 +29,11 @@ class MyScheduleController extends Controller
 
         // Ambil data lesson schedules berdasarkan user_id coach
         $lessonScheduleDatas = LessonSchedule::where("user_id", $coach_id)
-            ->with(["timeSlot", "lesson", "lessonType", "room", "user"])
+            ->join("time_slots", "lesson_schedules.time_slot_id", "=", "time_slots.id") // Join dengan time_slots
+            ->with(["timeSlot", "lesson", "lessonType", "room", "user"]) // Eager load relasi yang diperlukan
+            ->orderBy("lesson_schedules.date") // Urutkan berdasarkan tanggal
+            ->orderBy("time_slots.start_time") // Urutkan berdasarkan start_time
+            ->select("lesson_schedules.*") // Pastikan hanya memilih kolom dari lesson_schedules
             ->get();
 
         $lessonTypes = LessonType::get();
@@ -38,7 +42,7 @@ class MyScheduleController extends Controller
             "title_page" => "Pilates | My Schedules",
             "lessonScheduleDatas" => $lessonScheduleDatas,
             "lessonTypes" => $lessonTypes
-        ]);
+        ]);        
     }
 
     public function view(LessonSchedule $lessonSchedule)

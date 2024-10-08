@@ -32,8 +32,13 @@ class MyLessonController extends Controller
         confirmDelete($title, $text);
 
         $user_id = Auth::id();
-        $myBookings = Booking::where("user_id", $user_id)
+        $myBookings = Booking::where("bookings.user_id", $user_id)
+            ->join("lesson_schedules", "bookings.lesson_schedule_id", "=", "lesson_schedules.id") // Join dengan lesson_schedules
+            ->join("time_slots", "lesson_schedules.time_slot_id", "=", "time_slots.id") // Join dengan time_slots
             ->with(["lessonSchedule.lesson", "lessonSchedule.lessonType", "lessonSchedule.user", "lessonSchedule.timeSlot", "user.profile"]) // Eager load relasi yang diperlukan
+            ->select("bookings.*") // Pilih kolom dari bookings
+            ->orderBy("lesson_schedules.date") // Urutkan berdasarkan tanggal
+            ->orderBy("time_slots.start_time") // Urutkan berdasarkan start_time
             ->get();
 
         $lessonTypes = LessonType::get();
@@ -60,7 +65,7 @@ class MyLessonController extends Controller
             if ($lessonSchedule) {
                 // Periksa apakah waktu mulai sudah lewat
                 $currentDateTime = now(); // Waktu saat ini
-                $lessonStartTime = Carbon::parse($lessonSchedule->date . ' ' . $lessonSchedule->timeSlot->start_time);
+                $lessonStartTime = Carbon::parse($lessonSchedule->date . " " . $lessonSchedule->timeSlot->start_time);
 
                 if ($currentDateTime->greaterThanOrEqualTo($lessonStartTime)) {
                     // Jika sudah lewat, tampilkan pesan kesalahan

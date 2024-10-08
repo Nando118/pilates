@@ -73,7 +73,7 @@
                                         </span>
                                         <br>
                                         <span style="font-size: 0.7rem">
-                                            <strong>{{ \Carbon\Carbon::parse($myLesson->date)->translatedFormat('l, d F Y') }}</strong><br>
+                                            <strong>{{ \Carbon\Carbon::parse($myLesson->date)->translatedFormat('D, d-M-y') }}</strong><br>
                                         </span>
                                     </div>
 

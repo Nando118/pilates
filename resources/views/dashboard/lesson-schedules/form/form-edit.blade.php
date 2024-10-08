@@ -4,11 +4,7 @@
 
 @section('content_header')
     <h1 class="ml-2">
-        @if (isset($lessonType))
-            Update Lesson Schedule
-        @else
-            Add New Lesson Schedule
-        @endif
+        Update Lesson Schedule
     </h1>
 @endsection
 
@@ -18,11 +14,7 @@
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
                 <li class="breadcrumb-item"><a href="{{ route('lesson-schedules.index') }}">Lesson Schedule</a></li>
-                @if (isset($lessonSchedule))
-                    <li class="breadcrumb-item active" aria-current="page">Update Lesson Schedule</li>
-                @else
-                    <li class="breadcrumb-item active" aria-current="page">Add Lesson Schedule</li>
-                @endif
+                <li class="breadcrumb-item active" aria-current="page">Update Lesson Schedule</li>
             </ol>
         </nav>
 
@@ -39,7 +31,7 @@
                     <div class="mb-3">
                         <label for="date" class="form-label">Date<span style="color: red;">*</span></label>
                         <div class="input-group date" data-provide="datepicker">
-                            <input type="text" class="form-control @error('date') is-invalid @enderror" id="date" name="date" autocomplete="off" value="{{ old('date') ?? (isset($lessonSchedule) ? date("Y/m/d", strtotime($lessonSchedule->date)) : "") }}" required>
+                            <input type="text" class="form-control @error('date') is-invalid @enderror" id="date" name="date" autocomplete="off" value="{{ old('date') ?? (isset($lessonSchedule) ? date("Y/m/d", strtotime($lessonSchedule->date)) : "") }}" required readonly>
                             <div class="input-group-addon">
                                 <span class="glyphicon glyphicon-th"></span>
                             </div>
@@ -52,12 +44,36 @@
                     </div>
 
                     <div class="mb-3">
+                        <label for="room" class="form-label">Room<span style="color: red;">*</span></label>
+                        <select class="form-control dropdown-form-select" id="room" name="room" required>
+                            <option value="" disabled {{ !isset($lessonSchedule) ? 'selected' : '' }}>Select room</option>
+                            @foreach ($rooms as $room)
+                                <option value="{{ $room->id }}" {{ old('room') == $room->id ? 'selected' : (isset($lessonSchedule) && $lessonSchedule->room_id == $room->id ? 'selected' : '') }}>
+                                    {{ $room->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="coach_user" class="form-label">Coach<span style="color: red;">*</span></label>
+                        <select class="form-control dropdown-form-select" id="coach_user" name="coach_user" required>
+                            <option value="" disabled {{ !isset($lessonSchedule) ? 'selected' : '' }}>Select coach</option>
+                            @foreach ($coachUsers as $coachUser)
+                                <option value="{{ $coachUser->id }}" {{ old('coach_user') == $coachUser->id ? 'selected' : (isset($lessonSchedule) && $lessonSchedule->user_id == $coachUser->id ? 'selected' : '') }}>
+                                    {{ $coachUser->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>  
+
+                    <div class="mb-3">
                         <label for="time_slot" class="form-label">Time<span style="color: red;">*</span></label>
                         <select class="form-control dropdown-form-select" id="time_slot" name="time_slot" required>
                             <option value="" disabled {{ !isset($lessonSchedule) ? 'selected' : '' }}>Select time</option>
                             @foreach ($timeSlots as $timeSlot)
                                 <option value="{{ $timeSlot->id }}" {{ old('time_slot') == $timeSlot->id ? 'selected' : (isset($lessonSchedule) && $lessonSchedule->time_slot_id == $timeSlot->id ? 'selected' : '') }}>
-                                    {{ $timeSlot->start_time }}
+                                    {{ $timeSlot->start_time . " - " . $timeSlot->end_time }}
                                 </option>
                             @endforeach
                         </select>
@@ -82,30 +98,6 @@
                             @foreach ($lessonTypes as $lessonType)
                                 <option value="{{ $lessonType->id }}" data-quota="{{ $lessonType->quota }}" {{ old('lesson_type') == $lessonType->id ? 'selected' : (isset($lessonSchedule) && $lessonSchedule->lesson_type_id == $lessonType->id ? 'selected' : '') }}>
                                     {{ $lessonType->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="coach_user" class="form-label">Coach<span style="color: red;">*</span></label>
-                        <select class="form-control dropdown-form-select" id="coach_user" name="coach_user" required>
-                            <option value="" disabled {{ !isset($lessonSchedule) ? 'selected' : '' }}>Select coach</option>
-                            @foreach ($coachUsers as $coachUser)
-                                <option value="{{ $coachUser->id }}" {{ old('coach_user') == $coachUser->id ? 'selected' : (isset($lessonSchedule) && $lessonSchedule->user_id == $coachUser->id ? 'selected' : '') }}>
-                                    {{ $coachUser->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="room" class="form-label">Room<span style="color: red;">*</span></label>
-                        <select class="form-control dropdown-form-select" id="room" name="room" required>
-                            <option value="" disabled {{ !isset($lessonSchedule) ? 'selected' : '' }}>Select room</option>
-                            @foreach ($rooms as $room)
-                                <option value="{{ $room->id }}" {{ old('room') == $room->id ? 'selected' : (isset($lessonSchedule) && $lessonSchedule->room_id == $room->id ? 'selected' : '') }}>
-                                    {{ $room->name }}
                                 </option>
                             @endforeach
                         </select>
@@ -142,6 +134,8 @@
                 autoclose: true,      // Agar otomatis menutup setelah tanggal dipilih
                 todayHighlight: true,  // Agar hari ini di highlight
                 startDate: Date(),
+                endDate: Date(),
+                orientation: 'bottom'
             });
         });
 

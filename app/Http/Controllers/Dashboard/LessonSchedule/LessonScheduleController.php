@@ -74,6 +74,21 @@ class LessonScheduleController extends Controller
             ->make(true);
     }
 
+    public function getAvailableTimeSlots(Request $request)
+    {
+        $selectedDate = $request->input("date"); // Ambil input tanggal dari request
+        $selectedRoomId = $request->input("room_id"); // Ambil input room dari request
+
+        // Ambil semua time slot yang ada
+        $availableTimeSlots = TimeSlot::whereDoesntHave("schedules", function ($query) use ($selectedDate, $selectedRoomId) {
+            $query->where("date", $selectedDate) // Cari lesson schedules pada tanggal yang dipilih
+                ->where("room_id", $selectedRoomId); // Cek room yang sama
+        })->get(); // Hanya ambil time slot yang belum ada lesson schedule
+
+        return response()->json($availableTimeSlots);
+    }
+
+
     public function create()
     {
         $action = route("lesson-schedules.store");
@@ -86,7 +101,7 @@ class LessonScheduleController extends Controller
         })->get();
         $rooms = Room::get();
 
-        return view("dashboard.lesson-schedules.form.form", [
+        return view("dashboard.lesson-schedules.form.form-add", [
             "title_page" => "Pilates | Add Lesson Schedules",
             "timeSlots" => $timeSlots,
             "lessons" => $lessons,
@@ -122,15 +137,16 @@ class LessonScheduleController extends Controller
 
             // 2. Cek apakah coach sudah terjadwal dalam rentang waktu yang sama
             $isCoachAvailable = LessonSchedule::where("user_id", $coachId)
-            ->where("date",
-                $date
-            )
-            ->whereHas("timeSlot", function ($query) use ($timeSlotId) {
-                $timeSlot = TimeSlot::find($timeSlotId);
-                $query->where("start_time", "<", $timeSlot->end_time)
-                ->where("end_time", ">", $timeSlot->start_time);
-            })
-            ->exists();
+                ->where(
+                    "date",
+                    $date
+                )
+                ->whereHas("timeSlot", function ($query) use ($timeSlotId) {
+                    $timeSlot = TimeSlot::find($timeSlotId);
+                    $query->where("start_time", "<", $timeSlot->end_time)
+                        ->where("end_time", ">", $timeSlot->start_time);
+                })
+                ->exists();
 
             if ($isCoachAvailable) {
                 // Jika coach sudah dijadwalkan pada waktu yang sama, rollback transaksi dan kirim pesan error
@@ -165,7 +181,6 @@ class LessonScheduleController extends Controller
     public function edit(LessonSchedule $lessonSchedule)
     {
         $action = route("lesson-schedules.update", ["lessonSchedule" => $lessonSchedule->id]);
-        $timeSlots = TimeSlot::get();
         $lessons = Lesson::get();
         $lessonTypes = LessonType::get();
         $coachUsers = User::with("profile")->whereHas("roles", function ($query) {
@@ -173,7 +188,19 @@ class LessonScheduleController extends Controller
         })->get();
         $rooms = Room::get();
 
-        return view("dashboard.lesson-schedules.form.form", compact("lessonSchedule", "action", "timeSlots", "lessons", "lessonTypes", "coachUsers", "rooms"))
+        // Dapatkan tanggal dan ruangan dari lessonSchedule yang akan diedit
+        $selectedDate = $lessonSchedule->date;
+        $selectedRoomId = $lessonSchedule->room_id;
+
+        // Query time slots yang tersedia berdasarkan tanggal dan ruangan
+        $timeSlots = TimeSlot::whereDoesntHave("schedules", function ($query) use ($selectedDate, $selectedRoomId, $lessonSchedule) {
+            // Filter time slots yang bentrok pada tanggal dan ruangan yang sama
+            $query->where("date", $selectedDate)
+                ->where("room_id", $selectedRoomId)
+                ->where("id", "!=", $lessonSchedule->id);  // Jangan ambil lessonSchedule yang sedang diedit
+        })->get();
+
+        return view("dashboard.lesson-schedules.form.form-edit", compact("lessonSchedule", "action", "timeSlots", "lessons", "lessonTypes", "coachUsers", "rooms"))
         ->with([
             "title_page" => "Pilates | Update Lesson Schedule",
             "method" => "POST"
@@ -224,10 +251,10 @@ class LessonScheduleController extends Controller
                     return redirect()->back()->withInput();
                 }
             }
-            
+
             // 3. Jika semua validasi lolos, update jadwal
             $lessonSchedule->update([
-                "date" => $validated["date"],
+                // "date" => $validated["date"],
                 "time_slot_id" => $validated["time_slot"],
                 "lesson_id" => $validated["lesson"],
                 "lesson_type_id" => $validated["lesson_type"],

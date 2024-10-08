@@ -27,8 +27,15 @@ class UserLessonScheduleController extends Controller
 
     public function index()
     {
-        $lessonScheduleDatas = LessonSchedule::with(['timeSlot', 'lesson', 'lessonType', 'user', 'room'])->get();
-        $lessonTypes = LessonType::get();
+        // Ambil data lesson schedule dengan eager loading dan urutkan berdasarkan date dan start_time
+        $lessonScheduleDatas = LessonSchedule::with(["timeSlot", "lesson", "lessonType", "user", "room"])
+        ->join("time_slots", "lesson_schedules.time_slot_id", "=", "time_slots.id") // Lakukan join untuk mendapatkan data dari time_slots
+        ->select("lesson_schedules.*") // Pilih kolom dari lesson_schedules
+        ->orderBy("lesson_schedules.date") // Urutkan berdasarkan tanggal
+        ->orderBy("time_slots.start_time") // Urutkan berdasarkan start_time
+        ->get();
+
+        $lessonTypes = LessonType::all(); // Mengambil semua lesson types
 
         return view("home.lesson-schedules.index", [
             "title_page" => "Pilates | Lesson Schedules",
@@ -70,7 +77,7 @@ class UserLessonScheduleController extends Controller
 
             // Cek apakah tanggal dan waktu sudah lewat
             $currentDateTime = now(); // Waktu saat ini
-            $lessonStartTime = \Carbon\Carbon::parse($lessonSchedule->date . ' ' . $lessonSchedule->timeSlot->start_time);
+            $lessonStartTime = \Carbon\Carbon::parse($lessonSchedule->date . " " . $lessonSchedule->timeSlot->start_time);
 
             if ($currentDateTime->greaterThanOrEqualTo($lessonStartTime)) {
                 // Jika sudah lewat, rollback dan kirim alert

@@ -31,7 +31,7 @@
                     <p><strong>Time:</strong> {{ date('H:i', strtotime($lessonSchedule->timeSlot->start_time)) }}</p>
                     <p><strong>Coach:</strong> {{ $lessonSchedule->user->name }}</p>
                 </div>
-
+                
                 <!-- List of Participants -->
                 <div class="container-fluid">
                     <h5>List Participants</h5>

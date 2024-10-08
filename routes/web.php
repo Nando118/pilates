@@ -163,6 +163,7 @@ Route::middleware(['auth', 'verified', 'onlyAdmin'])->group(function () {
     // START LESSON SCHEDULES ROUTE - ADMIN PAGE
     Route::get("/dashboard/lesson-schedules", [LessonScheduleController::class, "index"])->name("lesson-schedules.index");
     Route::get("/dashboard/lesson-schedules/data", [LessonScheduleController::class, "getData"])->name("lesson-schedules.data");
+    Route::get("/dashboard/lesson-schedules/getAvailableTimeSlots", [LessonScheduleController::class, "getAvailableTimeSlots"])->name("lesson-schedules.getAvailableTimeSlots");
     Route::get("/dashboard/lesson-schedules/create", [LessonScheduleController::class, "create"])->name("lesson-schedules.create");
     Route::post("/dashboard/lesson-schedules/create/store", [LessonScheduleController::class, "store"])->name("lesson-schedules.store");
     Route::get("/dashboard/lesson-schedules/edit/{lessonSchedule}", [LessonScheduleController::class, "edit"])->name("lesson-schedules.edit");
