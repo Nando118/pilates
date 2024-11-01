@@ -66,6 +66,15 @@ class LessonTypeController extends Controller
         try {
             $validated = $request->validated();
 
+            $existingLessonType = LessonType::where("name", $validated["name"])
+                ->whereNull("deleted_at") // Cek hanya yang belum dihapus (soft delete)
+                ->first();
+
+            if ($existingLessonType) {
+                alert()->error("Oppss...", "Lesson type name already exists. Please use a different name.");
+                return redirect()->back()->withInput();
+            }
+
             DB::beginTransaction();
 
             LessonType::create([

@@ -25,13 +25,13 @@
 
                     @if(isset($lessonSchedule))
                         @method('PUT')
-                        <input type="hidden" name="id" value="{{ $lessonSchedule->id }}">
+                        <input type="hidden" name="id" value="{{ $lessonSchedule->id }}">                        
                     @endif
 
                     <div class="mb-3">
                         <label for="date" class="form-label">Date<span style="color: red;">*</span></label>
                         <div class="input-group date" data-provide="datepicker">
-                            <input type="text" class="form-control @error('date') is-invalid @enderror" id="date" name="date" autocomplete="off" value="{{ old('date') ?? (isset($lessonSchedule) ? date("Y/m/d", strtotime($lessonSchedule->date)) : "") }}" required readonly>
+                            <input type="text" class="form-control @error('date') is-invalid @enderror" id="date" name="date" autocomplete="off" value="{{ old('date') ?? (isset($lessonSchedule) ? date("Y/m/d", strtotime($lessonSchedule->date)) : "") }}" required>
                             <div class="input-group-addon">
                                 <span class="glyphicon glyphicon-th"></span>
                             </div>
@@ -130,11 +130,10 @@
     <script>
         $(document).ready(function(){
             $('.date').datepicker({
-                format: 'yyyy/mm/dd', // Mengatur format menjadi 2020/12/23
-                autoclose: true,      // Agar otomatis menutup setelah tanggal dipilih
-                todayHighlight: true,  // Agar hari ini di highlight
-                startDate: Date(),
-                endDate: Date(),
+                format: 'yyyy/mm/dd', // Format tanggal
+                autoclose: true,      // Otomatis menutup setelah tanggal dipilih
+                todayHighlight: true,  // Sorot hari ini
+                startDate: new Date(), // Set agar minimal hari ini
                 orientation: 'bottom'
             });
         });

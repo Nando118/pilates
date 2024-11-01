@@ -8,6 +8,7 @@ use App\Models\Booking;
 use App\Models\LessonSchedule;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
@@ -60,10 +61,18 @@ class BookingController extends Controller
                 return $username;
             })
             ->addColumn("action", function ($booking) {
-                $btn = '<div class="btn-group mr-1">';
-                $btn .= '<a href="' . route("bookings.delete", ["bookings" => $booking->id]) . '" class="btn btn-danger btn-sm" title="Delete" data-confirm-delete="true"><i class="fas fa-fw fa-trash"></i></button> ';
-                $btn .= '</div>';
-                return $btn;
+
+                $currentDate = Carbon::today();
+                $scheduleDate = Carbon::parse($booking->lessonSchedule->date);
+
+                if ($scheduleDate->greaterThanOrEqualTo($currentDate)) {
+                    $btn = '<div class="btn-group mr-1">';
+                    $btn .= '<a href="' . route("bookings.delete", ["bookings" => $booking->id]) . '" class="btn btn-danger btn-sm" title="Delete" data-confirm-delete="true"><i class="fas fa-fw fa-trash"></i></button> ';
+                    $btn .= '</div>';
+                    return $btn;
+                }
+
+                return '<span class="text-muted">Not Available to edit</span>'; // Tidak ada tombol jika tanggal sudah lewat
             })
             ->rawColumns(["lesson", "date", "action"])
             ->make(true);

@@ -12,6 +12,7 @@ use App\Models\Room;
 use App\Models\TimeSlot;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
@@ -63,12 +64,18 @@ class LessonScheduleController extends Controller
                 return ucfirst($lessonSchedule->room->name ?? "N/A");
             })
             ->addColumn("action", function ($lessonSchedule) {
-                $btn = '<div class="btn-group mr-1">';
-                $btn .= '<a href="' . route("bookings.create", ["bookings" => $lessonSchedule->id]) . '" class="btn btn-primary btn-sm" title="Booking"><i class="fas fa-fw fa-user-plus"></i></a> ';
-                $btn .= '<a href="' . route("lesson-schedules.edit", ["lessonSchedule" => $lessonSchedule->id]) . '" class="btn btn-warning btn-sm" title="Edit"><i class="fas fa-fw fa-edit"></i></a> ';
-                $btn .= '<a href="' . route("lesson-schedules.delete", ["lessonSchedule" => $lessonSchedule->id]) . '" class="btn btn-danger btn-sm" title="Delete" data-confirm-delete="true"><i class="fas fa-fw fa-trash"></i></button> ';
-                $btn .= '</div>';
-                return $btn;
+                $currentDate = Carbon::today();
+                $scheduleDate = Carbon::parse($lessonSchedule->date);
+
+                if ($scheduleDate->greaterThanOrEqualTo($currentDate)) {
+                    $btn = '<div class="btn-group mr-1">';
+                    $btn .= '<a href="' . route("bookings.create", ["bookings" => $lessonSchedule->id]) . '" class="btn btn-primary btn-sm" title="Booking"><i class="fas fa-fw fa-user-plus"></i></a> ';
+                    $btn .= '<a href="' . route("lesson-schedules.edit", ["lessonSchedule" => $lessonSchedule->id]) . '" class="btn btn-warning btn-sm" title="Edit"><i class="fas fa-fw fa-edit"></i></a> ';
+                    $btn .= '<a href="' . route("lesson-schedules.delete", ["lessonSchedule" => $lessonSchedule->id]) . '" class="btn btn-danger btn-sm" title="Delete" data-confirm-delete="true"><i class="fas fa-fw fa-trash"></i></button> ';
+                    $btn .= '</div>';
+                    return $btn;
+                }
+                return '<span class="text-muted">Not Available to edit</span>'; // Tidak ada tombol jika tanggal sudah lewat
             })
             ->rawColumns(["time", "lesson", "action"])
             ->make(true);
@@ -201,10 +208,10 @@ class LessonScheduleController extends Controller
         })->get();
 
         return view("dashboard.lesson-schedules.form.form-edit", compact("lessonSchedule", "action", "timeSlots", "lessons", "lessonTypes", "coachUsers", "rooms"))
-        ->with([
-            "title_page" => "Pilates | Update Lesson Schedule",
-            "method" => "POST"
-        ]);
+            ->with([
+                "title_page" => "Pilates | Update Lesson Schedule",
+                "method" => "POST"
+            ]);
     }
 
     public function update(LessonSchedule $lessonSchedule, UpdateLessonScheduleRequest $request)
@@ -254,7 +261,7 @@ class LessonScheduleController extends Controller
 
             // 3. Jika semua validasi lolos, update jadwal
             $lessonSchedule->update([
-                // "date" => $validated["date"],
+                "date" => $validated["date"],
                 "time_slot_id" => $validated["time_slot"],
                 "lesson_id" => $validated["lesson"],
                 "lesson_type_id" => $validated["lesson_type"],
