@@ -70,7 +70,7 @@
             <button type="submit" id="btn_submit" class="btn w-100 btn-dark"><strong>Sign Up</strong></button>
         </form>
         <p class="text-center text-muted mt-3">
-            &copy; 2024 Your Company. All rights reserved.
+            &copy;Ohana Pilates. All rights reserved.
         </p>
     </div>
 @endsection

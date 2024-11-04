@@ -16,6 +16,7 @@ use App\Http\Controllers\Home\MyLesson\MyLessonController;
 use App\Http\Controllers\Home\MySchedule\MyScheduleController;
 use App\Http\Controllers\Home\Profile\ProfileController;
 use App\Http\Controllers\Dashboard\CoachCertification\CoachCertificationController;
+use App\Http\Controllers\Dashboard\UserCredit\UserCreditController;
 use App\Http\Controllers\Home\Coach\CoachController;
 use Illuminate\Support\Facades\Route;
 
@@ -188,4 +189,9 @@ Route::middleware(['auth', 'verified', 'onlyAdmin'])->group(function () {
     Route::put("/dashboard/coach-certifications/edit/{coachCertification}/update", [CoachCertificationController::class, "update"])->name("coach-certifications.update");
     Route::delete("/dashboard/coach-certifications/{coachCertification}/delete", [CoachCertificationController::class, "destroy"])->name("coach-certifications.delete");
     // END COACH CERTIFICATION ROUTE - ADMIN PAGE
+
+    // START USER CREDITS ROUTE - ADMIN PAGE
+    Route::get("/dashboard/user-credits", [UserCreditController::class, "index"])->name("user-credits.index");
+    Route::get("/dashboard/user-credits/data", [UserCreditController::class, "getData"])->name("user-credits.data");
+    // END USER CREDITS ROUTE - ADMIN PAGE
 });

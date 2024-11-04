@@ -93,4 +93,14 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(CoachCertification::class, "user_id", "id");
     }
+
+    public function creditTransactions(): HasMany
+    {
+        return $this->hasMany(CreditTransaction::class, 'user_id', 'id');
+    }
+
+    public function hasSufficientCredit(int $requiredCredit): bool
+    {
+        return $this->credit_balance >= $requiredCredit;
+    }
 }

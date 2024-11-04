@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
         DB::transaction(function () {
             // Buat Role
             $roles = [
+                'super_admin' => Role::query()->create(['name' => 'super_admin']),
                 'admin' => Role::query()->create(['name' => 'admin']),
                 'coach' => Role::query()->create(['name' => 'coach']),
                 'client' => Role::query()->create(['name' => 'client']),
@@ -39,13 +40,24 @@ class DatabaseSeeder extends Seeder
             // Data User
             $users = [
                 [
-                    "name" => "Admin User",
+                    "name" => "Super Admin",
+                    "email" => "super.admin@admin.com",
+                    "password" => Hash::make("super.admin@admin.com"),
+                    "registration_type" => "form",
+                    "profile" => [
+                        "gender" => "male",
+                        "phone" => "1234567890",
+                        "address" => "Tangerang",
+                        "profile_picture" => null
+                    ],
+                    "role" => 'super_admin'
+                ],
+                [
+                    "name" => "Admin",
                     "email" => "admin@admin.com",
                     "password" => Hash::make("admin@admin.com"),
                     "registration_type" => "form",
                     "profile" => [
-//                        "branch" => "tangerang",
-                        "username" => "adminuser",
                         "gender" => "male",
                         "phone" => "1234567890",
                         "address" => "Tangerang",
@@ -59,8 +71,6 @@ class DatabaseSeeder extends Seeder
                     "password" => Hash::make("justin@coach.com"),
                     "registration_type" => "form",
                     "profile" => [
-//                        "branch" => "jakarta",
-                        "username" => "coachjustin",
                         "gender" => "male",
                         "phone" => "0987654321",
                         "address" => "Jakarta",
@@ -74,8 +84,6 @@ class DatabaseSeeder extends Seeder
                     "password" => Hash::make("adam.levin@client.com"),
                     "registration_type" => "form",
                     "profile" => [
-//                        "branch" => "tangerang",
-                        "username" => "adamlevin",
                         "gender" => "male",
                         "phone" => "1122334455",
                         "address" => "California",
@@ -89,8 +97,6 @@ class DatabaseSeeder extends Seeder
                     "password" => Hash::make("helga@coach.com"),
                     "registration_type" => "form",
                     "profile" => [
-                        //                        "branch" => "jakarta",
-                        "username" => "helga",
                         "gender" => "female",
                         "phone" => "0987654321",
                         "address" => "Tangerang",
@@ -104,8 +110,6 @@ class DatabaseSeeder extends Seeder
                     "password" => Hash::make("sumiko@client.com"),
                     "registration_type" => "form",
                     "profile" => [
-                        //                        "branch" => "tangerang",
-                        "username" => "sumikojp",
                         "gender" => "female",
                         "phone" => "1122334455",
                         "address" => "Yokohama",
@@ -119,8 +123,6 @@ class DatabaseSeeder extends Seeder
                     "password" => Hash::make("mastatang@client.com"),
                     "registration_type" => "form",
                     "profile" => [
-                        //                        "branch" => "tangerang",
-                        "username" => "mastatang",
                         "gender" => "male",
                         "phone" => "1122334455",
                         "address" => "Bandung",
@@ -144,8 +146,6 @@ class DatabaseSeeder extends Seeder
                 // Buat profile user
                 UserProfile::query()->create([
                     "user_id" => $user->id,
-//                    "branch" => $userData['profile']['branch'],
-                    "username" => $userData['profile']['username'],
                     "gender" => $userData['profile']['gender'],
                     "phone" => $userData['profile']['phone'],
                     "address" => $userData['profile']['address'],
@@ -157,7 +157,7 @@ class DatabaseSeeder extends Seeder
             }
 
             // Buat Time Slots
-            $start = strtotime('09:00');
+            /* $start = strtotime('09:00');
             $end = strtotime('18:00');
 
             while ($start < $end) {
@@ -222,10 +222,10 @@ class DatabaseSeeder extends Seeder
 
             foreach ($lessons as $lesson) {
                 Lesson::query()->create($lesson);
-            }
+            } */
 
             // Buat Schedule
-            $startDate = Carbon::now();
+            /* $startDate = Carbon::now();
             $scheduleData = [
                 [
                     'date' => $startDate->copy(),
@@ -282,11 +282,11 @@ class DatabaseSeeder extends Seeder
 
             foreach ($scheduleData as $schedule) {
                 LessonSchedule::query()->create($schedule);
-            }
+            } */
 
             // Certification
             // Seeder Coach Certifications
-            $certifications = [
+            /* $certifications = [
                 'Bachelor of Physiotherapy',
                 'STOTT Intensive Mat Pilates (IMP)',
                 'STOTT Intensive Reformer (IR)',
@@ -314,7 +314,7 @@ class DatabaseSeeder extends Seeder
                     'date_received' => now()->subYears(rand(1, 5)),
                     'issuing_organization' => 'Pilates Institute'
                 ]);
-            }
+            } */
         });
     }
 }

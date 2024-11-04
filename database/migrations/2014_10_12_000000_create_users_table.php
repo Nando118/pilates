@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
             $table->enum('registration_type', ['form', 'social'])->nullable(false);
+            $table->integer('credit_balance')->default(0);
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

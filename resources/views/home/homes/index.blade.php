@@ -27,7 +27,7 @@
             <div class="container-fluid">
                 <div class="mb-5">
                     <!-- Tampilkan Nama Pengguna dan Tanggal -->
-                    <p class="h5">Hi <em>{{ '@' . $user->profile->username }}</em>, today is the best day for exercise!</p>
+                    <p class="h5">Hi <em>{{ $user->name }}</em>, today is the best day for exercise!</p>
                     <p class="lead">{{ $currentDate }}</p>
                 </div>
 

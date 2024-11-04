@@ -11,7 +11,7 @@
             <button type="submit" class="btn btn-link p-0 m-0 align-baseline">click here to re-send verification link</button>.
         </form>
         <p class="text-center text-muted mt-3">
-            &copy; 2024 Your Company. All rights reserved.
+            &copy;Ohana Pilates. All rights reserved.
         </p>
     </div>
 @endsection

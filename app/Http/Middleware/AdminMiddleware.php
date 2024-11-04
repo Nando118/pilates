@@ -17,7 +17,7 @@ class AdminMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         // Periksa apakah pengguna terautentikasi dan memiliki peran admin
-        if (!Auth::check() || !$request->user()->hasRole("admin")) {
+        if (!Auth::check() || !$request->user()->hasRole("admin") && !$request->user()->hasRole("super_admin")) {
             // Redirect ke halaman yang diinginkan jika tidak memiliki akses
             return abort(403, "Unauthorized");
         }

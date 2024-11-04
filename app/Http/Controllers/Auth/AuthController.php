@@ -107,9 +107,7 @@ class AuthController extends Controller
             }
 
             $userProfile = UserProfile::create([
-                "user_id" => $userId,
-                // "branch" => $validated["branch"],
-                "username" => $validated["username"],
+                "user_id" => $userId,                
                 "gender" => $validated["gender"],
                 "phone" => $validated["phone"],
                 "address" => isset($validated["address"]) && !empty($validated["address"]) ? $validated["address"] : null,
@@ -226,9 +224,7 @@ class AuthController extends Controller
 
             $userProfile = UserProfile::updateOrCreate(
                 ["user_id" => $user->id],
-                [
-                    // "branch" => "",
-                    "username" => "",
+                [                    
                     "gender" => "other",
                     "phone" => "",
                     "address" => ""
@@ -308,9 +304,7 @@ class AuthController extends Controller
             }
 
             // Update profile
-            $userProfile->update([
-                // "branch" => $validated["branch"],
-                "username" => $validated["username"],
+            $userProfile->update([                
                 "gender" => $validated["gender"],
                 "phone" => $validated["phone"],
                 "address" => isset($validated["address"]) && !empty($validated["address"]) ? $validated["address"] : null,
@@ -335,9 +329,6 @@ class AuthController extends Controller
 
     private function isUserProfileIncomplete($userProfile)
     {
-        //        return empty($userProfile->branch) || empty($userProfile->username) ||
-        //            empty($userProfile->phone) || empty($userProfile->address);
-
         return empty($userProfile->username) || empty($userProfile->phone);
     }
 

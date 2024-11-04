@@ -6,7 +6,7 @@ class RedirectByRoleHelper
 {
     public static function redirectBasedOnRole($user)
     {
-        if ($user->hasRole("admin")) {
+        if ($user->hasRole("super_admin") || $user->hasRole("admin")) {
             return redirect()->route("dashboard");
         } elseif ($user->hasRole("coach") || $user->hasRole("client")) {
             return redirect()->route("home");

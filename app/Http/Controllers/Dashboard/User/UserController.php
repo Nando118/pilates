@@ -44,13 +44,10 @@ class UserController extends Controller
     public function getData()
     {
         $users = User::with("profile")->whereDoesntHave("roles", function ($query) {
-            $query->where("name", "admin");
+            $query->whereIn("name", ["super_admin", "admin"]);
         })->get();
 
-        return DataTables::of($users)
-            //            ->addColumn("branch", function ($user) {
-            //                return ucfirst($user->profile->branch) ?? "N/A";
-            //            })
+        return DataTables::of($users)            
             ->addColumn("gender", function ($user) {
                 return ucfirst($user->profile->gender) ?? "N/A";
             })
@@ -113,9 +110,7 @@ class UserController extends Controller
             }
 
             UserProfile::create([
-                "user_id" => $userId,
-                //                "branch" => $validated["branch"],
-                "username" => $validated["username"],
+                "user_id" => $userId,                
                 "gender" => $validated["gender"],
                 "phone" => $validated["phone"],
                 "address" => isset($validated["address"]) && !empty($validated["address"]) ? $validated["address"] : null,

@@ -343,6 +343,12 @@ return [
             'icon' => 'fas fa-fw fa-users',
         ],
         [
+            'text' => 'User Credits',
+            'url' => '/dashboard/user-credits',
+            'icon' => 'fas fa-fw fa-coins',
+            'can' => 'super-admin'
+        ],
+        [
             'text' => 'Coach Certifications',
             'url' => '/dashboard/coach-certifications',
             'icon' => 'fas fa-fw fa-certificate',

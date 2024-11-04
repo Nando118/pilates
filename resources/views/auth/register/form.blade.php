@@ -8,29 +8,10 @@
             @csrf
             <h2 class="text-left mb-4">Register</h2>
 
-{{--            <div class="mb-3">--}}
-{{--                <label for="branch" class="form-label">Branch</label>--}}
-{{--                <select class="form-control" id="branch" name="branch" required>--}}
-{{--                    <option value="" disabled selected>Select branch</option>--}}
-{{--                    <option value="jakarta" {{ old('branch') == 'jakarta' ? 'selected' : '' }}>Jakarta</option>--}}
-{{--                    <option value="tangerang" {{ old('branch') == 'tangerang' ? 'selected' : '' }}>Tangerang</option>--}}
-{{--                </select>--}}
-{{--            </div>--}}
-
             <div class="mb-3">
                 <label for="name" class="form-label">Name<span style="color: red;">*</span></label>
                 <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" autocomplete="off" value="{{ old('name') }}" required>
                 @error('name')
-                    <div class="invalid-feedback">
-                        {{ $message }}
-                    </div>
-                @enderror
-            </div>
-
-            <div class="mb-3">
-                <label for="username" class="form-label">Username<span style="color: red;">*</span></label>
-                <input type="text" class="form-control @error('username') is-invalid @enderror" id="username" name="username" autocomplete="off" value="{{ old('username') }}" required>
-                @error('username')
                     <div class="invalid-feedback">
                         {{ $message }}
                     </div>
@@ -112,7 +93,7 @@
             <p class="text-center mt-4 mb-0">Already have an account?<a class="link-dark text-decoration-none" href="{{ route('login') }}"> <strong>Sign In</strong></a></p>
         </form>
         <p class="text-center text-muted mt-3">
-            &copy; 2024 Your Company. All rights reserved.
+            &copy;Ohana Pilates. All rights reserved.
         </p>
     </div>
 @endsection

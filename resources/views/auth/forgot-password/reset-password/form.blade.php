@@ -45,7 +45,7 @@
             <p class="text-center mt-4 mb-0">Already have an account?<a class="link-dark text-decoration-none" href="{{ route('login') }}"> <strong>Sign In</strong></a></p>
         </form>
         <p class="text-center text-muted mt-3">
-            &copy; 2024 Your Company. All rights reserved.
+            &copy;Ohana Pilates. All rights reserved.
         </p>
     </div>
 @endsection

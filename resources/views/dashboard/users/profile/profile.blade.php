@@ -32,18 +32,20 @@
             </div>
             <div class="card-body p-0">
                 <ul class="list-group list-group-flush">
-{{--                <li class="list-group-item d-flex align-items-center">--}}
-{{--                    <i class="fas fa-map-marker-alt mr-2"></i>{{ ucfirst($userData->profile->branch) }}--}}
-{{--                </li>--}}
-                <li class="list-group-item d-flex align-items-center">
-                    <i class="fas fa-venus-mars mr-2"></i>{{ ucfirst($userData->profile->gender) }}
-                </li>
-                <li class="list-group-item d-flex align-items-center">
-                    <i class="fas fa-phone mr-2"></i>{{ ucfirst($userData->profile->phone) }}
-                </li>
-                <li class="list-group-item d-flex align-items-center">
-                    <i class="fas fa-home mr-2"></i>{{ ucfirst($userData->profile->address) }}
-                </li>
+                    <li class="list-group-item d-flex align-items-center">
+                        <i class="fas fa-venus-mars mr-2"></i>{{ ucfirst($userData->profile->gender) }}
+                    </li>
+                    <li class="list-group-item d-flex align-items-center">
+                        <i class="fas fa-phone mr-2"></i>{{ ucfirst($userData->profile->phone) }}
+                    </li>
+                    <li class="list-group-item d-flex align-items-center">
+                        <i class="fas fa-home mr-2"></i>{{ ucfirst($userData->profile->address) }}
+                    </li>
+                    @if ($roleName != "Coach")                        
+                        <li class="list-group-item d-flex align-items-center">
+                            <i class="fas fa-coins mr-2"></i>{{ ucfirst($userData->credit_balance) }} credits
+                        </li>
+                    @endif
                 </ul>
             </div>
         </div>

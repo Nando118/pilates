@@ -3,7 +3,7 @@
 @section('title', $title_page)
 
 @section('content_header')
-    <h1 class="ml-2">Users</h1>
+    <h1 class="ml-2">User Credits</h1>
 @endsection
 
 @section('content')
@@ -11,7 +11,7 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Users</li>
+                <li class="breadcrumb-item active" aria-current="page">User Credits</li>
             </ol>
         </nav>
 
@@ -21,13 +21,11 @@
                     <table id="tbl_list" class="table table-striped" width="100%">
                         <thead>
                             <tr >
-                                <th>No</th>
-                                <th>Created At</th>
+                                <th>No</th>                                
                                 <th>Name</th>
                                 <th>Email</th>
-                                <th>Gender</th>
-                                <th>Platform</th>
-                                <th>Role</th>
+                                <th>Phone</th>
+                                <th>Gender</th>                                
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -36,10 +34,7 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
-            <div class="card-footer">
-                <a href="{{ route('users.create') }}" class="btn btn-success">Add New User</a>
-            </div>
+            </div>            
         </div>
     </div>
 @endsection
@@ -50,7 +45,7 @@
             $('#tbl_list').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: '{{ route('users.data') }}',
+                ajax: '{{ route('user-credits.data') }}',
                 language: {
                     zeroRecords: "There is no users data yet",
                 },
@@ -64,27 +59,14 @@
                             // Menampilkan nomor index (incremented by 1) pada setiap baris
                             return meta.row + meta.settings._iDisplayStart + 1;
                         }
-                    },
-                    { data: 'created_at', name: 'created_at', render: DataTable.render.date()},
+                    },                    
                     { data: 'name', name: 'name'},
                     { data: 'email', name: 'email'},
-                    { data: 'gender', name: 'gender'},
-                    { data: 'platform', name: 'platform'},
-                    { data: 'role', name: 'role'},
+                    { data: 'phone', name: 'phone'},
+                    { data: 'gender', name: 'gender'},                    
                     { data: 'action', name: 'action', orderable: false, searchable: false},
                 ],
-                order: [1, 'desc'],
-                dom: 'Bfrtip',
-                buttons: [
-                    {
-                        extend: 'excelHtml5',
-                        text: '<i class="fas fa-file-excel mr-1"></i> Export to Excel',
-                        className: 'btn btn-success',
-                        exportOptions: {
-                            columns: ':visible'
-                        }
-                    }
-                ]
+                order: [1, 'desc'],                
             });
         });
     </script>

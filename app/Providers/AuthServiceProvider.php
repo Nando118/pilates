@@ -24,13 +24,20 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
         Gate::define("access-dashboard", function (User $user) {
-            if ($user->hasRole("admin")) {
+            if ($user->hasRole("admin") || $user->hasRole("super_admin")) {
                 return true;
             }
             return false;
         });
+
+        Gate::define("super-admin", function (User $user) {
+            if ($user->hasRole("super_admin")) {
+                return true;
+            }
+            return false;
+        });
+
         Gate::define("access-user-home", function (User $user) {
             if ($user->hasRole("client") || $user->hasRole("coach")) {
                 return true;
