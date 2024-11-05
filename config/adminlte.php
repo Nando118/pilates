@@ -349,6 +349,12 @@ return [
             'can' => 'super-admin'
         ],
         [
+            'text' => 'User Credits History',
+            'url' => '/dashboard/credit-transactions',
+            'icon' => 'fas fa-fw fa-history',
+            'can' => 'super-admin'
+        ],
+        [
             'text' => 'Coach Certifications',
             'url' => '/dashboard/coach-certifications',
             'icon' => 'fas fa-fw fa-certificate',
