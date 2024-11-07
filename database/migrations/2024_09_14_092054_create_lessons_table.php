@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('lessons', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique()->nullable(false);
+            $table->string('name')->nullable(false);
             $table->timestamps();
             $table->softDeletes();
         });

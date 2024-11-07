@@ -24,9 +24,9 @@
                                 <th>No</th>
                                 <th>Date</th>
                                 <th>Time</th>
-                                <th>Lesson</th>
-                                <th>Room</th>
+                                <th>Lesson</th>                                
                                 <th>Quota</th>
+                                <th>Credit Price</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -98,9 +98,9 @@
                     },
                     { data: 'date', name: 'date', render: DataTable.render.date(), className: 'align-middle'},
                     { data: 'time', name: 'time', className: 'align-middle'},
-                    { data: 'lesson', name: 'lesson', className: 'align-middle'},
-                    { data: 'room', name: 'room', className: 'align-middle'},
+                    { data: 'lesson', name: 'lesson', className: 'align-middle'},                    
                     { data: 'quota', name: 'quota', className: 'align-middle'},
+                    { data: 'credit_price', name: 'credit_price', className: 'align-middle'},
                     { data: 'status', name: 'status', className: 'align-middle'},
                     { data: 'action', name: 'action', orderable: false, searchable: false, className: 'align-middle'},
                 ],

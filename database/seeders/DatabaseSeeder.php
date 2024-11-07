@@ -157,7 +157,7 @@ class DatabaseSeeder extends Seeder
             }
 
             // Buat Time Slots
-            /* $start = strtotime('09:00');
+            $start = strtotime('09:00');
             $end = strtotime('18:00');
 
             while ($start < $end) {
@@ -173,26 +173,12 @@ class DatabaseSeeder extends Seeder
 
                 $start = $end_time; // Waktu berikutnya
             }
-
-            // Buat Rooms
-            $rooms = [
-                [
-                    'name' => 'Room Alpha'
-                ],
-                [
-                    'name' => 'Room Beta'
-                ]
-            ];
-
-            foreach ($rooms as $room) {
-                Room::query()->create($room);
-            }
-
+        
             // Buat Lesson Types
             $lessonTypes = [
                 [
-                    'name' => 'Reformer',
-                    'quota' => 5
+                    'name' => 'Group',
+                    'quota' => 8
                 ],
                 [
                     'name' => 'Private',
@@ -222,7 +208,7 @@ class DatabaseSeeder extends Seeder
 
             foreach ($lessons as $lesson) {
                 Lesson::query()->create($lesson);
-            } */
+            }
 
             // Buat Schedule
             /* $startDate = Carbon::now();

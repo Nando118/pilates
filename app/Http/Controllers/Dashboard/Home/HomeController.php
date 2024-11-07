@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Dashboard\Home;
 
 use App\Http\Controllers\Controller;
 use App\Models\Role;
-use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -33,16 +32,13 @@ class HomeController extends Controller
         $clientCount = Role::where('name', 'client')
             ->withCount('users')
             ->first()
-            ->users_count;
-
-        $roomCount = Room::count();
+            ->users_count;        
 
         return view("dashboard.homes.index", [
             "title_page" => "Pilates | Dashboard",
             "user" => Auth::user(),
             "coachCount" => $coachCount,
-            "clientCount" => $clientCount,
-            "roomCount" => $roomCount
+            "clientCount" => $clientCount
         ]);
     }
 }

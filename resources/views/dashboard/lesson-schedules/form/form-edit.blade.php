@@ -42,19 +42,7 @@
                             </div>
                         @enderror
                     </div>
-
-                    <div class="mb-3">
-                        <label for="room" class="form-label">Room<span style="color: red;">*</span></label>
-                        <select class="form-control dropdown-form-select" id="room" name="room" required>
-                            <option value="" disabled {{ !isset($lessonSchedule) ? 'selected' : '' }}>Select room</option>
-                            @foreach ($rooms as $room)
-                                <option value="{{ $room->id }}" {{ old('room') == $room->id ? 'selected' : (isset($lessonSchedule) && $lessonSchedule->room_id == $room->id ? 'selected' : '') }}>
-                                    {{ $room->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
+                
                     <div class="mb-3">
                         <label for="coach_user" class="form-label">Coach<span style="color: red;">*</span></label>
                         <select class="form-control dropdown-form-select" id="coach_user" name="coach_user" required>
@@ -106,12 +94,24 @@
                     <div class="mb-3">
                         <label for="quota" class="form-label">Quota<span style="color: red;">*</span></label>
                         <input type="number" class="form-control @error('quota') is-invalid @enderror" id="quota" name="quota" autocomplete="off" value="{{ old('quota') ?? (isset($lessonSchedule) ? $lessonSchedule->quota : "") }}" required>
+                        <small id="emailHelp" class="form-text text-muted">Please enter a new number if you want to add quota. Later, what is entered will be added to the remaining quota available in this Lesson Schedule.</small>
+
                         @error('quota')
                             <div class="invalid-feedback">
                                 {{ $message }}
                             </div>
                         @enderror
                     </div>
+
+                    <div class="mb-3">
+                            <label for="credit_price" class="form-label">Credit Price<span style="color: red;">*</span></label>
+                            <input type="number" class="form-control @error('credit_price') is-invalid @enderror" id="credit_price" name="credit_price" autocomplete="off" value="{{ old('credit_price') ?? (isset($lessonSchedule) ? $lessonSchedule->credit_price : "") }}" required>
+                            @error('credit_price')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
 
                     <button id="btn_submit" class="btn btn-success" type="submit">
                         @if (isset($lessonSchedule))

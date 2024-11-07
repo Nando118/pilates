@@ -331,11 +331,6 @@ return [
             'url' => '/dashboard/time-slots',
             'icon' => 'fas fa-fw far fa-cog',
         ],
-        [
-            'text' => 'Rooms',
-            'url' => '/dashboard/rooms',
-            'icon' => 'fas fa-fw far fa-cog',
-        ],
         ['header' => 'account_settings'],
         [
             'text' => 'Users',

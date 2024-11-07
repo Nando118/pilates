@@ -27,9 +27,9 @@ class UpdateLessonScheduleRequest extends FormRequest
             "time_slot" => ["required", "integer", "exists:time_slots,id"],
             "lesson" => ["required", "integer", "exists:lessons,id"],
             "lesson_type" => ["required", "integer", "exists:lesson_types,id"],
-            "coach_user" => ["required", "integer", "exists:users,id"],
-            "room" => ["required", "integer", "exists:rooms,id"],
-            "quota" => ["required", "numeric", "min:1"]
+            "coach_user" => ["required", "integer", "exists:users,id"],            
+            "quota" => ["required", "numeric", "min:1"],
+            "credit_price" => ["required", "numeric", "min:1"]
         ];
     }
 }

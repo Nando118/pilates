@@ -17,16 +17,37 @@
 
         <div class="card">
             <div class="card-body">
+                
+                <div class="row mb-4">
+                    <div class="col d-flex justify-content-between align-items-center">
+                        <div>
+                            <form method="GET" id="filter-form">
+                                <div class="form-row align-items-center justify-content-center">
+                                    <div class="col-auto">
+                                        <label class="mr-sm-2">Periode</label>                                        
+                                        <div class="input-group date" data-provide="datepicker">
+                                            <input type="text" class="form-control" id="date" name="date" autocomplete="off" placeholder="{{ now()->format('Y/m/d') }}">
+                                            <div class="input-group-addon">
+                                                <span class="glyphicon glyphicon-th"></span>
+                                            </div>
+                                        </div>
+                                    </div>                                    
+                                    <div class="col-auto btn-list align-self-end">
+                                        <button type="submit" id="cari" class="btn btn-info"><i class="fa fa-search mr-1"></i> Filter</button>                                        
+                                    </div>
+                                </div>
+                            </form>
+                        </div>                        
+                    </div>
+                </div>
+                
                 <div class="table-responsive">
                     <table id="tbl_list" class="table table-striped" width="100%">
                         <thead>
                             <tr >
-                                <th>No</th>
-                                <th>Lesson</th>
-                                <th>Date</th>
+                                <th>No</th>                                
                                 <th>Name</th>
-                                <th>Username</th>
-                                <th>Created At</th>
+                                <th>Phone</th>                                
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -43,10 +64,16 @@
 @push("scripts")
     <script type="text/javascript">
         $(document).ready(function () {
-            $('#tbl_list').DataTable({
+            // Initialize DataTable
+            var table = $('#tbl_list').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: '{{ route('bookings.data') }}',
+                ajax: {
+                    url: '{{ route('bookings.data') }}',
+                    data: function (d) {
+                        d.date = $('#date').val(); // Kirim nilai filter date ke server
+                    }
+                },
                 language: {
                     zeroRecords: "There is no booking data yet",
                 },
@@ -62,17 +89,27 @@
                         },
                         className: 'align-middle'
                     },
-                    { data: 'lesson', name: 'lesson', className: 'align-middle'},
-                    { data: 'date', name: 'date', className: 'align-middle'},
                     { data: 'booked_by_name', name: 'booked_by_name', className: 'align-middle'},
-                    { data: 'username', name: 'username', className: 'align-middle'},
-                    { data: 'created_at', name: 'created_at', className: 'align-middle', render: DataTable.render.date()},
+                    { data: 'phone', name: 'phone', className: 'align-middle'},                    
                     { data: 'action', name: 'action', orderable: false, searchable: false, className: 'align-middle'},
                 ],
                 order: [
-                    [2, 'desc'],
-                    [5, 'desc']
+                    [1, 'desc']
                 ],
+            });
+
+            // Initialize datepicker
+            $('.date').datepicker({
+                format: 'yyyy/mm/dd',
+                autoclose: true,
+                todayHighlight: true,
+                orientation: 'bottom'
+            });
+
+            // Handle filter form submit
+            $('#filter-form').on('submit', function(e) {
+                e.preventDefault();
+                table.ajax.reload(); // Reload tabel dengan filter baru
             });
         });
     </script>

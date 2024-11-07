@@ -31,8 +31,7 @@
                             <p class="card-text">Lesson Type: {{ $lessonDetails->lessonType->name }}</p>
                             <p class="card-text">Date: {{ date('d-m-Y', strtotime($lessonDetails->date)) }}</p>
                             <p class="card-text">Time:  {{ date('H:i', strtotime($lessonDetails->timeSlot->start_time)) }} - {{ date('H:i', strtotime($lessonDetails->timeSlot->end_time)) }}</p>
-                            <p class="card-text">Duration: {{ $lessonDetails->timeSlot->duration }} Minute</p>
-                            <p class="card-text">Room: {{ $lessonDetails->room->name }}</p>
+                            <p class="card-text">Duration: {{ $lessonDetails->timeSlot->duration }} Minute</p>                            
                             <p class="card-text">Available Quota: {{ $lessonDetails->quota }} Person</p>
                         </div>
                     </div>
@@ -44,7 +43,7 @@
                                 <option value="" disabled selected>Select or add name</option>
                                 @foreach ($clientUsers as $clientUser)
                                     <option value="{{ $clientUser->id }}">
-                                        {{ $clientUser->name . " @" . $clientUser->profile->username }}
+                                        {{ $clientUser->name . " - " . $clientUser->email }}
                                     </option>
                                 @endforeach
                             </select>
@@ -93,7 +92,7 @@
                                 <option value="" disabled selected>Select or add name</option>
                                 @foreach ($clientUsers as $clientUser)
                                     <option value="{{ $clientUser->id }}" class="client-option">
-                                        {{ $clientUser->name . " @" . $clientUser->profile->username }}
+                                        {{ $clientUser->name . " - " . $clientUser->email }}
                                     </option>
                                 @endforeach
                             </select>

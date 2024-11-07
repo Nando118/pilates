@@ -142,16 +142,6 @@ Route::middleware(['auth', 'verified', 'onlyAdmin'])->group(function () {
     Route::delete("/dashboard/lesson-types/{lessonType}/delete", [LessonTypeController::class, "destroy"])->name("lesson-types.delete");
     // END LESSON TYPES ROUTE - ADMIN PAGE
 
-    // START ROOMS ROUTE - ADMIN PAGE
-    Route::get("/dashboard/rooms", [RoomController::class, "index"])->name("rooms.index");
-    Route::get("/dashboard/rooms/data", [RoomController::class, "getData"])->name("rooms.data");
-    Route::get("/dashboard/rooms/create", [RoomController::class, "create"])->name("rooms.create");
-    Route::post("/dashboard/rooms/create/store", [RoomController::class, "store"])->name("rooms.store");
-    Route::get("/dashboard/rooms/edit/{room}", [RoomController::class, "edit"])->name("rooms.edit");
-    Route::put("/dashboard/rooms/edit/{room}/update", [RoomController::class, "update"])->name("rooms.update");
-    Route::delete("/dashboard/rooms/{room}/delete", [RoomController::class, "destroy"])->name("rooms.delete");
-    // END ROOMS ROUTE - ADMIN PAGE
-
     // START LESSON ROUTE - ADMIN PAGE
     Route::get("/dashboard/lessons", [LessonController::class, "index"])->name("lessons.index");
     Route::get("/dashboard/lessons/data", [LessonController::class, "getData"])->name("lessons.data");

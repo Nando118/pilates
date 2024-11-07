@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('credit_transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Hubungkan ke tabel users
-            $table->enum('type', ['add', 'deduct']); // Menyimpan jenis transaksi (penambahan atau pengurangan)
+            $table->enum('type', ['add', 'deduct', 'return']); // Menyimpan jenis transaksi (penambahan atau pengurangan)
             $table->integer('amount'); // Jumlah kredit yang ditambah atau dikurangi
             $table->string('description')->nullable(); // Deskripsi atau keterangan transaksi
             $table->timestamps();

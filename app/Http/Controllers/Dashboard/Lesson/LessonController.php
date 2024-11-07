@@ -65,6 +65,15 @@ class LessonController extends Controller
         try {
             $validated = $request->validated();
 
+            $existingLesson = Lesson::where("name", $validated["name"])
+                ->whereNull("deleted_at") // Cek hanya yang belum dihapus (soft delete)
+                ->first();
+
+            if ($existingLesson) {
+                alert()->error("Oppss...", "Lesson name already exists. Please use a different name.");
+                return redirect()->back()->withInput();
+            }
+
             DB::beginTransaction();
 
             Lesson::create([
@@ -98,6 +107,15 @@ class LessonController extends Controller
     {
         try {
             $validated = $request->validated();
+
+            $existingLesson = Lesson::where("name", $validated["name"])
+                ->whereNull("deleted_at") // Cek hanya yang belum dihapus (soft delete)
+                ->first();
+
+            if ($existingLesson) {
+                alert()->error("Oppss...", "Lesson name already exists. Please use a different name.");
+                return redirect()->back()->withInput();
+            }
 
             DB::beginTransaction();
 

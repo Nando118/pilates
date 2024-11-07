@@ -38,21 +38,8 @@
                             </div>
                         @enderror
                     </div>
-
-                    <!-- Step 2: Room -->
-                    <div class="mb-3">
-                        <label for="room" class="form-label">Room<span style="color: red;">*</span></label>
-                        <select class="form-control dropdown-form-select" id="room" name="room" required>
-                            <option value="" selected disabled>Select room</option>
-                            @foreach ($rooms as $room)
-                                <option value="{{ $room->id }}" {{ old('room') == $room->id ? 'selected' : '' }}>
-                                    {{ $room->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <!-- Step 3: Coach -->
+                    
+                    <!-- Step 2: Coach -->
                     <div class="mb-3">
                         <label for="coach_user" class="form-label">Coach<span style="color: red;">*</span></label>
                         <select class="form-control dropdown-form-select" id="coach_user" name="coach_user" required>
@@ -65,7 +52,7 @@
                         </select>
                     </div>
 
-                    <!-- Step 4: Time (dynamic) -->
+                    <!-- Step 3: Time (dynamic) -->
                     <div class="mb-3" id="time_slot_container" style="display: none;">
                         <label for="time_slot" class="form-label">Time<span style="color: red;">*</span></label>
                         <select class="form-control dropdown-form-select" id="time_slot" name="time_slot" required>                            
@@ -73,7 +60,7 @@
                         </select>
                     </div>
 
-                    <!-- Step 5: Lesson, Lesson Type, Quota -->
+                    <!-- Step 4: Lesson, Lesson Type, Quota -->
                     <div id="lesson_details_container" style="display: none;">
                         <div class="mb-3">
                             <label for="lesson" class="form-label">Lesson<span style="color: red;">*</span></label>
@@ -108,6 +95,16 @@
                                 </div>
                             @enderror
                         </div>
+
+                        <div class="mb-3">
+                            <label for="credit_price" class="form-label">Credit Price<span style="color: red;">*</span></label>
+                            <input type="number" class="form-control @error('credit_price') is-invalid @enderror" id="credit_price" name="credit_price" autocomplete="off" value="{{ old('credit_price') }}" required>
+                            @error('credit_price')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
                     </div>
 
                     <button id="btn_submit" class="btn btn-success" type="submit">
@@ -136,19 +133,17 @@
                 theme: 'bootstrap4',
             });
 
-            // Trigger when Date or Room changes
-            $('#date, #room').change(function() {
+            // Trigger when Date changes
+            $('#date').change(function() {
                 var selectedDate = $('#date').val();
-                var selectedRoom = $('#room').val();
 
-                if (selectedDate && selectedRoom) {
-                    // Fetch available time slots for the selected date and room
+                if (selectedDate) {
+                    // Fetch available time slots for the selected date
                     $.ajax({
                         url: '{{ route('lesson-schedules.getAvailableTimeSlots') }}',
                         type: 'GET',
                         data: {
-                            date: selectedDate,
-                            room_id: selectedRoom
+                            date: selectedDate
                         },
                         success: function(response) {
                             // Clear existing time slots

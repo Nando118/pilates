@@ -20,7 +20,7 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-4 col-sm-12">
+                    <div class="col-md-6 col-sm-12">
                         <div class="card">
                             <div class="card-footer alert alert-primary text-center">
                                 <i class="fa-solid fa-ticket fa-xl"></i>
@@ -32,7 +32,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4 col-sm-12">
+                    <div class="col-md-6 col-sm-12">
                         <div class="card">
                             <div class="card-footer alert alert-danger text-center">
                                 <i class="fa-solid fa-ticket fa-xl"></i>
@@ -43,19 +43,7 @@
                                 <a href="{{ route('users.index') }}" class="btn btn-primary">Check</a>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-4 col-sm-12">
-                        <div class="card">
-                            <div class="card-footer alert alert-info text-center">
-                                <i class="fa-solid fa-ticket fa-xl"></i>
-                                <span class="font-weight-bold ml-2">Total Rooms</span>
-                            </div>
-                            <div class="card-body text-center">
-                                <p class="card-text font-weight-bolder">{{ $roomCount }}</p>
-                                <a href="{{ route('rooms.index') }}" class="btn btn-primary">Check</a>
-                            </div>
-                        </div>
-                    </div>
+                    </div>                    
                 </div>
             </div>
         </div>

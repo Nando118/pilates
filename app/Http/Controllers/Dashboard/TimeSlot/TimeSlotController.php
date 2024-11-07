@@ -152,19 +152,29 @@ class TimeSlotController extends Controller
                 return redirect()->back()->withInput();
             }
 
-            // Cek apakah time slot bentrok dengan yang sudah ada di database
-            $isConflict = TimeSlot::where(function ($query) use ($newStartTime, $newEndTime) {
-                $query->where("start_time", "<", $newEndTime)
-                    ->where("end_time", ">", $newStartTime);
-            })->exists();
+            // Ambil data time slot dari database
+            $timeSlot = TimeSlot::findOrFail($timeSlot->id);
 
-            if ($isConflict) {
-                alert()->error("Oppss...", "The created time clashes with an existing time. Please enter another time to avoid a schedule clash.");
-                return redirect()->back()->withInput();
+            // Konversi waktu dari database ke format Carbon untuk membandingkan secara tepat
+            $dbStartTime = Carbon::createFromFormat("H:i:s", $timeSlot->start_time);
+            $dbEndTime = Carbon::createFromFormat("H:i:s", $timeSlot->end_time);
+
+            // Hanya lakukan validasi isConflict jika start_time atau end_time berubah
+            if (!$newStartTime->equalTo($dbStartTime) || !$newEndTime->equalTo($dbEndTime)) {
+                // Cek apakah time slot bentrok dengan yang sudah ada di database
+                $isConflict = TimeSlot::where(function ($query) use ($newStartTime, $newEndTime) {
+                    $query->where("start_time", "<", $newEndTime)
+                        ->where("end_time", ">", $newStartTime);
+                })->exists();
+
+                if ($isConflict) {
+                    alert()->error("Oppss...", "The created time clashes with an existing time. Please enter another time to avoid a schedule clash.");
+                    return redirect()->back()->withInput();
+                }
             }
 
             DB::beginTransaction();
-            $timeSlot = TimeSlot::findOrFail($timeSlot->id);
+
             $timeSlot->start_time = $validated["start_time"];
             $timeSlot->end_time = $validated["end_time"];
             $timeSlot->duration = $validated["duration"];

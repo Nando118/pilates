@@ -12,7 +12,7 @@ class LessonSchedule extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ["date", "time_slot_id", "lesson_id", "lesson_type_id", "user_id", "room_id", "quota", "status"];
+    protected $fillable = ["date", "time_slot_id", "lesson_id", "lesson_type_id", "user_id", "quota", "credit_price"];
 
     public function timeSlot(): BelongsTo
     {
@@ -20,12 +20,11 @@ class LessonSchedule extends Model
     }
 
     // Metode untuk memeriksa ketersediaan time slot
-    public static function isTimeSlotAvailable($date, $timeSlotId, $roomId)
+    public static function isTimeSlotAvailable($date, $timeSlotId)
     {
         // Cek jika ada lesson_schedule dengan waktu dan ruangan yang sama
         return !self::where('date', $date)
             ->where('time_slot_id', $timeSlotId)
-            ->where('room_id', $roomId)
             ->exists();
     }
 
@@ -42,11 +41,6 @@ class LessonSchedule extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, "user_id", "id");
-    }
-
-    public function room(): BelongsTo
-    {
-        return $this->belongsTo(Room::class,"room_id", "id");
     }
 
     public function bookings(): HasMany

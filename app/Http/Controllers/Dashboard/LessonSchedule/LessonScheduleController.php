@@ -8,7 +8,6 @@ use App\Http\Requests\Dashboard\LessonSchedules\UpdateLessonScheduleRequest;
 use App\Models\Lesson;
 use App\Models\LessonSchedule;
 use App\Models\LessonType;
-use App\Models\Room;
 use App\Models\TimeSlot;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -60,22 +59,28 @@ class LessonScheduleController extends Controller
 
                 return "<strong>" . $lessonName . " / " . $lessonType . "</strong>" . "<br>" . $coachName;
             })
-            ->addColumn("room", function ($lessonSchedule) {
-                return ucfirst($lessonSchedule->room->name ?? "N/A");
+            ->addColumn("status", function ($lessonSchedule) {
+                if($lessonSchedule->quota <= 0) {
+                    return "Full Booking";
+                }
+
+                return "Available";
             })
             ->addColumn("action", function ($lessonSchedule) {
-                $currentDate = Carbon::today();
-                $scheduleDate = Carbon::parse($lessonSchedule->date);
+                $currentDateTime = Carbon::now();
+                // Menggabungkan tanggal jadwal dan waktu mulai menjadi satu instance Carbon
+                $scheduleDateTime = Carbon::parse($lessonSchedule->date . ' ' . $lessonSchedule->timeSlot->start_time);
 
-                if ($scheduleDate->greaterThanOrEqualTo($currentDate)) {
+                // Cek apakah tanggal saat ini belum melewati tanggal jadwal dan waktu sekarang belum melewati waktu mulai jadwal
+                if ($scheduleDateTime->greaterThanOrEqualTo($currentDateTime)) {
                     $btn = '<div class="btn-group mr-1">';
                     $btn .= '<a href="' . route("bookings.create", ["bookings" => $lessonSchedule->id]) . '" class="btn btn-primary btn-sm" title="Booking"><i class="fas fa-fw fa-user-plus"></i></a> ';
                     $btn .= '<a href="' . route("lesson-schedules.edit", ["lessonSchedule" => $lessonSchedule->id]) . '" class="btn btn-warning btn-sm" title="Edit"><i class="fas fa-fw fa-edit"></i></a> ';
-                    $btn .= '<a href="' . route("lesson-schedules.delete", ["lessonSchedule" => $lessonSchedule->id]) . '" class="btn btn-danger btn-sm" title="Delete" data-confirm-delete="true"><i class="fas fa-fw fa-trash"></i></button> ';
+                    $btn .= '<a href="' . route("lesson-schedules.delete", ["lessonSchedule" => $lessonSchedule->id]) . '" class="btn btn-danger btn-sm" title="Delete" data-confirm-delete="true"><i class="fas fa-fw fa-trash"></i></a> ';
                     $btn .= '</div>';
                     return $btn;
                 }
-                return '<span class="text-muted">Not Available to edit</span>'; // Tidak ada tombol jika tanggal sudah lewat
+                return '<span class="text-muted">Not Available to edit</span>'; // Tidak ada tombol jika waktu sudah lewat
             })
             ->rawColumns(["time", "lesson", "action"])
             ->make(true);
@@ -83,13 +88,11 @@ class LessonScheduleController extends Controller
 
     public function getAvailableTimeSlots(Request $request)
     {
-        $selectedDate = $request->input("date"); // Ambil input tanggal dari request
-        $selectedRoomId = $request->input("room_id"); // Ambil input room dari request
+        $selectedDate = $request->input("date"); // Ambil input tanggal dari request        
 
         // Ambil semua time slot yang ada
-        $availableTimeSlots = TimeSlot::whereDoesntHave("schedules", function ($query) use ($selectedDate, $selectedRoomId) {
-            $query->where("date", $selectedDate) // Cari lesson schedules pada tanggal yang dipilih
-                ->where("room_id", $selectedRoomId); // Cek room yang sama
+        $availableTimeSlots = TimeSlot::whereDoesntHave("schedules", function ($query) use ($selectedDate) {
+            $query->where("date", $selectedDate); // Cari lesson schedules pada tanggal yang dipilih                
         })->get(); // Hanya ambil time slot yang belum ada lesson schedule
 
         return response()->json($availableTimeSlots);
@@ -105,8 +108,7 @@ class LessonScheduleController extends Controller
         $lessonTypes = LessonType::get();
         $coachUsers = User::with("profile")->whereHas("roles", function ($query) {
             $query->where("name", "coach");
-        })->get();
-        $rooms = Room::get();
+        })->get();        
 
         return view("dashboard.lesson-schedules.form.form-add", [
             "title_page" => "Pilates | Add Lesson Schedules",
@@ -114,7 +116,6 @@ class LessonScheduleController extends Controller
             "lessons" => $lessons,
             "lessonTypes" => $lessonTypes,
             "coachUsers" => $coachUsers,
-            "rooms" => $rooms,
             "action" => $action,
             "method" => "POST"
         ]);
@@ -128,26 +129,12 @@ class LessonScheduleController extends Controller
             DB::beginTransaction();
 
             $date = $validated["date"];
-            $timeSlotId = $validated["time_slot"]; // Assumed time slot contains start_time and end_time
-            $roomId = $validated["room"];
+            $timeSlotId = $validated["time_slot"]; // Assumed time slot contains start_time and end_time            
             $coachId = $validated["coach_user"];
 
-            // 1. Cek apakah ruangan tersedia untuk waktu yang sama
-            $isRoomAvailable = LessonSchedule::isTimeSlotAvailable($date, $timeSlotId, $roomId);
-
-            if (!$isRoomAvailable) {
-                // Jika ruangan tidak tersedia, rollback transaksi dan kirim pesan error
-                DB::rollBack();
-                alert()->error("Oppss...", "Room is not available for the selected time, please select a different room or time.");
-                return redirect()->back()->withInput();
-            }
-
-            // 2. Cek apakah coach sudah terjadwal dalam rentang waktu yang sama
+            // 1. Cek apakah coach sudah terjadwal dalam rentang waktu yang sama
             $isCoachAvailable = LessonSchedule::where("user_id", $coachId)
-                ->where(
-                    "date",
-                    $date
-                )
+                ->where("date", $date)
                 ->whereHas("timeSlot", function ($query) use ($timeSlotId) {
                     $timeSlot = TimeSlot::find($timeSlotId);
                     $query->where("start_time", "<", $timeSlot->end_time)
@@ -158,19 +145,19 @@ class LessonScheduleController extends Controller
             if ($isCoachAvailable) {
                 // Jika coach sudah dijadwalkan pada waktu yang sama, rollback transaksi dan kirim pesan error
                 DB::rollBack();
-                alert()->error("Oppss...", "Room is not available for the selected time, please select a different room or time.");
+                alert()->error("Oppss...", "Coach is already scheduled at the selected time, please select a different time.");
                 return redirect()->back()->withInput();
             }
 
-            // 3. Jika semua validasi lolos, buat jadwal baru
+            // 2. Jika semua validasi lolos, buat jadwal baru
             LessonSchedule::create([
                 "date" => $validated["date"],
                 "time_slot_id" => $validated["time_slot"],
                 "lesson_id" => $validated["lesson"],
                 "lesson_type_id" => $validated["lesson_type"],
                 "user_id" => $validated["coach_user"],
-                "room_id" => $validated["room"],
-                "quota" => $validated["quota"]
+                "quota" => $validated["quota"],
+                "credit_price" => $validated["credit_price"]
             ]);
 
             DB::commit();
@@ -193,21 +180,18 @@ class LessonScheduleController extends Controller
         $coachUsers = User::with("profile")->whereHas("roles", function ($query) {
             $query->where("name", "coach");
         })->get();
-        $rooms = Room::get();
 
-        // Dapatkan tanggal dan ruangan dari lessonSchedule yang akan diedit
+        // Dapatkan tanggal dari lessonSchedule yang akan diedit
         $selectedDate = $lessonSchedule->date;
-        $selectedRoomId = $lessonSchedule->room_id;
 
-        // Query time slots yang tersedia berdasarkan tanggal dan ruangan
-        $timeSlots = TimeSlot::whereDoesntHave("schedules", function ($query) use ($selectedDate, $selectedRoomId, $lessonSchedule) {
+        // Query time slots yang tersedia berdasarkan tanggal
+        $timeSlots = TimeSlot::whereDoesntHave("schedules", function ($query) use ($selectedDate, $lessonSchedule) {
             // Filter time slots yang bentrok pada tanggal dan ruangan yang sama
             $query->where("date", $selectedDate)
-                ->where("room_id", $selectedRoomId)
                 ->where("id", "!=", $lessonSchedule->id);  // Jangan ambil lessonSchedule yang sedang diedit
         })->get();
 
-        return view("dashboard.lesson-schedules.form.form-edit", compact("lessonSchedule", "action", "timeSlots", "lessons", "lessonTypes", "coachUsers", "rooms"))
+        return view("dashboard.lesson-schedules.form.form-edit", compact("lessonSchedule", "action", "timeSlots", "lessons", "lessonTypes", "coachUsers"))
             ->with([
                 "title_page" => "Pilates | Update Lesson Schedule",
                 "method" => "POST"
@@ -222,24 +206,12 @@ class LessonScheduleController extends Controller
             DB::beginTransaction();
 
             $date = $validated["date"];
-            $timeSlotId = $validated["time_slot"];
-            $roomId = $validated["room"];
+            $timeSlotId = $validated["time_slot"];            
             $coachId = $validated["coach_user"];
 
             // Ambil lesson schedule yang akan diupdate
             $lessonSchedule = LessonSchedule::findOrFail($lessonSchedule->id);
-
-            if ($roomId != $lessonSchedule->room_id) {
-                // 1. Cek apakah ruangan tersedia untuk waktu yang sama, kecuali ruangan yang sama yang sedang diupdate
-                $isRoomAvailable = LessonSchedule::isTimeSlotAvailable($date, $timeSlotId, $roomId, $lessonSchedule->id);
-
-                if (!$isRoomAvailable) {
-                    DB::rollBack();
-                    alert()->error("Oppss...", "Room is not available for the selected time, please select a different room or time.");
-                    return redirect()->back()->withInput();
-                }
-            }
-
+            
             if ($coachId != $lessonSchedule->user_id) {
                 // 2. Cek apakah coach sudah terjadwal dalam rentang waktu yang sama, kecuali coach yang sama yang sedang diupdate
                 $isCoachAvailable = LessonSchedule::where("user_id", $coachId)
@@ -259,6 +231,18 @@ class LessonScheduleController extends Controller
                 }
             }
 
+            // Cek sisa Quota kelas terakhir dari Database
+            $old_quota = $lessonSchedule->quota;
+            
+            // Cek apakah value Quota diubah atau tidak
+            if($old_quota != $validated["quota"]) {
+                $new_quota = $old_quota + intval($validated["quota"]);
+
+                $lessonSchedule->update([
+                    "quota" => $new_quota
+                ]);
+            }
+
             // 3. Jika semua validasi lolos, update jadwal
             $lessonSchedule->update([
                 "date" => $validated["date"],
@@ -266,8 +250,7 @@ class LessonScheduleController extends Controller
                 "lesson_id" => $validated["lesson"],
                 "lesson_type_id" => $validated["lesson_type"],
                 "user_id" => $validated["coach_user"],
-                "room_id" => $validated["room"],
-                "quota" => $validated["quota"]
+                "credit_price" => $validated["credit_price"]
             ]);
 
             DB::commit();

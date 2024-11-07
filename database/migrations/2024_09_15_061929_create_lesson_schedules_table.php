@@ -17,10 +17,9 @@ return new class extends Migration
             $table->foreignId('time_slot_id')->constrained()->onDelete('cascade');  // Foreign key ke tabel time_slots
             $table->foreignId('lesson_id')->constrained()->onDelete('cascade');     // Foreign key ke tabel lessons
             $table->foreignId('lesson_type_id')->constrained()->onDelete('cascade'); // Foreign key ke tabel lesson_types
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');        // Foreign key ke tabel users (misalnya untuk trainer/coach)
-            $table->foreignId('room_id')->constrained()->onDelete('cascade'); // Foreign key ke tabel rooms
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');        // Foreign key ke tabel users (misalnya untuk trainer/coach)            
             $table->integer('quota')->default(0); // Kolom quota
-            $table->enum('status', ['Available', 'Full Booked'])->default('Available'); // Kolom status untuk menandai apakah slot sudah penuh
+            $table->integer('credit_price')->default(0); // Kolom quota            
             $table->timestamps();
             $table->softDeletes();
         });

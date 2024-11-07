@@ -37,45 +37,38 @@ class BookingController extends Controller
         ]);
     }
 
-    public function getData()
+    public function getData(Request $request)
     {
-        $bookings = Booking::get();
+        $query = Booking::query();
 
-        return DataTables::of($bookings)
-            ->addColumn("lesson", function ($booking) {
-                $lessonName = ucfirst($booking->lessonSchedule->lesson->name ?? "N/A");
-                $lessonType = ucfirst($booking->lessonSchedule->lessonType->name ?? "N/A");
-                $coachName = ucfirst($booking->lessonSchedule->user->name ?? "N/A");
+        // Filter berdasarkan tanggal, jika ada
+        if ($request->has("date") && $request->date) {
+            $filterDate = Carbon::parse($request->date)->format('Y-m-d');
+            $query->whereDate("created_at", "=", $filterDate);
+        } else {
+            $currentDate = Carbon::today()->format('Y-m-d');
+            $query->whereDate("created_at", "=", $currentDate);
+        }
 
-                return "<strong>" . $lessonName . " / " . $lessonType . "</strong>" . "<br>" . $coachName;
-            })
-            ->addColumn("date", function ($booking) {
-                $date = $booking->lessonSchedule->date ?? "N/A";
-                $time = $booking->lessonSchedule->timeSlot->start_time ?? "N/A";
+        return DataTables::of($query)
+        ->addColumn("phone", function ($booking) {
+            return $booking->user->profile->phone;
+        })
+        ->addColumn("action", function ($booking) {
+            $currentDate = Carbon::today();
+            $scheduleDate = Carbon::parse($booking->lessonSchedule->date);
 
-                return "<strong>" . $date . "</strong>" . "<br>" . $time;
-            })
-            ->addColumn("username", function ($booking) {
-                $username = $booking->user->profile->username ?? "-";
+            if ($scheduleDate->greaterThanOrEqualTo($currentDate)) {
+                $btn = '<div class="btn-group mr-1">';
+                $btn .= '<a href="' . route("bookings.delete", ["bookings" => $booking->id]) . '" class="btn btn-danger btn-sm" title="Delete" data-confirm-delete="true"><i class="fas fa-fw fa-trash"></i></button>';
+                $btn .= '</div>';
+                return $btn;
+            }
 
-                return $username;
-            })
-            ->addColumn("action", function ($booking) {
-
-                $currentDate = Carbon::today();
-                $scheduleDate = Carbon::parse($booking->lessonSchedule->date);
-
-                if ($scheduleDate->greaterThanOrEqualTo($currentDate)) {
-                    $btn = '<div class="btn-group mr-1">';
-                    $btn .= '<a href="' . route("bookings.delete", ["bookings" => $booking->id]) . '" class="btn btn-danger btn-sm" title="Delete" data-confirm-delete="true"><i class="fas fa-fw fa-trash"></i></button> ';
-                    $btn .= '</div>';
-                    return $btn;
-                }
-
-                return '<span class="text-muted">Not Available to edit</span>'; // Tidak ada tombol jika tanggal sudah lewat
-            })
-            ->rawColumns(["lesson", "date", "action"])
-            ->make(true);
+            return '<span class="text-muted">Not Available to edit</span>';
+        })
+        ->rawColumns(["action"])
+        ->make(true);
     }
 
     public function create(LessonSchedule $bookings)
@@ -86,7 +79,7 @@ class BookingController extends Controller
         })->get();
 
         // Hitung kuota yang tersisa
-        $remainingQuota = $bookings->quota - $bookings->bookings()->count(); // Misalkan ada relasi bookings() pada LessonSchedule
+        $remainingQuota = $bookings->quota - $bookings->bookings()->count();
 
         return view("dashboard.bookings.form.form", [
             "title_page" => "Pilates | Booking Lesson",
@@ -98,7 +91,8 @@ class BookingController extends Controller
         ]);
     }
 
-    public function store(CreateBookingsRequest $request) {
+    public function store(CreateBookingsRequest $request)
+    {
         try {
             $validated = $request->validated();
 
@@ -148,11 +142,6 @@ class BookingController extends Controller
                 ]);
                 // Kurangi kuota
                 $lessonSchedule->quota -= 1;
-            }
-
-            // Update status jika kuota habis
-            if ($lessonSchedule->quota <= 0) {
-                $lessonSchedule->status = "Full Booked";
             }
 
             // Simpan perubahan pada lesson_schedules
@@ -214,6 +203,5 @@ class BookingController extends Controller
             alert()->error("Oppss...", "An error occurred while canceling the lesson schedule booking for this user, please try again.");
             return redirect()->back();
         }
-
     }
 }
