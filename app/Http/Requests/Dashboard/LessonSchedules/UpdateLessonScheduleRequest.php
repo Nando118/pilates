@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Dashboard\LessonSchedules;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
 
 class UpdateLessonScheduleRequest extends FormRequest
 {
@@ -27,9 +28,20 @@ class UpdateLessonScheduleRequest extends FormRequest
             "time_slot" => ["required", "integer", "exists:time_slots,id"],
             "lesson" => ["required", "integer", "exists:lessons,id"],
             "lesson_type" => ["required", "integer", "exists:lesson_types,id"],
-            "coach_user" => ["required", "integer", "exists:users,id"],            
-            "quota" => ["required", "numeric", "min:1"],
+            "coach_user" => ["required", "integer", "exists:users,id"],
+            "quota" => ["required", "numeric"], // Tetapkan tanpa `min:1` terlebih dahulu
             "credit_price" => ["required", "numeric", "min:1"]
         ];
+    }
+
+    protected function withValidator(Validator $validator)
+    {
+        // Ambil lesson schedule dari route untuk mendapatkan quota saat ini
+        $lessonSchedule = $this->route('lessonSchedule');
+
+        // Tambahkan aturan dinamis pada 'quota' hanya jika nilainya berbeda
+        $validator->sometimes('quota', 'min:1', function ($input) use ($lessonSchedule) {
+            return $input->quota != $lessonSchedule->quota;
+        });
     }
 }

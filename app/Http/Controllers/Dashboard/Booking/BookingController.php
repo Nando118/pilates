@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Dashboard\Bookings\CreateBookingsRequest;
 use App\Models\Booking;
 use App\Models\LessonSchedule;
+use App\Models\TimeSlot;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -32,40 +33,59 @@ class BookingController extends Controller
         $text = "Are you sure you want to delete?";
         confirmDelete($title, $text);
 
+        $timeSlots = TimeSlot::get();
+
         return view("dashboard.bookings.index", [
-            "title_page" => "Pilates | Bookings"
+            "title_page" => "Pilates | Bookings",
+            "timeSlots" => $timeSlots
         ]);
     }
 
     public function getData(Request $request)
     {
-        $query = Booking::query();
+        $query = Booking::query()->with(['lessonSchedule', 'lessonSchedule.timeSlot', 'user.profile']);
 
-        // Filter berdasarkan tanggal, jika ada
+        // Filter berdasarkan tanggal jika ada, atau gunakan tanggal hari ini sebagai default
         if ($request->has("date") && $request->date) {
             $filterDate = Carbon::parse($request->date)->format('Y-m-d');
-            $query->whereDate("created_at", "=", $filterDate);
         } else {
-            $currentDate = Carbon::today()->format('Y-m-d');
-            $query->whereDate("created_at", "=", $currentDate);
+            $filterDate = Carbon::today()->format('Y-m-d');
+        }
+        $query->whereHas('lessonSchedule', function ($q) use ($filterDate) {
+            $q->whereDate('date', '=', $filterDate);
+        });
+
+        // Filter berdasarkan jam jika ada
+        if ($request->has("time_slot_id") && $request->time_slot_id) {
+            $query->whereHas('lessonSchedule', function ($q) use ($request) {
+                $q->where('time_slot_id', '=', $request->time_slot_id);
+            });
         }
 
         return DataTables::of($query)
         ->addColumn("phone", function ($booking) {
             return $booking->user->profile->phone;
         })
+        ->addColumn("lesson_code", function ($booking) {
+            return $booking->lessonSchedule->lesson_code;
+        })
         ->addColumn("action", function ($booking) {
-            $currentDate = Carbon::today();
-            $scheduleDate = Carbon::parse($booking->lessonSchedule->date);
+            $currentDateTime = Carbon::now();
+            $scheduleDateTime = Carbon::parse($booking->lessonSchedule->date . ' ' . $booking->lessonSchedule->timeSlot->start_time);
 
-            if ($scheduleDate->greaterThanOrEqualTo($currentDate)) {
+            // Cek apakah jadwal masih lebih dari 24 jam dari sekarang
+            $isCancellable = $scheduleDateTime->diffInHours($currentDateTime, false) > 24;
+
+            if ($isCancellable) {
                 $btn = '<div class="btn-group mr-1">';
-                $btn .= '<a href="' . route("bookings.delete", ["bookings" => $booking->id]) . '" class="btn btn-danger btn-sm" title="Delete" data-confirm-delete="true"><i class="fas fa-fw fa-trash"></i></button>';
+                $btn .= '<a href="' . route("bookings.delete", ["bookings" => $booking->id]) . '" class="btn btn-danger btn-sm" title="Cancle Booking" data-confirm-delete="true"><i class="fas fa-fw fa-ban"></i></a>';
                 $btn .= '</div>';
                 return $btn;
             }
 
-            return '<span class="text-muted">Not Available to edit</span>';
+            // Jika kurang dari 24 jam sebelum kelas, tombol dinonaktifkan
+            return
+            '<a href="' . route("bookings.delete", ["bookings" => $booking->id]) . '" class="btn btn-danger btn-sm disabled" title="Cancle Booking" data-confirm-delete="true"><i class="fas fa-fw fa-ban"></i></a>';
         })
         ->rawColumns(["action"])
         ->make(true);
@@ -74,8 +94,12 @@ class BookingController extends Controller
     public function create(LessonSchedule $bookings)
     {
         $action = route("bookings.store", ["bookings" => $bookings->id]);
+
+        // Ambil user dengan role client yang belum melakukan booking pada lesson_schedule saat ini
         $clientUsers = User::with("profile")->whereHas("roles", function ($query) {
             $query->where("name", "client");
+        })->whereDoesntHave("bookings", function ($query) use ($bookings) {
+            $query->where("lesson_schedule_id", $bookings->id);
         })->get();
 
         // Hitung kuota yang tersisa
@@ -151,7 +175,7 @@ class BookingController extends Controller
             DB::commit();
 
             alert()->success("Yeay!", "Successfully booked a lesson.");
-            return redirect()->route("bookings.index");
+            return redirect()->route("lesson-schedules.index");
         } catch (\Exception $e) {
             Log::error("Error adding booking data in BookingController@store: " . $e->getMessage());
             DB::rollBack();

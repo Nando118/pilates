@@ -12,7 +12,7 @@ class LessonSchedule extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ["date", "time_slot_id", "lesson_id", "lesson_type_id", "user_id", "quota", "credit_price"];
+    protected $fillable = ["date", "lesson_code", "time_slot_id", "lesson_id", "lesson_type_id", "user_id", "quota", "credit_price"];
 
     public function timeSlot(): BelongsTo
     {

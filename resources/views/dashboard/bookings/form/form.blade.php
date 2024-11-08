@@ -33,8 +33,11 @@
                             <p class="card-text">Time:  {{ date('H:i', strtotime($lessonDetails->timeSlot->start_time)) }} - {{ date('H:i', strtotime($lessonDetails->timeSlot->end_time)) }}</p>
                             <p class="card-text">Duration: {{ $lessonDetails->timeSlot->duration }} Minute</p>                            
                             <p class="card-text">Available Quota: {{ $lessonDetails->quota }} Person</p>
+                            <p class="card-text">Credit Price: {{ $lessonDetails->credit_price }}</p>
+
+                            <small id="emailHelp" class="form-text text-muted">Make sure the user has sufficient credit to book a lesson.</small>
                         </div>
-                    </div>
+                    </div>                    
 
                     <div id="participants-container">
                         <div class="mb-3 participant">
@@ -43,7 +46,7 @@
                                 <option value="" disabled selected>Select or add name</option>
                                 @foreach ($clientUsers as $clientUser)
                                     <option value="{{ $clientUser->id }}">
-                                        {{ $clientUser->name . " - " . $clientUser->email }}
+                                        {{ $clientUser->name . " - " . $clientUser->email . " - Remaining credit" . " " . $clientUser->credit_balance }}
                                     </option>
                                 @endforeach
                             </select>
@@ -92,7 +95,7 @@
                                 <option value="" disabled selected>Select or add name</option>
                                 @foreach ($clientUsers as $clientUser)
                                     <option value="{{ $clientUser->id }}" class="client-option">
-                                        {{ $clientUser->name . " - " . $clientUser->email }}
+                                        {{ $clientUser->name . " - " . $clientUser->email . " - Remaining credit" . " " . $clientUser->credit_balance }}
                                     </option>
                                 @endforeach
                             </select>

@@ -24,14 +24,23 @@
                             <form method="GET" id="filter-form">
                                 <div class="form-row align-items-center justify-content-center">
                                     <div class="col-auto">
-                                        <label class="mr-sm-2">Periode</label>                                        
+                                        <label class="mr-sm-2">Date:</label>                                        
                                         <div class="input-group date" data-provide="datepicker">
                                             <input type="text" class="form-control" id="date" name="date" autocomplete="off" placeholder="{{ now()->format('Y/m/d') }}">
                                             <div class="input-group-addon">
                                                 <span class="glyphicon glyphicon-th"></span>
                                             </div>
                                         </div>
-                                    </div>                                    
+                                    </div>
+                                    <div class="col-auto">
+                                        <label class="mr-sm-2">Time:</label>
+                                        <select class="form-control" id="time" name="time_slot_id"> <!-- Ubah name menjadi time_slot_id -->
+                                            <option value="">All Times</option> <!-- Tambahkan opsi untuk semua waktu -->
+                                            @foreach ($timeSlots as $timeSlot)                                            
+                                                <option value="{{ $timeSlot->id }}">{{ date("H:i", strtotime($timeSlot->start_time)) }}</option>
+                                            @endforeach
+                                        </select>                                        
+                                    </div>
                                     <div class="col-auto btn-list align-self-end">
                                         <button type="submit" id="cari" class="btn btn-info"><i class="fa fa-search mr-1"></i> Filter</button>                                        
                                     </div>
@@ -48,6 +57,7 @@
                                 <th>No</th>                                
                                 <th>Name</th>
                                 <th>Phone</th>                                
+                                <th>Lesson Code</th>                              
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -72,6 +82,7 @@
                     url: '{{ route('bookings.data') }}',
                     data: function (d) {
                         d.date = $('#date').val(); // Kirim nilai filter date ke server
+                        d.time_slot_id = $('#time').val(); // Kirim nilai filter time_slot_id ke server
                     }
                 },
                 language: {
@@ -91,10 +102,11 @@
                     },
                     { data: 'booked_by_name', name: 'booked_by_name', className: 'align-middle'},
                     { data: 'phone', name: 'phone', className: 'align-middle'},                    
+                    { data: 'lesson_code', name: 'lesson_code', className: 'align-middle'},                    
                     { data: 'action', name: 'action', orderable: false, searchable: false, className: 'align-middle'},
                 ],
                 order: [
-                    [1, 'desc']
+                    [3, 'desc']
                 ],
             });
 

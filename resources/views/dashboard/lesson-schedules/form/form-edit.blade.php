@@ -95,7 +95,6 @@
                         <label for="quota" class="form-label">Quota<span style="color: red;">*</span></label>
                         <input type="number" class="form-control @error('quota') is-invalid @enderror" id="quota" name="quota" autocomplete="off" value="{{ old('quota') ?? (isset($lessonSchedule) ? $lessonSchedule->quota : "") }}" required>
                         <small id="emailHelp" class="form-text text-muted">Please enter a new number if you want to add quota. Later, what is entered will be added to the remaining quota available in this Lesson Schedule.</small>
-
                         @error('quota')
                             <div class="invalid-feedback">
                                 {{ $message }}

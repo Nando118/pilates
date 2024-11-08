@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('lesson_schedules', function (Blueprint $table) {
             $table->id();
             $table->date('date')->nullable(false); // Kolom untuk menyimpan tanggal
+            $table->string("lesson_code", 40)->nullable(false);
             $table->foreignId('time_slot_id')->constrained()->onDelete('cascade');  // Foreign key ke tabel time_slots
             $table->foreignId('lesson_id')->constrained()->onDelete('cascade');     // Foreign key ke tabel lessons
             $table->foreignId('lesson_type_id')->constrained()->onDelete('cascade'); // Foreign key ke tabel lesson_types

@@ -22,6 +22,7 @@
                         <thead>
                             <tr >
                                 <th>No</th>
+                                <th>Lesson Code</th>
                                 <th>Date</th>
                                 <th>Time</th>
                                 <th>Lesson</th>                                
@@ -96,7 +97,8 @@
                         },
                         className: 'align-middle'
                     },
-                    { data: 'date', name: 'date', render: DataTable.render.date(), className: 'align-middle'},
+                    { data: 'lesson_code', name: 'lesson_code', className: 'align-middle'},
+                    { data: 'date', name: 'date', render: DataTable.render.date(), className: 'align-middle'},                  
                     { data: 'time', name: 'time', className: 'align-middle'},
                     { data: 'lesson', name: 'lesson', className: 'align-middle'},                    
                     { data: 'quota', name: 'quota', className: 'align-middle'},
@@ -105,8 +107,8 @@
                     { data: 'action', name: 'action', orderable: false, searchable: false, className: 'align-middle'},
                 ],
                 order: [
-                    [1, 'desc'],
-                    [2, 'desc']
+                    [2, 'desc'],                  
+                    [3, 'desc']                    
                 ],
             });
 

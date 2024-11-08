@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Dashboard\LessonSchedule;
 
+use App\Helpers\LessonCodeHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Dashboard\LessonSchedules\CreateLessonScheduleRequest;
 use App\Http\Requests\Dashboard\LessonSchedules\UpdateLessonScheduleRequest;
@@ -71,10 +72,17 @@ class LessonScheduleController extends Controller
                 // Menggabungkan tanggal jadwal dan waktu mulai menjadi satu instance Carbon
                 $scheduleDateTime = Carbon::parse($lessonSchedule->date . ' ' . $lessonSchedule->timeSlot->start_time);
 
+                // Tentukan apakah tombol Booking harus dinonaktifkan
+                if($lessonSchedule->quota <= 0) {
+                    $disabledAttribute = "disabled";
+                }else{
+                    $disabledAttribute = "";
+                }
+
                 // Cek apakah tanggal saat ini belum melewati tanggal jadwal dan waktu sekarang belum melewati waktu mulai jadwal
                 if ($scheduleDateTime->greaterThanOrEqualTo($currentDateTime)) {
                     $btn = '<div class="btn-group mr-1">';
-                    $btn .= '<a href="' . route("bookings.create", ["bookings" => $lessonSchedule->id]) . '" class="btn btn-primary btn-sm" title="Booking"><i class="fas fa-fw fa-user-plus"></i></a> ';
+                    $btn .= '<a href="' . route("bookings.create", ["bookings" => $lessonSchedule->id]) . '" class="btn btn-primary btn-sm ' . $disabledAttribute . '" title="Booking"><i class="fas fa-fw fa-user-plus"></i></a> ';
                     $btn .= '<a href="' . route("lesson-schedules.edit", ["lessonSchedule" => $lessonSchedule->id]) . '" class="btn btn-warning btn-sm" title="Edit"><i class="fas fa-fw fa-edit"></i></a> ';
                     $btn .= '<a href="' . route("lesson-schedules.delete", ["lessonSchedule" => $lessonSchedule->id]) . '" class="btn btn-danger btn-sm" title="Delete" data-confirm-delete="true"><i class="fas fa-fw fa-trash"></i></a> ';
                     $btn .= '</div>';
@@ -149,9 +157,13 @@ class LessonScheduleController extends Controller
                 return redirect()->back()->withInput();
             }
 
+            // Generate Lesson Code
+            $lessonCode = LessonCodeHelper::generateLessonCode();
+
             // 2. Jika semua validasi lolos, buat jadwal baru
             LessonSchedule::create([
                 "date" => $validated["date"],
+                "lesson_code" => $lessonCode,
                 "time_slot_id" => $validated["time_slot"],
                 "lesson_id" => $validated["lesson"],
                 "lesson_type_id" => $validated["lesson_type"],
