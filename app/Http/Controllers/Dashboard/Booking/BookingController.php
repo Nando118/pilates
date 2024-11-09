@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dashboard\Booking;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Dashboard\Bookings\CreateBookingsRequest;
 use App\Models\Booking;
+use App\Models\CreditTransaction;
 use App\Models\LessonSchedule;
 use App\Models\TimeSlot;
 use App\Models\User;
@@ -30,7 +31,7 @@ class BookingController extends Controller
     public function index()
     {
         $title = "Delete Booking!";
-        $text = "Are you sure you want to delete?";
+        $text = "Are you sure you want to cancel the Lesson booking for this user?";
         confirmDelete($title, $text);
 
         $timeSlots = TimeSlot::get();
@@ -64,7 +65,7 @@ class BookingController extends Controller
 
         return DataTables::of($query)
         ->addColumn("phone", function ($booking) {
-            return $booking->user->profile->phone;
+            return $booking->user->profile->phone ?? "N/A";
         })
         ->addColumn("lesson_code", function ($booking) {
             return $booking->lessonSchedule->lesson_code;
@@ -73,8 +74,8 @@ class BookingController extends Controller
             $currentDateTime = Carbon::now();
             $scheduleDateTime = Carbon::parse($booking->lessonSchedule->date . ' ' . $booking->lessonSchedule->timeSlot->start_time);
 
-            // Cek apakah jadwal masih lebih dari 24 jam dari sekarang
-            $isCancellable = $scheduleDateTime->diffInHours($currentDateTime, false) > 24;
+            // Cek apakah jadwal masih lebih dari 24 jam dari waktu saat ini
+            $isCancellable = $scheduleDateTime->diffInHours($currentDateTime) > 24;
 
             if ($isCancellable) {
                 $btn = '<div class="btn-group mr-1">';
@@ -148,14 +149,24 @@ class BookingController extends Controller
                 // Cek apakah nama ini adalah user yang terdaftar
                 $user = User::where("id", $name)->first(); // Update: cek user berdasarkan id
 
-                // Cek apakah user sudah terdaftar di lesson ini
-                $existingBooking = Booking::where("lesson_schedule_id", $lessonSchedule->id)
-                    ->where("user_id", $user ? $user->id : null)
-                    ->first();
-                if ($existingBooking) {
-                    // Jika user sudah terdaftar, rollback dan kirim alert
-                    alert()->warning("Warning", "You or one of the Names you entered is already registered for this lesson schedule.");
-                    return redirect()->back();
+                // Jika terdaftar, akan dilakukan pengecekan credit_balance
+                if ($user) {
+                    // Cek saldo user apakah cukup untuk booking lesson atau tidak
+                    if ($user->credit_balance < $lessonSchedule->credit_price) {
+                        alert()->warning("Warning", "User {$user->name} does not have enough credit balance to book this lesson.");
+                        return redirect()->back();
+                    }
+
+                    // Jika cukup, kurangi credit balance
+                    $user->credit_balance -= $lessonSchedule->credit_price;
+                    $user->save();
+
+                    CreditTransaction::query()->create([
+                        "user_id" => $user->id,
+                        "type" => "deduct",
+                        "amount" => $lessonSchedule->credit_price,
+                        "description" => $lessonSchedule->credit_price . ' credit has been deducted from the account '. $user->email .' , to make a booking for the lesson code '. $lessonSchedule->lesson_code .'.'
+                    ]);
                 }
 
                 // Simpan booking baru
@@ -164,13 +175,13 @@ class BookingController extends Controller
                     "booked_by_name" => $user ? $user->name : $name, // Update: simpan nama dari database atau nama input
                     "user_id" => $user ? $user->id : null, // Update: simpan user_id jika terdaftar, null jika tidak
                 ]);
+
                 // Kurangi kuota
                 $lessonSchedule->quota -= 1;
             }
 
             // Simpan perubahan pada lesson_schedules
             $lessonSchedule->save();
-
             // Commit transaksi jika semua berhasil
             DB::commit();
 
@@ -190,25 +201,43 @@ class BookingController extends Controller
             // Mulai transaksi database
             DB::beginTransaction();
 
-            // Ambil data booking berdasarkan id dari request
-            $bookings = Booking::findOrFail($bookings->id); // Di sini gunakan $id yang dikirimkan ke function
+            // Ambil data booking berdasarkan id
+            $booking = Booking::findOrFail($bookings->id);
 
             // Ambil lesson schedule terkait dari booking yang akan dihapus
-            $lessonSchedule = LessonSchedule::where("id", "=", $bookings->lesson_schedule_id)->first();
+            $lessonSchedule = LessonSchedule::where("id", $booking->lesson_schedule_id)->first();
 
-            if ($lessonSchedule) {
-                // Kembalikan kuota yang sudah terpakai
-                $lessonSchedule->quota += 1;
+            if (!$lessonSchedule) {
+                alert()->error("Oppss...", "Lesson schedule not found.");
+                return redirect()->route("bookings.index");
+            }
 
-                // Simpan perubahan kuota
-                $lessonSchedule->save();
-            } else {
-                // Jika lesson schedule tidak ditemukan
-                throw new \Exception('Lesson schedule not found.');
+            // Kembalikan kuota yang sudah terpakai
+            $lessonSchedule->quota += 1;
+            $lessonSchedule->save();
+
+            // Periksa apakah booking terkait memiliki user_id
+            if ($booking->user_id) {
+                // Ambil data user terkait
+                $user = User::find($booking->user_id);
+
+                // Jika ketemu, return credit balance user tersebut
+                if ($user) {
+                    // Tambahkan kembali credit balance untuk pengguna yang melakukan booking
+                    $user->credit_balance += $lessonSchedule->credit_price; // Sesuaikan jumlah yang dikembalikan jika berbeda
+                    $user->save();
+
+                    CreditTransaction::query()->create([
+                        "user_id" => $user->id,
+                        "type" => "return",
+                        "amount" => $lessonSchedule->credit_price,
+                        "description" => $lessonSchedule->credit_price . ' credit has been returned to the account '. $user->email .' , because the booking for the lesson code has been cancelled '. $lessonSchedule->lesson_code .'.'
+                    ]);
+                }
             }
 
             // Soft delete booking
-            $bookings->delete();
+            $booking->delete();
 
             // Commit transaksi jika semuanya berhasil
             DB::commit();
@@ -216,6 +245,7 @@ class BookingController extends Controller
             // Menampilkan pesan sukses menggunakan SweetAlert2
             alert()->success("Yeay!", "Successfully canceled the lesson schedule booking for this user.");
             return redirect()->route("bookings.index");
+
         } catch (\Exception $e) {
             // Menyimpan log error jika terjadi kesalahan
             Log::error("Error deleting booking in BookingController@destroy: " . $e->getMessage());

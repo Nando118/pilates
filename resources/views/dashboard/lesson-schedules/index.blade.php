@@ -25,7 +25,7 @@
                                 <th>Lesson Code</th>
                                 <th>Date</th>
                                 <th>Time</th>
-                                <th>Lesson</th>                                
+                                <th>Lesson</th>
                                 <th>Quota</th>
                                 <th>Credit Price</th>
                                 <th>Status</th>
@@ -98,17 +98,17 @@
                         className: 'align-middle'
                     },
                     { data: 'lesson_code', name: 'lesson_code', className: 'align-middle'},
-                    { data: 'date', name: 'date', render: DataTable.render.date(), className: 'align-middle'},                  
+                    { data: 'date', name: 'date', className: 'align-middle'},
                     { data: 'time', name: 'time', className: 'align-middle'},
-                    { data: 'lesson', name: 'lesson', className: 'align-middle'},                    
+                    { data: 'lesson', name: 'lesson', className: 'align-middle'},
                     { data: 'quota', name: 'quota', className: 'align-middle'},
                     { data: 'credit_price', name: 'credit_price', className: 'align-middle'},
                     { data: 'status', name: 'status', className: 'align-middle'},
                     { data: 'action', name: 'action', orderable: false, searchable: false, className: 'align-middle'},
                 ],
                 order: [
-                    [2, 'desc'],                  
-                    [3, 'desc']                    
+                    [2, 'desc'],
+                    [3, 'desc']
                 ],
             });
 
@@ -119,7 +119,7 @@
 
             $(document).on("click", ".add-booking-btn", function (e) {
                 e.preventDefault();
-                
+
                 var lessonScheduleId = $(this).data("id");
                 maxQuota = $(this).data("quota");
 

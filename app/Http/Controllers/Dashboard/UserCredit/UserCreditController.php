@@ -26,7 +26,7 @@ class UserCreditController extends Controller
     }
 
     public function index()
-    {        
+    {
         return view("dashboard.user-credits.index", [
             "title_page" => "Pilates | User Credits"
         ]);
@@ -41,13 +41,13 @@ class UserCreditController extends Controller
         return DataTables::of($users)
             ->addColumn("phone", function ($user) {
                 return ucfirst($user->profile->phone) ?? "N/A";
-            })                   
+            })
             ->addColumn("gender", function ($user) {
                 return ucfirst($user->profile->gender) ?? "N/A";
-            })                   
+            })
             ->addColumn("action", function ($user) {
                 $btn = '<div class="btn-group mr-1">';
-                $btn .= '<a href="'. route('user-credits.edit', ["user" => $user->id]) .'" class="btn btn-success btn-sm" title="Add Credits to User"><i class="fas fa-fw fa-coins"></i></a> ';                
+                $btn .= '<a href="'. route('user-credits.edit', ["user" => $user->id]) .'" class="btn btn-success btn-sm" title="Add Credits to User"><i class="fas fa-fw fa-coins"></i></a> ';
                 $btn .= '</div>';
                 return $btn;
             })
@@ -70,7 +70,7 @@ class UserCreditController extends Controller
     {
         try {
             $validated = $request->validated();
-            
+
             DB::beginTransaction();
 
             // Update data di tabel 'users'
@@ -84,7 +84,7 @@ class UserCreditController extends Controller
                 "user_id" => $user->id,
                 "type" => "add",
                 "amount" => $validated["credit_balance"],
-                "description" => 'Credit was added to account '. $user->name . ' by ' . Auth::user()->name . ', amounting to ' . $validated["credit_balance"] . ' credit.'
+                "description" => 'Credit was added to account '. $user->email . ' by ' . Auth::user()->email . ', amounting to ' . $validated["credit_balance"] . ' credit.'
             ]);
 
             DB::commit();

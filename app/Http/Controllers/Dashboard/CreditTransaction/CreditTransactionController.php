@@ -34,9 +34,17 @@ class CreditTransactionController extends Controller
         return DataTables::of($credit_transactions)
             ->addColumn("name", function ($credit_transaction) {
                 return ucfirst($credit_transaction->user->name) ?? "N/A";
-            })       
-            ->addColumn("type", function ($credit_transaction) {                
-                return "<span class='badge badge-pill badge-success'><strong>" . ucfirst($credit_transaction->type) . "</strong></span>";
+            })
+            ->addColumn("type", function ($credit_transaction) {
+                if ($credit_transaction->type === "add") {
+                    return "<span class='badge badge-pill badge-success'><strong>" . ucfirst($credit_transaction->type) . "</strong></span>";
+                }elseif ($credit_transaction->type === "deduct") {
+                    return "<span class='badge badge-pill badge-danger'><strong>" . ucfirst($credit_transaction->type) . "</strong></span>";
+                }elseif ($credit_transaction->type === "return") {
+                    return "<span class='badge badge-pill badge-warning'><strong>" . ucfirst($credit_transaction->type) . "</strong></span>";
+                }else {
+                    return "<span class='badge badge-pill badge-info'><strong>not found</strong></span>";
+                }
             })
             ->rawColumns(["type", "action"])
             ->make(true);

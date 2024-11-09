@@ -46,6 +46,10 @@ class LessonScheduleController extends Controller
         $lessonScheduleDatas = LessonSchedule::get();
 
         return DataTables::of($lessonScheduleDatas)
+            ->addColumn("date", function ($lessonSchedule) {
+                // Memformat tanggal menjadi dd/mm/yyyy
+                return Carbon::parse($lessonSchedule->date)->format('d/m/Y');
+            })
             ->addColumn("time", function ($lessonSchedule) {
                 $startTime = $lessonSchedule->timeSlot->start_time ?? "N/A";
                 $duration = $lessonSchedule->timeSlot->duration ?? 0; // Pastikan Anda memiliki kolom duration di timeSlot
@@ -96,11 +100,11 @@ class LessonScheduleController extends Controller
 
     public function getAvailableTimeSlots(Request $request)
     {
-        $selectedDate = $request->input("date"); // Ambil input tanggal dari request        
+        $selectedDate = $request->input("date"); // Ambil input tanggal dari request
 
         // Ambil semua time slot yang ada
         $availableTimeSlots = TimeSlot::whereDoesntHave("schedules", function ($query) use ($selectedDate) {
-            $query->where("date", $selectedDate); // Cari lesson schedules pada tanggal yang dipilih                
+            $query->where("date", $selectedDate); // Cari lesson schedules pada tanggal yang dipilih
         })->get(); // Hanya ambil time slot yang belum ada lesson schedule
 
         return response()->json($availableTimeSlots);
@@ -116,7 +120,7 @@ class LessonScheduleController extends Controller
         $lessonTypes = LessonType::get();
         $coachUsers = User::with("profile")->whereHas("roles", function ($query) {
             $query->where("name", "coach");
-        })->get();        
+        })->get();
 
         return view("dashboard.lesson-schedules.form.form-add", [
             "title_page" => "Pilates | Add Lesson Schedules",
@@ -137,7 +141,7 @@ class LessonScheduleController extends Controller
             DB::beginTransaction();
 
             $date = $validated["date"];
-            $timeSlotId = $validated["time_slot"]; // Assumed time slot contains start_time and end_time            
+            $timeSlotId = $validated["time_slot"]; // Assumed time slot contains start_time and end_time
             $coachId = $validated["coach_user"];
 
             // 1. Cek apakah coach sudah terjadwal dalam rentang waktu yang sama
@@ -218,12 +222,12 @@ class LessonScheduleController extends Controller
             DB::beginTransaction();
 
             $date = $validated["date"];
-            $timeSlotId = $validated["time_slot"];            
+            $timeSlotId = $validated["time_slot"];
             $coachId = $validated["coach_user"];
 
             // Ambil lesson schedule yang akan diupdate
             $lessonSchedule = LessonSchedule::findOrFail($lessonSchedule->id);
-            
+
             if ($coachId != $lessonSchedule->user_id) {
                 // 2. Cek apakah coach sudah terjadwal dalam rentang waktu yang sama, kecuali coach yang sama yang sedang diupdate
                 $isCoachAvailable = LessonSchedule::where("user_id", $coachId)
@@ -245,7 +249,7 @@ class LessonScheduleController extends Controller
 
             // Cek sisa Quota kelas terakhir dari Database
             $old_quota = $lessonSchedule->quota;
-            
+
             // Cek apakah value Quota diubah atau tidak
             if($old_quota != $validated["quota"]) {
                 $new_quota = $old_quota + intval($validated["quota"]);
