@@ -25,36 +25,32 @@
         <!-- Scrollable Content Section with Cards -->
         <div class="scrollable-content p-3">
             <div class="container-fluid">
-                <div class="mb-5">
-                    <!-- Tampilkan Nama Pengguna dan Tanggal -->
-                    <p class="h5">Hi <em>{{ $user->name }}</em>, today is the best day for exercise!</p>
-                    <p class="lead">{{ $currentDate }}</p>
+                <div class="mb-4">                    
+                    <p class="h3">Hi,</p>
+                    <p class="h3"><em>{{ $user->name }}</em></p>
+                </div>
+                
+                <div class="mb-4">
+                    <p class="h3" style="font-size: 1rem;"><strong>Available Credits</strong></p>
+                    <p class="h3"><strong style="font-size: 1.5rem; margin-right: 0.5rem;">{{ $user->credit_balance }}</strong><span style="font-size: 1rem;">Left</span></p>
                 </div>
 
-                <figure class="text-center mb-5">
-                    <blockquote class="blockquote">
-                        <p>&ldquo;{{ $randomQuote }}&rdquo;</p>
-                    </blockquote>
-                    <figcaption class="blockquote-footer">
-                        <cite title="Source Title">Pilates Wisdom</cite>
-                    </figcaption>
-                </figure>    
+                <div class="mb-4">
+                    <a class="btn btn-outline-dark rounded-pill" href="{{ route('home') }}" role="button"><strong>Upcoming Lessons</strong></a>
+                    <a class="btn btn-dark rounded-pill" href="{{ route('pastLessons') }}" role="button"><strong>Past Lessons</strong></a>
+                </div>
                 
                 <div class="card text-bg-dark">
                     <div class="card-header">
-                        @if($isCoach)
-                            <strong>This Month's Lessons You Teach</strong> <!-- Judul untuk coach -->
-                        @else
-                            <strong>This Month's Lessons You Booked</strong> <!-- Judul untuk client -->
-                        @endif
+                        <strong>Past Lessons</strong>
                     </div>
                     <ul class="list-group list-group-flush">
                         @if($myLessons->isEmpty())
                             <li class="list-group-item">
                                 @if($isCoach)
-                                    You have no lessons to teach this month.
+                                    There are no lessons you teach this month.
                                 @else
-                                    You have no lessons booked this month.
+                                    There are no lessons you have booked this month.
                                 @endif
                             </li>
                         @else
@@ -81,13 +77,13 @@
                                     <div class="flex-grow-1">
                                         @if($isCoach)
                                             <strong>{{ $myLesson->lesson->name ?? 'N/A' }}</strong> / 
-                                            <span>{{ $myLesson->lessonType->name ?? 'N/A' }}</span><br>                                            
-                                            Room: <strong>{{ $myLesson->room->name ?? 'N/A' }}</strong>
+                                            <span>{{ $myLesson->lessonType->name ?? 'N/A' }}</span><br>
+                                            <em>Lesson Code: <br><strong>{{ $myLesson->lesson_code ?? 'N/A' }}</strong></em>                                        
                                         @else
                                             <strong>{{ $myLesson->lessonSchedule->lesson->name ?? 'N/A' }}</strong> / 
                                             <span>{{ $myLesson->lessonSchedule->lessonType->name ?? 'N/A' }}</span><br>                                            
                                             <em>Instructor: <strong>{{ $myLesson->lessonSchedule->user->name ?? 'N/A' }}</strong></em><br>
-                                            Room: <strong>{{ $myLesson->lessonSchedule->room->name ?? 'N/A' }}</strong>
+                                            <em>Lesson Code: <br><strong>{{ $myLesson->lessonSchedule->lesson_code ?? 'N/A' }}</strong></em>
                                         @endif
                                     </div>
                                 </li>

@@ -28,7 +28,7 @@ class CoachController extends Controller
             ->get();
 
         return view("home.coaches.index", [
-            "title_page" => "Pilates | Coaches",
+            "title_page" => "Ohana Pilates | Coaches",
             "coaches" => $coaches
         ]);
     }

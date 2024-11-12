@@ -37,36 +37,64 @@ class UserController extends Controller
         confirmDelete($title, $text);
 
         return view("dashboard.users.index", [
-            "title_page" => "Pilates | Users"
+            "title_page" => "Ohana Pilates | Users"
         ]);
     }
 
     public function getData()
     {
-        $users = User::with("profile")->whereDoesntHave("roles", function ($query) {
-            $query->whereIn("name", ["super_admin", "admin"]);
-        })->get();
+        $query = User::with("profile", "roles");
 
-        return DataTables::of($users)            
-            ->addColumn("gender", function ($user) {
-                return ucfirst($user->profile->gender) ?? "N/A";
-            })
-            ->addColumn("platform", function ($user) {
-                $socialAccount = $user->socialAccounts->first(); // Ambil akun pertama (jika ada)
-                return $socialAccount ? ucfirst($socialAccount->provider) : "-"; // Tampilkan provider atau N/A jika tidak ada
-            })
-            ->addColumn("role", function ($user) {
-                return ucfirst($user->roles->pluck("name")->first() ?? "N/A");
-            })
-            ->addColumn("action", function ($user) {
-                $btn = '<div class="btn-group mr-1">';
-                $btn .= '<a href="' . route("users.edit", ["user" => $user->id]) . '" class="btn btn-warning btn-sm" title="Edit"><i class="fas fa-fw fa-edit"></i></a> ';
-                $btn .= '<a href="' . route("users.view", ["user" => $user->id]) . '" class="btn btn-info btn-sm" title="View"><i class="fas fa-fw fa-eye"></i></a> ';
-                $btn .= '<a href="' . route("users.delete", ["user" => $user->id]) . '" class="btn btn-danger btn-sm" title="Delete" data-confirm-delete="true"><i class="fas fa-fw fa-trash"></i></button> ';
-                $btn .= '</div>';
-                return $btn;
-            })
-            ->make(true);
+        if (auth()->user()->hasRole('admin')) {
+            // Jika yang login adalah admin, tampilkan user dengan role admin, coach, dan client saja
+            $query->whereHas("roles", function ($query) {
+                $query->whereIn("name", ["admin", "coach", "client"]);
+            });
+        } elseif (auth()->user()->hasRole('super_admin')) {
+            // Jika yang login adalah super_admin, tampilkan semua user kecuali satu user tertentu (berdasarkan email)
+            $query->where("email", "!=", "support@ptmfs.co.id");
+        }
+
+        $users = $query->get();
+
+        return DataTables::of($users)
+        ->addColumn("phone", function ($user) {
+            return $user->profile->phone ?? "N/A";
+        })
+        ->addColumn("gender", function ($user) {
+            return ucfirst($user->profile->gender) ?? "N/A";
+        })
+        ->addColumn("platform", function ($user) {
+            $socialAccount = $user->socialAccounts->first();
+            return $socialAccount ? ucfirst($socialAccount->provider) : "-";
+        })
+        ->addColumn("role", function ($user) {
+            return ucfirst($user->roles->pluck("name")->first() ?? "N/A");
+        })
+        ->addColumn("action", function ($user) {
+            $btn = '<div class="btn-group mr-1">';
+
+            // Tombol Edit dan View tetap muncul
+            $btn .= '<a href="' . route("users.edit", ["user" => $user->id]) . '" class="btn btn-warning btn-sm" title="Edit"><i class="fas fa-fw fa-edit"></i></a> ';
+            $btn .= '<a href="' . route("users.view", ["user" => $user->id]) . '" class="btn btn-info btn-sm" title="View"><i class="fas fa-fw fa-eye"></i></a> ';
+
+            // Menambahkan tombol Delete berdasarkan role pengguna yang login
+            if (auth()->user()->hasRole('super_admin')) {
+                // Super Admin tidak bisa menghapus dirinya sendiri dan sesama super_admin, tapi bisa menghapus admin
+                if (auth()->user()->id !== $user->id && !$user->hasRole('super_admin')) {
+                    $btn .= '<a href="' . route("users.delete", ["user" => $user->id]) . '" class="btn btn-danger btn-sm" title="Delete" data-confirm-delete="true"><i class="fas fa-fw fa-trash"></i></a>';
+                }
+            } elseif (auth()->user()->hasRole('admin')) {
+                // Admin tidak bisa menghapus user dengan role admin dan super_admin
+                if (!$user->hasRole('admin') && !$user->hasRole('super_admin')) {
+                    $btn .= '<a href="' . route("users.delete", ["user" => $user->id]) . '" class="btn btn-danger btn-sm" title="Delete" data-confirm-delete="true"><i class="fas fa-fw fa-trash"></i></a>';
+                }
+            }
+
+            $btn .= '</div>';
+            return $btn;
+        })
+        ->make(true);
     }
 
     public function create()
@@ -74,7 +102,7 @@ class UserController extends Controller
         $action = route("users.store");
 
         return view("dashboard.users.form.form", [
-            "title_page" => "Pilates | Add New User",
+            "title_page" => "Ohana Pilates | Add New User",
             "action" => $action,
             "method" => "POST"
         ]);
@@ -141,7 +169,7 @@ class UserController extends Controller
 
         // Kirim data ke view menggunakan compact
         return view("dashboard.users.profile.profile", compact("userData", "roleName"))
-            ->with("title_page", "Pilates | User Profile");
+            ->with("title_page", "Ohana Pilates | User Profile");
     }
 
     public function edit(User $user)
@@ -157,7 +185,7 @@ class UserController extends Controller
 
         return view("dashboard.users.form.form", compact("user", "action", "roleId"))
             ->with([
-                "title_page" => "Pilates | Update User Profile",
+                "title_page" => "Ohana Pilates | Update User Profile",
                 "method" => "POST"
             ]);
     }
@@ -172,6 +200,12 @@ class UserController extends Controller
             // Update data di tabel 'users'
             $user = User::findOrFail($user->id);
             $user->name = $validated["name"];
+
+            // Jika password diisi, update password
+            if ($request->has('password') && $request->password) {
+                $user->password = bcrypt($request->password);  // Hash password
+            }
+
             $user->save();
 
             // Update data di tabel 'profiles'
@@ -195,7 +229,7 @@ class UserController extends Controller
                 $profile->profile_picture = $path; // Simpan path seperti 'images/profile/imagename.extension'
             }
 
-            //            $profile->branch = $validated["branch"];
+            // Update profile data lainnya
             $profile->gender = $validated["gender"];
             $profile->phone = $validated["phone"];
             $profile->address = isset($validated["address"]) && !empty($validated["address"]) ? $validated["address"] : null;

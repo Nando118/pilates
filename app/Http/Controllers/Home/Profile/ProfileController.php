@@ -37,7 +37,7 @@ class ProfileController extends Controller
         $roleName = ucfirst($userData->roles->pluck("name")->first());
 
         return view("home.profiles.index", [
-            "title_page" => "Pilates | Home",
+            "title_page" => "Ohana Pilates | Home",
             "userData" => $userData,
             "roleName" => $roleName
         ]);
@@ -58,7 +58,7 @@ class ProfileController extends Controller
 
         return view("home.profiles.form.form", compact("userData", "action", "roleId"))
         ->with([
-            "title_page" => "Pilates | Update User Profile",
+            "title_page" => "Ohana Pilates | Update User Profile",
             "method" => "POST"
         ]);
     }

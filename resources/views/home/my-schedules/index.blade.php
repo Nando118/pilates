@@ -57,8 +57,7 @@
                         <thead>
                             <tr>
                                 <th>Time</th>
-                                <th>Lesson</th>
-                                <th>Room</th>
+                                <th>Lesson</th>                                
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -82,10 +81,8 @@
                                     </td>
                                     <td>
                                         <strong>{{ ucfirst($lessonSchedule->lesson->name ?? 'N/A') }} / {{ ucfirst($lessonSchedule->lessonType->name ?? 'N/A') }}</strong><br>
-                                        {{ ucfirst($lessonSchedule->user->name ?? 'N/A') }}
-                                    </td>
-                                    <td>
-                                        <strong>{{ ucfirst($lessonSchedule->room->name ?? 'N/A') }}</strong>
+                                        {{ ucfirst($lessonSchedule->user->name ?? 'N/A') }} <br>
+                                        {{ ucfirst($lessonSchedule->lesson_code ?? 'N/A') }}
                                     </td>
                                     <td>
                                         <a href="{{ route('my-schedules.view', ["lessonSchedule" => $lessonSchedule->id]) }}" class="btn btn-primary btn-sm" title="View Participants">

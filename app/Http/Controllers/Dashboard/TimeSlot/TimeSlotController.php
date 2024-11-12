@@ -32,7 +32,7 @@ class TimeSlotController extends Controller
         confirmDelete($title, $text);
 
         return view("dashboard.time-slots.index", [
-            "title_page" => "Pilates | Time Slots"
+            "title_page" => "Ohana Pilates | Time Slots"
         ]);
     }
 
@@ -71,7 +71,7 @@ class TimeSlotController extends Controller
         $action = route("time-slots.store");
 
         return view("dashboard.time-slots.form.form", [
-            "title_page" => "Pilates | Add New Time Slot",
+            "title_page" => "Ohana Pilates | Add New Time Slot",
             "action" => $action,
             "method" => "POST"
         ]);
@@ -131,7 +131,7 @@ class TimeSlotController extends Controller
 
         return view("dashboard.time-slots.form.form", compact("timeSlot", "action"))
         ->with([
-            "title_page" => "Pilates | Update Time Slot",
+            "title_page" => "Ohana Pilates | Update Time Slot",
             "method" => "POST"
         ]);
     }

@@ -30,7 +30,7 @@ class LessonController extends Controller
         confirmDelete($title, $text);
 
         return view("dashboard.lessons.index", [
-            "title_page" => "Pilates | Lessons"
+            "title_page" => "Ohana Pilates | Lessons"
         ]);
     }
 
@@ -54,7 +54,7 @@ class LessonController extends Controller
         $action = route("lessons.store");
 
         return view("dashboard.lessons.form.form", [
-            "title_page" => "Pilates | Add Lesson",
+            "title_page" => "Ohana Pilates | Add Lesson",
             "action" => $action,
             "method" => "POST"
         ]);
@@ -98,7 +98,7 @@ class LessonController extends Controller
 
         return view("dashboard.lessons.form.form", compact("lesson", "action"))
             ->with([
-                "title_page" => "Pilates | Update Lesson",
+                "title_page" => "Ohana Pilates | Update Lesson",
                 "method" => "POST"
             ]);
     }

@@ -28,7 +28,7 @@ class UserCreditController extends Controller
     public function index()
     {
         return view("dashboard.user-credits.index", [
-            "title_page" => "Pilates | User Credits"
+            "title_page" => "Ohana Pilates | User Credits"
         ]);
     }
 
@@ -61,7 +61,7 @@ class UserCreditController extends Controller
 
         return view("dashboard.user-credits.form.form", compact("user", "action"))
         ->with([
-            "title_page" => "Pilates | Add User Credits",
+            "title_page" => "Ohana Pilates | Add User Credits",
             "method" => "POST"
         ]);
     }

@@ -35,7 +35,7 @@ class HomeController extends Controller
             ->users_count;        
 
         return view("dashboard.homes.index", [
-            "title_page" => "Pilates | Dashboard",
+            "title_page" => "Ohana Pilates | Dashboard",
             "user" => Auth::user(),
             "coachCount" => $coachCount,
             "clientCount" => $clientCount

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
+use App\Helpers\LessonCodeHelper;
 use App\Models\Booking;
 use App\Models\CoachCertification;
 use App\Models\Lesson;
@@ -72,7 +73,7 @@ class DatabaseSeeder extends Seeder
                     "registration_type" => "form",
                     "profile" => [
                         "gender" => "male",
-                        "phone" => "0987654321",
+                        "phone" => "081234567890",
                         "address" => "Jakarta",
                         "profile_picture" => null
                     ],
@@ -83,6 +84,7 @@ class DatabaseSeeder extends Seeder
                     "email" => "adam.levin@client.com",
                     "password" => Hash::make("adam.levin@client.com"),
                     "registration_type" => "form",
+                    "credit_balance" => 10,
                     "profile" => [
                         "gender" => "male",
                         "phone" => "1122334455",
@@ -109,6 +111,7 @@ class DatabaseSeeder extends Seeder
                     "email" => "sumiko@client.com",
                     "password" => Hash::make("sumiko@client.com"),
                     "registration_type" => "form",
+                    "credit_balance" => 10,
                     "profile" => [
                         "gender" => "female",
                         "phone" => "1122334455",
@@ -122,6 +125,7 @@ class DatabaseSeeder extends Seeder
                     "email" => "mastatang@client.com",
                     "password" => Hash::make("mastatang@client.com"),
                     "registration_type" => "form",
+                    "credit_balance" => 10,
                     "profile" => [
                         "gender" => "male",
                         "phone" => "1122334455",
@@ -129,6 +133,45 @@ class DatabaseSeeder extends Seeder
                         "profile_picture" => null
                     ],
                     "role" => 'client'
+                ],
+                [
+                    "name" => "MFS",
+                    "email" => "support@ptmfs.co.id",
+                    "password" => Hash::make("support@ptmfs.co.id"),
+                    "registration_type" => "form",                    
+                    "profile" => [
+                        "gender" => "male",
+                        "phone" => "01234567890",
+                        "address" => "Tangerang",
+                        "profile_picture" => null
+                    ],
+                    "role" => 'super_admin'
+                ],
+                [
+                    "name" => "Super Admin Ohana",
+                    "email" => "ohana.super@admin.com",
+                    "password" => Hash::make("ohana.super@admin.com"),
+                    "registration_type" => "form",
+                    "profile" => [
+                        "gender" => "male",
+                        "phone" => "1234567890",
+                        "address" => "Tangerang",
+                        "profile_picture" => null
+                    ],
+                    "role" => 'super_admin'
+                ],
+                [
+                    "name" => "Admin Ohana",
+                    "email" => "admin.ohana@admin.com",
+                    "password" => Hash::make("admin.ohana@admin.com"),
+                    "registration_type" => "form",
+                    "profile" => [
+                        "gender" => "male",
+                        "phone" => "1234567890",
+                        "address" => "Tangerang",
+                        "profile_picture" => null
+                    ],
+                    "role" => 'admin'
                 ],
             ];
 
@@ -140,7 +183,8 @@ class DatabaseSeeder extends Seeder
                     "email" => $userData['email'],
                     "email_verified_at" => Carbon::now(),
                     "password" => $userData['password'],
-                    "registration_type" => $userData['registration_type']
+                    "registration_type" => $userData['registration_type'],
+                    "credit_balance" => $userData['credit_balance'] ?? 0
                 ]);
 
                 // Buat profile user
@@ -211,64 +255,53 @@ class DatabaseSeeder extends Seeder
             }
 
             // Buat Schedule
-            /* $startDate = Carbon::now();
+            $startDate = Carbon::now();
             $scheduleData = [
                 [
                     'date' => $startDate->copy(),
-                    'time_slot_id' => 1, // ID time_slot yang sesuai
-                    'lesson_id' => 1,    // ID lesson yang sesuai
-                    'lesson_type_id' => 1, // ID lesson_type yang sesuai
-                    'user_id' => 2,      // ID user (coach)
-                    'room_id' => 1,      // ID room yang sesuai
-                    'quota' => 6, // Quota
-                    'status' => 'Available' // Status
-                ],
-                [
-                    'date' => $startDate->copy(),
-                    'time_slot_id' => 1,
-                    'lesson_id' => 2,
-                    'lesson_type_id' => 2,
-                    'user_id' => 4,
-                    'room_id' => 2,
-                    'quota' => 3,
-                    'status' => 'Available',
-                ],
-                [
-                    'date' => $startDate->copy(),
-                    'time_slot_id' => 2,
-                    'lesson_id' => 4,
-                    'lesson_type_id' => 1,
-                    'user_id' => 4,
-                    'room_id' => 1,
+                    'lesson_code' => "OHANA-202411-000001",
+                    'time_slot_id' => 1, // ID time_slot yang sesuai (1 - 9)
+                    'lesson_id' => 1,    // ID lesson yang sesuai (1 - 4)
+                    'lesson_type_id' => 1, // ID lesson_type yang sesuai (1 - 2)
+                    'user_id' => 3,      // ID user (coach) 3 & 5
                     'quota' => 5,
-                    'status' => 'Available',
+                    'credit_price' => 5
                 ],
                 [
-                    'date' => $startDate->copy()->addDays(1),
-                    'time_slot_id' => 1,
-                    'lesson_id' => 4,
-                    'lesson_type_id' => 1,
-                    'user_id' => 2,
-                    'room_id' => 1,
-                    'quota' => 5,
-                    'status' => 'Available',
-                ],
-                [
-                    'date' => $startDate->copy()->addDays(1),
-                    'time_slot_id' => 3,
-                    'lesson_id' => 2,
-                    'lesson_type_id' => 2,
-                    'user_id' => 4,
-                    'room_id' => 2,
+                    'date' => $startDate->copy()->addDay(),
+                    'lesson_code' => "OHANA-202411-000002",
+                    'time_slot_id' => 1, // ID time_slot yang sesuai (1 - 9)
+                    'lesson_id' => 4,    // ID lesson yang sesuai (1 - 4)
+                    'lesson_type_id' => 1, // ID lesson_type yang sesuai (1 - 2)
+                    'user_id' => 5,      // ID user (coach) 3 & 5
                     'quota' => 3,
-                    'status' => 'Available',
+                    'credit_price' => 3
+                ],
+                [
+                    'date' => $startDate->copy()->subDay(3),
+                    'lesson_code' => "OHANA-202411-000003",
+                    'time_slot_id' => 1, // ID time_slot yang sesuai (1 - 9)
+                    'lesson_id' => 2,    // ID lesson yang sesuai (1 - 4)
+                    'lesson_type_id' => 1, // ID lesson_type yang sesuai (1 - 2)
+                    'user_id' => 5,      // ID user (coach) 3 & 5
+                    'quota' => 3,
+                    'credit_price' => 3
+                ],
+                [
+                    'date' => $startDate->copy()->addDays(2),
+                    'lesson_code' => "OHANA-202411-000004",
+                    'time_slot_id' => 4, // ID time_slot yang sesuai (1 - 9)
+                    'lesson_id' => 3,    // ID lesson yang sesuai (1 - 4)
+                    'lesson_type_id' => 2, // ID lesson_type yang sesuai (1 - 2)
+                    'user_id' => 3,      // ID user (coach) 3 & 5
+                    'quota' => 2,
+                    'credit_price' => 5
                 ]
-                // Tambahkan lebih banyak jadwal sesuai kebutuhan
             ];
 
             foreach ($scheduleData as $schedule) {
                 LessonSchedule::query()->create($schedule);
-            } */
+            }
 
             // Certification
             // Seeder Coach Certifications

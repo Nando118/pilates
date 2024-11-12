@@ -25,6 +25,7 @@
                                 <th>Created At</th>
                                 <th>Name</th>
                                 <th>Email</th>
+                                <th>Phone</th>
                                 <th>Gender</th>
                                 <th>Platform</th>
                                 <th>Role</th>
@@ -68,6 +69,7 @@
                     { data: 'created_at', name: 'created_at', render: DataTable.render.date()},
                     { data: 'name', name: 'name'},
                     { data: 'email', name: 'email'},
+                    { data: 'phone', name: 'phone'},
                     { data: 'gender', name: 'gender'},
                     { data: 'platform', name: 'platform'},
                     { data: 'role', name: 'role'},

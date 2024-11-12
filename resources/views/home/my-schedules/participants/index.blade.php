@@ -25,8 +25,9 @@
         <!-- Scrollable Content Section -->
         <div class="scrollable-content pb-3">
             <div class="container-fluid">
-                <div class="mb-3 px-3 pt-3">
+                <div class="mb-5 px-3 pt-3">
                     <h3>{{ $lessonSchedule->lesson->name ?? 'Lesson' }} - {{ $lessonSchedule->lessonType->name ?? 'Type' }}</h3>
+                    <p><strong>Lesson Code:</strong> {{ $lessonSchedule->lesson_code }}</p>
                     <p><strong>Date:</strong> {{ $lessonSchedule->date }}</p>
                     <p><strong>Time:</strong> {{ date('H:i', strtotime($lessonSchedule->timeSlot->start_time)) }}</p>
                     <p><strong>Coach:</strong> {{ $lessonSchedule->user->name }}</p>
@@ -46,6 +47,9 @@
                             @endforeach
                         </ul>
                     @endif
+                </div>
+                <div class="d-flex justify-content-around">                    
+                    <a class="btn btn-warning w-25" href="{{ route('my-schedules.index') }}" role="button"><strong>Back</strong></a>
                 </div>
             </div>                    
         </div>  

@@ -38,6 +38,12 @@
                         <label for="role" class="form-label">Role<span style="color: red;">*</span></label>
                         <select class="form-control" id="role" name="role" required>
                             <option value="" disabled selected>Select role</option>
+                            @if(auth()->user() && auth()->user()->hasRole('super_admin'))
+                                <option value="1" {{ old('role') == "1" ? 'selected' : (isset($user) && $roleId == "1" ? 'selected' : '') }}>Super Admin</option>
+                                <option value="2" {{ old('role') == "2" ? 'selected' : (isset($user) && $roleId == "2" ? 'selected' : '') }}>Admin</option>
+                            @elseif (auth()->user() && auth()->user()->hasRole('admin'))
+                                <option value="2" {{ old('role') == "2" ? 'selected' : (isset($user) && $roleId == "2" ? 'selected' : '') }}>Admin</option>
+                            @endif
                             <option value="3" {{ old('role') == "3" ? 'selected' : (isset($user) && $roleId == "3" ? 'selected' : '') }}>Coach</option>
                             <option value="4" {{ old('role') == "4" ? 'selected' : (isset($user) && $roleId == "4" ? 'selected' : '') }}>Client</option>
                         </select>
@@ -109,7 +115,25 @@
                     @enderror
 
                     @if (isset($user))
-                        <div class=""></div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">New Password (Leave blank if not changing)</label>
+                            <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" autocomplete="off">
+                            @error('password')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="password_confirmation" class="form-label">Confirm New Password</label>
+                            <input type="password" class="form-control @error('password_confirmation') is-invalid @enderror" id="password_confirmation" name="password_confirmation" autocomplete="off">
+                            @error('password_confirmation')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
                     @else
                         <div class="mb-3">
                             <label for="password" class="form-label">Password<span style="color: red;">*</span></label>
@@ -131,6 +155,7 @@
                             @enderror
                         </div>
                     @endif
+
                     <button id="btn_submit" class="btn btn-success" type="submit">
                         @if (isset($user))
                             Update

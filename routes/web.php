@@ -68,7 +68,8 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', 'verified', 'onlyCoachClient'])->group(function () {
     // CLIENT & COACH PAGES
     // START HOME ROUTE - CLIENT & COACH PAGES
-    Route::get("/home", [HomeUserController::class, "index"])->name("home");
+    Route::get("/home/upcoming-lessons", [HomeUserController::class, "upcomingLessons"])->name("home");
+    Route::get("/home/past-lessons", [HomeUserController::class, "pastLessons"])->name("pastLessons");
     // END HOME ROUTE - CLIENT & COACH PAGES
 
     // START LESSON SCHEDULES ROUTE - CLIENT & COACH PAGES

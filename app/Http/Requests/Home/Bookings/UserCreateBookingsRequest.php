@@ -21,26 +21,8 @@ class UserCreateBookingsRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = [
-            "id" => "required",
-            "string",
-            "name.0" => "required",
-            "string", // Field name pertama harus diisi
-        ];
-
-        // Tambahkan validasi untuk setiap participant yang diinput
-        for ($i = 1; $i < count($this->name); $i++) {
-            $rules["name." . $i] = "nullable|string"; // Field selanjutnya tidak wajib diisi
-        }
-
-        return $rules;
-    }
-
-    public function messages()
-    {
         return [
-            "name.0.required" => "The first name field must be filled in.",
-            "name.*.string" => "Name must be text.",
+            "id" => "required"
         ];
     }
 }

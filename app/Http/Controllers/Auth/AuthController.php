@@ -34,7 +34,7 @@ class AuthController extends Controller
     public function login()
     {
         return view("auth.login.form", [
-            "title_page" => "Pilates | Sign In"
+            "title_page" => "Ohana Pilates | Sign In"
         ]);
     }
 
@@ -74,7 +74,7 @@ class AuthController extends Controller
     public function register()
     {
         return view("auth.register.form", [
-            "title_page" => "Pilates | Sign Up"
+            "title_page" => "Ohana Pilates | Sign Up"
         ]);
     }
 
@@ -147,7 +147,7 @@ class AuthController extends Controller
 
         // Jika belum terverifikasi, tampilkan form verifikasi email
         return view("auth.email-verify.form", [
-            "title_page" => "Pilates | Sign Up"
+            "title_page" => "Ohana Pilates | Sign Up"
         ]);
     }
 
@@ -268,7 +268,7 @@ class AuthController extends Controller
 
         // Tampilkan form complete registration jika session ada
         return view("auth.complete-registration.form", [
-            "title_page" => "Pilates | Complete Registration"
+            "title_page" => "Ohana Pilates | Complete Registration"
         ]);
     }
 
@@ -336,7 +336,7 @@ class AuthController extends Controller
     public function forgotPassword()
     {
         return view("auth.forgot-password.form", [
-            "title_page" => "Pilates | Forgot Password"
+            "title_page" => "Ohana Pilates | Forgot Password"
         ]);
     }
 
@@ -383,7 +383,7 @@ class AuthController extends Controller
 
         // Kembalikan view dengan data yang diperlukan
         return view("auth.forgot-password.reset-password.form", [
-            "title_page" => "Support Ticket System | Reset Password",
+            "title_page" => "Ohana Pilates | Reset Password",
             "token" => $token,
             "email" => request("email") // Mengambil email dari request
         ]);

@@ -31,7 +31,7 @@ class LessonTypeController extends Controller
         confirmDelete($title, $text);
 
         return view("dashboard.lesson-types.index", [
-            "title_page" => "Pilates | Lesson Types"
+            "title_page" => "Ohana Pilates | Lesson Types"
         ]);
     }
 
@@ -55,7 +55,7 @@ class LessonTypeController extends Controller
         $action = route("lesson-types.store");
 
         return view("dashboard.lesson-types.form.form", [
-            "title_page" => "Pilates | Add Lesson Type",
+            "title_page" => "Ohana Pilates | Add Lesson Type",
             "action" => $action,
             "method" => "POST"
         ]);
@@ -100,7 +100,7 @@ class LessonTypeController extends Controller
 
         return view("dashboard.lesson-types.form.form", compact("lessonType", "action"))
             ->with([
-                "title_page" => "Pilates | Update Lesson Type",
+                "title_page" => "Ohana Pilates | Update Lesson Type",
                 "method" => "POST"
             ]);
     }

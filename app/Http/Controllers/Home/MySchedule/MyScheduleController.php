@@ -30,7 +30,7 @@ class MyScheduleController extends Controller
         // Ambil data lesson schedules berdasarkan user_id coach
         $lessonScheduleDatas = LessonSchedule::where("user_id", $coach_id)
             ->join("time_slots", "lesson_schedules.time_slot_id", "=", "time_slots.id") // Join dengan time_slots
-            ->with(["timeSlot", "lesson", "lessonType", "room", "user"]) // Eager load relasi yang diperlukan
+            ->with(["timeSlot", "lesson", "lessonType", "user"]) // Eager load relasi yang diperlukan
             ->orderBy("lesson_schedules.date") // Urutkan berdasarkan tanggal
             ->orderBy("time_slots.start_time") // Urutkan berdasarkan start_time
             ->select("lesson_schedules.*") // Pastikan hanya memilih kolom dari lesson_schedules
@@ -39,7 +39,7 @@ class MyScheduleController extends Controller
         $lessonTypes = LessonType::get();
 
         return view("home.my-schedules.index", [
-            "title_page" => "Pilates | My Schedules",
+            "title_page" => "Ohana Pilates | My Schedules",
             "lessonScheduleDatas" => $lessonScheduleDatas,
             "lessonTypes" => $lessonTypes
         ]);        
@@ -51,7 +51,7 @@ class MyScheduleController extends Controller
 
         // Ambil data lesson schedules berdasarkan user_id (coach)
         $lessonScheduleDatas = LessonSchedule::where("user_id", $coach_id)
-        ->with(["timeSlot", "lesson", "lessonType", "room", "user"]) // relasi yang dibutuhkan
+        ->with(["timeSlot", "lesson", "lessonType", "user"]) // relasi yang dibutuhkan
         ->get();
 
         // Ambil data bookings berdasarkan lesson_schedule_id
@@ -60,7 +60,7 @@ class MyScheduleController extends Controller
         ->get();
 
         return view("home.my-schedules.participants.index", [
-            "title_page" => "Pilates | Participants",
+            "title_page" => "Ohana Pilates | Participants",
             "lessonSchedule" => $lessonSchedule, // Kirimkan data lesson schedule
             "bookings" => $bookings // Kirimkan data bookings ke view
         ]);

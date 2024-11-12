@@ -23,7 +23,7 @@ class CreditTransactionController extends Controller
     public function index()
     {
         return view("dashboard.credit-transactions.index", [
-            "title_page" => "Pilates | User Credits History"
+            "title_page" => "Ohana Pilates | User Credits History"
         ]);
     }
 

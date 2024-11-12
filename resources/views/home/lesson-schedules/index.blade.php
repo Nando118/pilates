@@ -65,7 +65,11 @@
                                     <strong>{{ date("H:i", strtotime(optional($lessonSchedule->timeSlot)->start_time ?? 'N/A')) }}</strong><br>{{ optional($lessonSchedule->timeSlot)->duration ?? 0 }} Min
                                 </td>
                                 <td>
-                                    <strong>{{ ucfirst(optional($lessonSchedule->lesson)->name ?? 'N/A') }} / {{ ucfirst(optional($lessonSchedule->lessonType)->name ?? 'N/A') }}</strong><br>{{ ucfirst(optional($lessonSchedule->user)->name ?? 'N/A') }}
+                                    <strong>
+                                        {{ ucfirst(optional($lessonSchedule->lesson)->name ?? 'N/A') }} / {{ ucfirst(optional($lessonSchedule->lessonType)->name ?? 'N/A') }}
+                                    </strong>
+                                    <br>{{ ucfirst(optional($lessonSchedule->user)->name ?? 'N/A') }}
+                                    <br>{{ $lessonSchedule->lesson_code ?? 'N/A' }}
                                 </td>
                                 <td>
                                     <strong>
@@ -76,7 +80,7 @@
                                         @endif
                                     </strong>
                                     <br>
-                                    {{ ucfirst(optional($lessonSchedule->room)->name ?? 'N/A') }}
+                                    Credit Price {{ $lessonSchedule->credit_price ?? 'N/A' }}
                                 </td>
                                 @can('access-client-menu')
                                     <td class="text-center">
@@ -86,11 +90,18 @@
                                             $currentDateTime = now();
                                         @endphp
 
-                                        @if($currentDateTime->greaterThanOrEqualTo($lessonStartTime))
-                                            <button class="btn btn-primary btn-sm" title="Cannot Delete" disabled>
+                                        @if(in_array($lessonSchedule->id, $userBookings))
+                                            {{-- Tombol disabled jika sudah booking --}}
+                                            <button class="btn btn-primary btn-sm" title="Already Booked" disabled>
+                                                <i class="fas fa-fw fa-user-check"></i>
+                                            </button>
+                                        @elseif($currentDateTime->greaterThanOrEqualTo($lessonStartTime))
+                                            {{-- Tombol disabled jika waktu pelajaran sudah mulai --}}
+                                            <button class="btn btn-primary btn-sm" title="Cannot Book" disabled>
                                                 <i class="fas fa-fw fa-user-plus"></i>
                                             </button>
                                         @else
+                                            {{-- Tombol aktif jika belum booking dan waktu belum lewat --}}
                                             <a href="{{ route('user-lesson-schedules.create', ['bookings' => $lessonSchedule->id]) }}" class="btn btn-primary btn-sm" title="Booking">
                                                 <i class="fas fa-fw fa-user-plus"></i>
                                             </a>

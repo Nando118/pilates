@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Home\MyLesson;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\CreditTransaction;
 use App\Models\LessonSchedule;
 use App\Models\LessonType;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -44,7 +46,7 @@ class MyLessonController extends Controller
         $lessonTypes = LessonType::get();
 
         return view("home.my-lesson-schedules.index", [
-            "title_page" => "Pilates | My Lesson Schedules",
+            "title_page" => "Ohana Pilates | My Lesson Schedules",
             "myBookings" => $myBookings,
             "lessonTypes" => $lessonTypes
         ]);
@@ -56,36 +58,43 @@ class MyLessonController extends Controller
             // Mulai transaksi database
             DB::beginTransaction();
 
-            // Ambil data booking berdasarkan id dari request
-            $bookings = Booking::findOrFail($bookings->id);
+            // Ambil data booking berdasarkan id
+            $booking = Booking::findOrFail($bookings->id);
 
             // Ambil lesson schedule terkait dari booking yang akan dihapus
-            $lessonSchedule = LessonSchedule::where("id", "=", $bookings->lesson_schedule_id)->first();
+            $lessonSchedule = LessonSchedule::where("id", $booking->lesson_schedule_id)->first();
 
-            if ($lessonSchedule) {
-                // Periksa apakah waktu mulai sudah lewat
-                $currentDateTime = now(); // Waktu saat ini
-                $lessonStartTime = Carbon::parse($lessonSchedule->date . " " . $lessonSchedule->timeSlot->start_time);
-
-                if ($currentDateTime->greaterThanOrEqualTo($lessonStartTime)) {
-                    // Jika sudah lewat, tampilkan pesan kesalahan
-                    alert()->error("Oppss...", "Booking cannot be deleted because the lesson has already started.");
-                    return redirect()->back();
-                }
-
-                // Kembalikan kuota yang sudah terpakai
-                $lessonSchedule->quota += 1;
-
-                // Simpan perubahan kuota
-                $lessonSchedule->save();
-            } else {
-                // Jika lesson schedule tidak ditemukan
-                alert()->error("Oppss...", "An error occurred while canceling the lesson schedule booking for this user, please try again.");
-                return redirect()->back();
+            if (!$lessonSchedule) {
+                alert()->error("Oppss...", "Lesson schedule not found.");
+                return redirect()->route("bookings.index");
             }
 
+            // Periksa apakah booking terkait memiliki user_id
+            if ($booking->user_id) {
+                // Ambil data user terkait
+                $user = User::find($booking->user_id);
+
+                if ($user) {
+                    // Tambahkan kembali credit balance untuk pengguna
+                    $user->credit_balance += $lessonSchedule->credit_price;
+                    $user->save();
+
+                    // Catat transaksi pengembalian kredit
+                    CreditTransaction::query()->create([
+                        "user_id" => $user->id,
+                        "type" => "return",
+                        "amount" => $lessonSchedule->credit_price,
+                        "description" => $lessonSchedule->credit_price . ' credit has been returned to the account ' . $user->email . ' , because the booking for the lesson code has been cancelled ' . $lessonSchedule->lesson_code . '.'
+                    ]);
+                }
+            }
+
+            // Kembalikan kuota yang sudah terpakai
+            $lessonSchedule->quota += 1;
+            $lessonSchedule->save();
+
             // Soft delete booking
-            $bookings->delete();
+            $booking->delete();
 
             // Commit transaksi jika semuanya berhasil
             DB::commit();

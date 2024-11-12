@@ -19,7 +19,7 @@
             <!-- Sticky Navbar -->
             <nav class="navbar sticky-top bg-dark" data-bs-theme="dark">
                 <div class="container-fluid">
-                    <a class="navbar-brand" href="{{ route('home') }}"><strong>Pilates</strong></a>
+                    <a class="navbar-brand" href="{{ route('home') }}"><strong>Ohana Pilates</strong></a>
                     <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>

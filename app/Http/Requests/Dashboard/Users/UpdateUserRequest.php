@@ -21,15 +21,22 @@ class UpdateUserRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             "id" => ["required", "string"],
-            "role" => ["required", "string"],            
-            "name" => ["required", "string", "min:3", "max:200"],            
+            "role" => ["required", "string"],
+            "name" => ["required", "string", "min:3", "max:200"],
             "gender" => ["required", "string"],
             "phone" => ["required", "numeric", "min_digits:10", "max_digits:15"],
             "address" => ["nullable", "string", "min:3", "max:200"],
             "email" => ["required", "email:dns", "max:200"],
             "profile_picture" => ["nullable", "image", "mimes:jpeg,png,jpg,gif", "max:2048"]
         ];
+
+        // Jika ada password yang diinput, validasi password dan konfirmasi password
+        if ($this->input('password')) {
+            $rules['password'] = ['required', 'string', 'min:8', 'confirmed'];  // Minimum panjang password dan konfirmasi
+        }
+
+        return $rules;
     }
 }

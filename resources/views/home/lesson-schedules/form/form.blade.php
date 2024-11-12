@@ -30,107 +30,29 @@
 
                         <input type="hidden" name="id" value="{{ $lessonDetails->id }}">
 
-                        <div class="card">
-                            <div class="card-header">
-                                Booking lessons <strong>{{ $lessonDetails->lesson->name }}</strong> with coach <strong>{{ $lessonDetails->user->name }}</strong>
+                        <div class="card mb-4">
+                            <div class="card-header text-bg-dark">
+                                <strong>Lesson Details</strong>
                             </div>
                             <div class="card-body">
-                                <p class="card-text">Lesson Type: {{ $lessonDetails->lessonType->name }}</p>
-                                <p class="card-text">Date: {{ date('d-m-Y', strtotime($lessonDetails->date)) }}</p>
-                                <p class="card-text">Time:  {{ date('H:i', strtotime($lessonDetails->timeSlot->start_time)) }} - {{ date('H:i', strtotime($lessonDetails->timeSlot->end_time)) }}</p>
-                                <p class="card-text">Duration: {{ $lessonDetails->timeSlot->duration }} Minute</p>
-                                <p class="card-text">Room: {{ $lessonDetails->room->name }}</p>
-                                <p class="card-text">Available Quota: {{ $lessonDetails->quota }} Person</p>
+                                <p><strong>{{ $lessonDetails->lesson->name }}</strong> with coach <strong>{{ $lessonDetails->user->name }}</strong></p>
+                                <p>Lesson Code: {{ $lessonDetails->lesson_code }}</p>
+                                <p>Lesson Type: {{ $lessonDetails->lessonType->name }}</p>
+                                <p>Date: {{ date('d-m-Y', strtotime($lessonDetails->date)) }}</p>
+                                <p>Time:  {{ date('H:i', strtotime($lessonDetails->timeSlot->start_time)) }} - {{ date('H:i', strtotime($lessonDetails->timeSlot->end_time)) }}</p>
+                                <p>Duration: {{ $lessonDetails->timeSlot->duration }} Minute</p>                                
+                                <p>Available Quota: {{ $lessonDetails->quota }} Person</p>
+                                <p>Credit Price: {{ $lessonDetails->credit_price }}</p>
                             </div>
+                        </div>                        
+                        <div class="d-flex justify-content-around">                            
+                            <button id="btn_submit" class="btn btn-success w-25" type="submit"><strong>Booking</strong></button>
+                            <a class="btn btn-warning w-25" href="{{ route('user-lesson-schedules.index') }}" role="button"><strong>Cancel</strong></a>
                         </div>
-
-                        <div id="participants-container">
-                            <div class="mb-3 participant">
-                                <label for="name" class="form-label">Name<span style="color: red;">*</span></label>
-                                <select class="form-control select2" name="name[]" required>
-                                    <option value="" disabled selected>Select or add name</option>
-                                    @foreach ($clientUsers as $clientUser)
-                                        <option value="{{ $clientUser->id }}">
-                                            {{ $clientUser->name . " @" . $clientUser->profile->username }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <input type="hidden" id="remaining-quota" value="{{ $remainingQuota }}">
-
-                        <button id="btn_submit" class="btn btn-success" type="submit">Booking</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 @endsection
-
-@push('scripts')
-    <script>
-        $(document).ready(function() {
-            const $participantsContainer = $('#participants-container');
-            let remainingQuota = {{ $remainingQuota }}; // Set remaining quota dari backend
-            let selectedNames = []; // Menyimpan nama yang dipilih
-
-            $participantsContainer.on('change', 'select[name="name[]"]', function() {
-                const selectedValue = $(this).val();
-                const $this = $(this);
-
-                // Cek apakah nama sudah dipilih sebelumnya
-                if (selectedNames.includes(selectedValue)) {
-                    alert("This name has already been selected. Please choose another one.");
-                    $this.val(''); // Reset pilihan
-                    return;
-                }
-
-                // Tambahkan nama ke array jika valid
-                selectedNames.push(selectedValue);
-
-                // Hitung jumlah peserta saat ini
-                const participantCount = selectedNames.length; // Hitung berdasarkan nama yang dipilih
-
-                // Cek apakah masih ada kuota yang tersedia
-                if (selectedValue && (participantCount <= remainingQuota)) {
-                    // Tambahkan field baru hanya jika kuota masih ada
-                    const newParticipantDiv = $(`
-                        <div class="mb-3 participant">
-                            <label for="name" class="form-label">Name</label>
-                            <select class="form-control select2" name="name[]">
-                                <option value="" disabled selected>Select or add name</option>
-                                @foreach ($clientUsers as $clientUser)
-                                    <option value="{{ $clientUser->id }}" class="client-option">
-                                        {{ $clientUser->name . " @" . $clientUser->profile->username }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                    `);
-                    $participantsContainer.append(newParticipantDiv);
-
-                    // Hapus option yang sudah dipilih dari dropdown baru
-                    selectedNames.forEach(name => {
-                        newParticipantDiv.find(`option[value="${name}"]`).remove();
-                    });
-
-                    // Inisialisasi Select2 pada elemen baru
-                    $('.select2').select2({
-                        theme: 'bootstrap4',
-                        tags: true
-                    });
-
-                    // Update kuota yang tersisa
-                    remainingQuota -= 1; // Kurangi kuota setelah memilih nama
-                }
-            });
-
-            // Inisialisasi Select2 untuk elemen yang sudah ada saat halaman dimuat
-            $('.select2').select2({
-                theme: 'bootstrap4',
-                tags: true
-            });
-        });
-    </script>
-@endpush
 

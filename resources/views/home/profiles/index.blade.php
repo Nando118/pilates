@@ -33,8 +33,7 @@
                 @endif
                 
                 <!-- Nama dan Username -->
-                <h3 class="card-title mb-0">{{ $userData->name }}</h3>
-                <h6 class="card-subtitle mb-3"><em>{{ '@' . $userData->profile->username }}</em></h6>
+                <h3 class="card-title mb-0">{{ $userData->name }}</h3>                
 
                 <!-- Jarak Sebelum Detail Profil -->
                 <div class="mt-4" style="font-size: 0.9rem;">

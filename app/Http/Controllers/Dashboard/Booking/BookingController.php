@@ -37,7 +37,7 @@ class BookingController extends Controller
         $timeSlots = TimeSlot::get();
 
         return view("dashboard.bookings.index", [
-            "title_page" => "Pilates | Bookings",
+            "title_page" => "Ohana Pilates | Bookings",
             "timeSlots" => $timeSlots
         ]);
     }
@@ -107,7 +107,7 @@ class BookingController extends Controller
         $remainingQuota = $bookings->quota - $bookings->bookings()->count();
 
         return view("dashboard.bookings.form.form", [
-            "title_page" => "Pilates | Booking Lesson",
+            "title_page" => "Ohana Pilates | Booking Lesson",
             "action" => $action,
             "method" => "POST",
             "lessonDetails" => $bookings,

@@ -37,7 +37,7 @@ class LessonScheduleController extends Controller
         confirmDelete($title, $text);
 
         return view("dashboard.lesson-schedules.index", [
-            "title_page" => "Pilates | Lesson Schedules"
+            "title_page" => "Ohana Pilates | Lesson Schedules"
         ]);
     }
 
@@ -123,7 +123,7 @@ class LessonScheduleController extends Controller
         })->get();
 
         return view("dashboard.lesson-schedules.form.form-add", [
-            "title_page" => "Pilates | Add Lesson Schedules",
+            "title_page" => "Ohana Pilates | Add Lesson Schedules",
             "timeSlots" => $timeSlots,
             "lessons" => $lessons,
             "lessonTypes" => $lessonTypes,
@@ -209,7 +209,7 @@ class LessonScheduleController extends Controller
 
         return view("dashboard.lesson-schedules.form.form-edit", compact("lessonSchedule", "action", "timeSlots", "lessons", "lessonTypes", "coachUsers"))
             ->with([
-                "title_page" => "Pilates | Update Lesson Schedule",
+                "title_page" => "Ohana Pilates | Update Lesson Schedule",
                 "method" => "POST"
             ]);
     }

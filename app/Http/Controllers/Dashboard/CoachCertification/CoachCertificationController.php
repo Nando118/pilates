@@ -32,7 +32,7 @@ class CoachCertificationController extends Controller
         confirmDelete($title, $text);
 
         return view("dashboard.coach-certifications.index", [
-            "title_page" => "Pilates | Coach Certifications"
+            "title_page" => "Ohana Pilates | Coach Certifications"
         ]);
     }
 
@@ -67,7 +67,7 @@ class CoachCertificationController extends Controller
         })->get();
 
         return view("dashboard.coach-certifications.form.form", [
-            "title_page" => "Pilates | Add New Coach Certification",
+            "title_page" => "Ohana Pilates | Add New Coach Certification",
             "action" => $action,
             "coaches" => $coach,
             "method" => "POST"
@@ -113,7 +113,7 @@ class CoachCertificationController extends Controller
         })->get();
 
         return view("dashboard.coach-certifications.form.form", [
-            "title_page" => "Pilates | Update Coach Certification",
+            "title_page" => "Ohana Pilates | Update Coach Certification",
             "action" => $action,
             "method" => "POST",
             "coaches" => $coach,
