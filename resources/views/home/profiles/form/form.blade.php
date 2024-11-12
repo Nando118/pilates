@@ -79,7 +79,26 @@
                             {{ $message }}
                         </div>
                     @enderror
-                </div>                            
+                </div>
+                
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" autocomplete="off">
+                    @error('password')
+                        <div class="invalid-feedback">
+                            {{ $message }}
+                        </div>
+                    @enderror
+                </div>
+                <div class="mb-3">
+                    <label for="password_confirmation" class="form-label">Confirm Password</label>
+                    <input type="password" class="form-control @error('password_confirmation') is-invalid @enderror" id="password_confirmation" name="password_confirmation" autocomplete="off">
+                    @error('password_confirmation')
+                        <div class="invalid-feedback">
+                            {{ $message }}
+                        </div>
+                    @enderror
+                </div>
                 
                 <button id="btn_submit" class="btn btn-success" type="submit"><strong>Update</strong></button>
             </form>

@@ -73,8 +73,15 @@ class ProfileController extends Controller
             $user = User::findOrFail(Auth::id());
 
             // Update data di tabel 'users'
-            $user = User::findOrFail($user->id);
             $user->name = $validated["name"];
+
+            // Memeriksa apakah password diubah
+            if ($request->filled('password')) {
+                // Validasi password yang baru
+                $validated['password'] = bcrypt($validated['password']);
+                $user->password = $validated["password"];
+            }
+
             $user->save();
 
             // Update data di tabel 'profiles'
@@ -97,7 +104,7 @@ class ProfileController extends Controller
                 // Simpan path gambar baru di database
                 $profile->profile_picture = $path; // Simpan path seperti 'images/profile/imagename.extension'
             }
-            
+
             $profile->gender = $validated["gender"];
             $profile->phone = $validated["phone"];
             $profile->address = isset($validated["address"]) && !empty($validated["address"]) ? $validated["address"] : null;
