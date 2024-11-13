@@ -23,6 +23,20 @@
                 <form id="form_input" action="{{ $action }}" method="{{ $method }}">
                     @csrf
 
+                    <div class="mb-3">
+                        <label for="frequency" class="form-label">Frequency<span style="color: red;">*</span></label>
+                        <select class="form-control dropdown-form-select" id="frequency" name="frequency" required>
+                            <option value="" selected disabled>Select frequency</option>
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                        </select>
+                        <small class="form-text text-muted">Frequency Note:</small>
+                        <small class="form-text text-muted">Daily - Lesson Schedule will be created for one day, which is the selected date.</small>
+                        <small class="form-text text-muted">Weekly - Lesson Schedule will be created every week on the same day, starting from the selected date, for the next 3 weeks.</small>
+                        <small class="form-text text-muted">Monthly - Lesson Schedule will be created every month on the same date, starting from the selected date, for the next 2 months.</small>
+                    </div>
+
                     <!-- Step 1: Date -->
                     <div class="mb-3">
                         <label for="date" class="form-label">Date<span style="color: red;">*</span></label>

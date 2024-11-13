@@ -259,7 +259,7 @@ class DatabaseSeeder extends Seeder
             $scheduleData = [
                 [
                     'date' => $startDate->copy(),
-                    'lesson_code' => "OHANA-202411-000001",
+                    'lesson_code' => "OHN-LSN-202411-000001",
                     'time_slot_id' => 1, // ID time_slot yang sesuai (1 - 9)
                     'lesson_id' => 1,    // ID lesson yang sesuai (1 - 4)
                     'lesson_type_id' => 1, // ID lesson_type yang sesuai (1 - 2)
@@ -269,7 +269,7 @@ class DatabaseSeeder extends Seeder
                 ],
                 [
                     'date' => $startDate->copy()->addDay(),
-                    'lesson_code' => "OHANA-202411-000002",
+                    'lesson_code' => "OHN-LSN-202411-000002",
                     'time_slot_id' => 1, // ID time_slot yang sesuai (1 - 9)
                     'lesson_id' => 4,    // ID lesson yang sesuai (1 - 4)
                     'lesson_type_id' => 1, // ID lesson_type yang sesuai (1 - 2)
@@ -279,7 +279,7 @@ class DatabaseSeeder extends Seeder
                 ],
                 [
                     'date' => $startDate->copy()->subDay(3),
-                    'lesson_code' => "OHANA-202411-000003",
+                    'lesson_code' => "OHN-LSN-202411-000003",
                     'time_slot_id' => 1, // ID time_slot yang sesuai (1 - 9)
                     'lesson_id' => 2,    // ID lesson yang sesuai (1 - 4)
                     'lesson_type_id' => 1, // ID lesson_type yang sesuai (1 - 2)
@@ -289,7 +289,7 @@ class DatabaseSeeder extends Seeder
                 ],
                 [
                     'date' => $startDate->copy()->addDays(2),
-                    'lesson_code' => "OHANA-202411-000004",
+                    'lesson_code' => "OHN-LSN-202411-000004",
                     'time_slot_id' => 4, // ID time_slot yang sesuai (1 - 9)
                     'lesson_id' => 3,    // ID lesson yang sesuai (1 - 4)
                     'lesson_type_id' => 2, // ID lesson_type yang sesuai (1 - 2)

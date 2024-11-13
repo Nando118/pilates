@@ -14,6 +14,7 @@ class CreditTransaction extends Model
         'user_id',
         'type',
         'amount',
+        'transaction_code',
         'description',
     ];
 

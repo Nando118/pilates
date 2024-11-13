@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Dashboard\Booking;
 
+use App\Helpers\TransactionCodeHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Dashboard\Bookings\CreateBookingsRequest;
 use App\Models\Booking;
@@ -165,6 +166,7 @@ class BookingController extends Controller
                         "user_id" => $user->id,
                         "type" => "deduct",
                         "amount" => $lessonSchedule->credit_price,
+                        "transaction_code" => TransactionCodeHelper::generateTransactionCode(),
                         "description" => $lessonSchedule->credit_price . ' credit has been deducted from the account '. $user->email .' , to make a booking for the lesson code '. $lessonSchedule->lesson_code .'.'
                     ]);
                 }
@@ -172,6 +174,7 @@ class BookingController extends Controller
                 // Simpan booking baru
                 Booking::create([
                     "lesson_schedule_id" => $lessonSchedule->id,
+                    "paid_credit" => $lessonSchedule->credit_price,
                     "booked_by_name" => $user ? $user->name : $name, // Update: simpan nama dari database atau nama input
                     "user_id" => $user ? $user->id : null, // Update: simpan user_id jika terdaftar, null jika tidak
                 ]);
@@ -224,14 +227,15 @@ class BookingController extends Controller
                 // Jika ketemu, return credit balance user tersebut
                 if ($user) {
                     // Tambahkan kembali credit balance untuk pengguna yang melakukan booking
-                    $user->credit_balance += $lessonSchedule->credit_price; // Sesuaikan jumlah yang dikembalikan jika berbeda
+                    $user->credit_balance += $booking->paid_credit; // Gunakan nilai paid_credit yang disimpan
                     $user->save();
 
                     CreditTransaction::query()->create([
                         "user_id" => $user->id,
                         "type" => "return",
-                        "amount" => $lessonSchedule->credit_price,
-                        "description" => $lessonSchedule->credit_price . ' credit has been returned to the account '. $user->email .' , because the booking for the lesson code has been cancelled '. $lessonSchedule->lesson_code .'.'
+                        "amount" => $booking->paid_credit,
+                        "transaction_code" => TransactionCodeHelper::generateTransactionCode(),
+                        "description" => $booking->paid_credit . ' credit has been returned to the account ' . $user->email . ', because the booking for the lesson code has been cancelled ' . $lessonSchedule->lesson_code . '.'
                     ]);
                 }
             }
@@ -245,7 +249,6 @@ class BookingController extends Controller
             // Menampilkan pesan sukses menggunakan SweetAlert2
             alert()->success("Yeay!", "Successfully canceled the lesson schedule booking for this user.");
             return redirect()->route("bookings.index");
-
         } catch (\Exception $e) {
             // Menyimpan log error jika terjadi kesalahan
             Log::error("Error deleting booking in BookingController@destroy: " . $e->getMessage());

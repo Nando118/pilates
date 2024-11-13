@@ -28,6 +28,7 @@
                             Booking lessons <strong>{{ $lessonDetails->lesson->name }}</strong> with coach <strong>{{ $lessonDetails->user->name }}</strong>
                         </div>
                         <div class="card-body">
+                            <p class="card-text">Lesson Code: {{ $lessonDetails->lesson_code }}</p>
                             <p class="card-text">Lesson Type: {{ $lessonDetails->lessonType->name }}</p>
                             <p class="card-text">Date: {{ date('d-m-Y', strtotime($lessonDetails->date)) }}</p>
                             <p class="card-text">Time:  {{ date('H:i', strtotime($lessonDetails->timeSlot->start_time)) }} - {{ date('H:i', strtotime($lessonDetails->timeSlot->end_time)) }}</p>

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Hubungkan ke tabel users
             $table->enum('type', ['add', 'deduct', 'return']); // Menyimpan jenis transaksi (penambahan atau pengurangan)
             $table->integer('amount'); // Jumlah kredit yang ditambah atau dikurangi
+            $table->string('transaction_code')->unique();
             $table->string('description')->nullable(); // Deskripsi atau keterangan transaksi
             $table->timestamps();
         });

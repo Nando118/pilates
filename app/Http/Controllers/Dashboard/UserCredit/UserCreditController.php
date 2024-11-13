@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Dashboard\UserCredit;
 
+use App\Helpers\TransactionCodeHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Dashboard\UserCredits\UpdateUserCreditsRequest;
 use App\Models\CreditTransaction;
@@ -84,6 +85,7 @@ class UserCreditController extends Controller
                 "user_id" => $user->id,
                 "type" => "add",
                 "amount" => $validated["credit_balance"],
+                "transaction_code" => TransactionCodeHelper::generateTransactionCode(),
                 "description" => 'Credit was added to account '. $user->email . ' by ' . Auth::user()->email . ', amounting to ' . $validated["credit_balance"] . ' credit.'
             ]);
 

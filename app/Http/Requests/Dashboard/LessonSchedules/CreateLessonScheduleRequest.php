@@ -23,6 +23,7 @@ class CreateLessonScheduleRequest extends FormRequest
     {
         return [
             "date" => ["required", "date", "after_or_equal:today"],
+            "frequency" => ["required", "in:none,daily,weekly,monthly"],
             "time_slot" => ["required", "integer", "exists:time_slots,id"],
             "lesson" => ["required", "integer", "exists:lessons,id"],
             "lesson_type" => ["required", "integer", "exists:lesson_types,id"],

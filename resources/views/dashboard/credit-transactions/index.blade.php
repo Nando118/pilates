@@ -23,6 +23,7 @@
                             <tr >
                                 <th>No</th>                                
                                 <th>Created At</th>
+                                <th>Transaction Code</th>
                                 <th>Name</th>                        
                                 <th>Type</th>
                                 <th>Amount</th>
@@ -47,7 +48,7 @@
                 serverSide: true,
                 ajax: '{{ route('credit-transactions.data') }}',
                 language: {
-                    zeroRecords: "There is no users data yet",
+                    zeroRecords: "There is no transaction data yet",
                 },
                 columns: [
                     {
@@ -61,6 +62,7 @@
                         }
                     },                    
                     { data: 'created_at', name: 'created_at', render: DataTable.render.date()},
+                    { data: 'transaction_code', name: 'transaction_code'},
                     { data: 'name', name: 'name'},
                     { data: 'type', name: 'type'},
                     { data: 'amount', name: 'amount'},

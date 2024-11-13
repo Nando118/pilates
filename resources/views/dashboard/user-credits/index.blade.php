@@ -25,7 +25,7 @@
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Phone</th>
-                                <th>Gender</th>                                
+                                <th>Credits Balance</th>                                
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -63,7 +63,7 @@
                     { data: 'name', name: 'name'},
                     { data: 'email', name: 'email'},
                     { data: 'phone', name: 'phone'},
-                    { data: 'gender', name: 'gender'},                    
+                    { data: 'credit_balance', name: 'credit_balance'},                    
                     { data: 'action', name: 'action', orderable: false, searchable: false},
                 ],
                 order: [1, 'desc'],                

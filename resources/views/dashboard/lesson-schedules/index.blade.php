@@ -105,11 +105,7 @@
                     { data: 'credit_price', name: 'credit_price', className: 'align-middle'},
                     { data: 'status', name: 'status', className: 'align-middle'},
                     { data: 'action', name: 'action', orderable: false, searchable: false, className: 'align-middle'},
-                ],
-                order: [
-                    [2, 'desc'],
-                    [3, 'desc']
-                ],
+                ]
             });
 
             // Event handler untuk tombol Add Booking

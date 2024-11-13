@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('lesson_schedule_id')->constrained('lesson_schedules')->onDelete('cascade');
+            $table->integer('paid_credit')->default(0);
             $table->string('booked_by_name'); // Nama pengguna yang melakukan booking
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null'); // ID pengguna jika sudah terdaftar
             $table->timestamps();

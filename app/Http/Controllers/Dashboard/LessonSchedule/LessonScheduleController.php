@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Dashboard\LessonSchedule;
 
 use App\Helpers\LessonCodeHelper;
+use App\Helpers\TransactionCodeHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Dashboard\LessonSchedules\CreateLessonScheduleRequest;
 use App\Http\Requests\Dashboard\LessonSchedules\UpdateLessonScheduleRequest;
+use App\Models\Booking;
+use App\Models\CreditTransaction;
 use App\Models\Lesson;
 use App\Models\LessonSchedule;
 use App\Models\LessonType;
@@ -43,7 +46,13 @@ class LessonScheduleController extends Controller
 
     public function getData()
     {
-        $lessonScheduleDatas = LessonSchedule::get();
+        // Mengambil semua data LessonSchedule termasuk yang sudah dihapus
+        $lessonScheduleDatas = LessonSchedule::withTrashed()
+            ->join("time_slots", "lesson_schedules.time_slot_id", "=", "time_slots.id") // Join dengan time_slots
+            ->select("lesson_schedules.*", "time_slots.start_time") // Pastikan memilih kolom yang diperlukan
+            ->orderBy("lesson_schedules.date", "desc") // Mengurutkan berdasarkan tanggal terbaru
+            ->orderBy("time_slots.start_time", "desc") // Mengurutkan berdasarkan waktu terbaru pada time_slots
+            ->get();
 
         return DataTables::of($lessonScheduleDatas)
             ->addColumn("date", function ($lessonSchedule) {
@@ -51,40 +60,34 @@ class LessonScheduleController extends Controller
                 return Carbon::parse($lessonSchedule->date)->format('d/m/Y');
             })
             ->addColumn("time", function ($lessonSchedule) {
-                $startTime = $lessonSchedule->timeSlot->start_time ?? "N/A";
+                $startTime = $lessonSchedule->start_time ?? "N/A";
                 $duration = $lessonSchedule->timeSlot->duration ?? 0; // Pastikan Anda memiliki kolom duration di timeSlot
 
                 // Format waktu dan durasi
-                return "<strong>" . date("H:i", strtotime($startTime)) . "</strong>" . "<br>" . $duration . " Minute";
+                return "<strong>" . date("H:i", strtotime($startTime)) . "</strong><br>" . $duration . " Minute";
             })
             ->addColumn("lesson", function ($lessonSchedule) {
                 $lessonName = ucfirst($lessonSchedule->lesson->name ?? "N/A");
                 $lessonType = ucfirst($lessonSchedule->lessonType->name ?? "N/A");
                 $coachName = ucfirst($lessonSchedule->user->name ?? "N/A");
 
-                return "<strong>" . $lessonName . " / " . $lessonType . "</strong>" . "<br>" . $coachName;
+                return "<strong>" . $lessonName . " / " . $lessonType . "</strong><br>" . $coachName;
             })
             ->addColumn("status", function ($lessonSchedule) {
-                if($lessonSchedule->quota <= 0) {
-                    return "Full Booking";
+                if ($lessonSchedule->deleted_at) {
+                    return "<span class='text-danger'>Cancelled</span>"; // Status untuk jadwal yang sudah dihapus
                 }
 
-                return "Available";
+                return $lessonSchedule->quota <= 0 ? "Full Booking" : "Available";
             })
             ->addColumn("action", function ($lessonSchedule) {
                 $currentDateTime = Carbon::now();
-                // Menggabungkan tanggal jadwal dan waktu mulai menjadi satu instance Carbon
-                $scheduleDateTime = Carbon::parse($lessonSchedule->date . ' ' . $lessonSchedule->timeSlot->start_time);
+                $scheduleDateTime = Carbon::parse($lessonSchedule->date . ' ' . $lessonSchedule->start_time);
 
                 // Tentukan apakah tombol Booking harus dinonaktifkan
-                if($lessonSchedule->quota <= 0) {
-                    $disabledAttribute = "disabled";
-                }else{
-                    $disabledAttribute = "";
-                }
+                $disabledAttribute = $lessonSchedule->quota <= 0 ? "disabled" : "";
 
-                // Cek apakah tanggal saat ini belum melewati tanggal jadwal dan waktu sekarang belum melewati waktu mulai jadwal
-                if ($scheduleDateTime->greaterThanOrEqualTo($currentDateTime)) {
+                if ($scheduleDateTime->greaterThanOrEqualTo($currentDateTime) && !$lessonSchedule->deleted_at) {
                     $btn = '<div class="btn-group mr-1">';
                     $btn .= '<a href="' . route("bookings.create", ["bookings" => $lessonSchedule->id]) . '" class="btn btn-primary btn-sm ' . $disabledAttribute . '" title="Booking"><i class="fas fa-fw fa-user-plus"></i></a> ';
                     $btn .= '<a href="' . route("lesson-schedules.edit", ["lessonSchedule" => $lessonSchedule->id]) . '" class="btn btn-warning btn-sm" title="Edit"><i class="fas fa-fw fa-edit"></i></a> ';
@@ -92,9 +95,10 @@ class LessonScheduleController extends Controller
                     $btn .= '</div>';
                     return $btn;
                 }
-                return '<span class="text-muted">Not Available to edit</span>'; // Tidak ada tombol jika waktu sudah lewat
+
+                return $lessonSchedule->deleted_at ? '<span class="text-muted">Deleted</span>' : '<span class="text-muted">Not Available to edit</span>';
             })
-            ->rawColumns(["time", "lesson", "action"])
+            ->rawColumns(["time", "lesson", "status", "action"])
             ->make(true);
     }
 
@@ -140,50 +144,64 @@ class LessonScheduleController extends Controller
 
             DB::beginTransaction();
 
-            $date = $validated["date"];
-            $timeSlotId = $validated["time_slot"]; // Assumed time slot contains start_time and end_time
+            $startDate = Carbon::parse($validated["date"]);
+            $timeSlotId = $validated["time_slot"];
             $coachId = $validated["coach_user"];
+            $frequency = $validated["frequency"];
 
-            // 1. Cek apakah coach sudah terjadwal dalam rentang waktu yang sama
-            $isCoachAvailable = LessonSchedule::where("user_id", $coachId)
-                ->where("date", $date)
-                ->whereHas("timeSlot", function ($query) use ($timeSlotId) {
-                    $timeSlot = TimeSlot::find($timeSlotId);
-                    $query->where("start_time", "<", $timeSlot->end_time)
-                        ->where("end_time", ">", $timeSlot->start_time);
-                })
-                ->exists();
-
-            if ($isCoachAvailable) {
-                // Jika coach sudah dijadwalkan pada waktu yang sama, rollback transaksi dan kirim pesan error
-                DB::rollBack();
-                alert()->error("Oppss...", "Coach is already scheduled at the selected time, please select a different time.");
-                return redirect()->back()->withInput();
+            // Tentukan jumlah pengulangan berdasarkan frekuensi
+            $dates = [$startDate];
+            if ($frequency == "weekly") {
+                for ($i = 1; $i <= 3; $i++) { // Misalnya 3 minggu ke depan
+                    $dates[] = $startDate->copy()->addWeeks($i);
+                }
+            } elseif ($frequency == "monthly") {
+                for ($i = 1; $i <= 2; $i++) { // Misalnya 2 bulan ke depan
+                    $dates[] = $startDate->copy()->addMonths($i);
+                }
             }
 
-            // Generate Lesson Code
-            $lessonCode = LessonCodeHelper::generateLessonCode();
+            foreach ($dates as $date) {
+                // Periksa apakah coach tersedia di waktu tersebut
+                $isCoachAvailable = LessonSchedule::where("user_id", $coachId)
+                    ->where("date", $date)
+                    ->whereHas("timeSlot", function ($query) use ($timeSlotId) {
+                        $timeSlot = TimeSlot::find($timeSlotId);
+                        $query->where("start_time", "<", $timeSlot->end_time)
+                            ->where("end_time", ">", $timeSlot->start_time);
+                    })
+                    ->exists();
 
-            // 2. Jika semua validasi lolos, buat jadwal baru
-            LessonSchedule::create([
-                "date" => $validated["date"],
-                "lesson_code" => $lessonCode,
-                "time_slot_id" => $validated["time_slot"],
-                "lesson_id" => $validated["lesson"],
-                "lesson_type_id" => $validated["lesson_type"],
-                "user_id" => $validated["coach_user"],
-                "quota" => $validated["quota"],
-                "credit_price" => $validated["credit_price"]
-            ]);
+                if ($isCoachAvailable) {
+                    DB::rollBack();
+                    alert()->error("Oops...", "Coach is already scheduled at the selected time on $date, please select a different time.");
+                    return redirect()->back()->withInput();
+                }
+
+                // Generate kode lesson
+                $lessonCode = LessonCodeHelper::generateLessonCode();
+
+                // Buat jadwal baru
+                LessonSchedule::create([
+                    "date" => $date,
+                    "lesson_code" => $lessonCode,
+                    "time_slot_id" => $validated["time_slot"],
+                    "lesson_id" => $validated["lesson"],
+                    "lesson_type_id" => $validated["lesson_type"],
+                    "user_id" => $validated["coach_user"],
+                    "quota" => $validated["quota"],
+                    "credit_price" => $validated["credit_price"]
+                ]);
+            }
 
             DB::commit();
 
-            alert()->success("Yeay!", "Successfully added new lesson schedule data.");
+            alert()->success("Success", "Lesson schedules created successfully.");
             return redirect()->route("lesson-schedules.index");
         } catch (\Exception $e) {
             Log::error("Error adding lesson schedule in LessonScheduleController@store: " . $e->getMessage());
             DB::rollBack();
-            alert()->error("Oppss...", "An error occurred while adding a new lesson schedule data, please try again.");
+            alert()->error("Oops...", "An error occurred while adding lesson schedules. Please try again.");
             return redirect()->back();
         }
     }
@@ -286,18 +304,54 @@ class LessonScheduleController extends Controller
         try {
             DB::beginTransaction();
 
+            // Pastikan lesson schedule ditemukan
             $lessonSchedule = LessonSchedule::findOrFail($lessonSchedule->id);
 
+            // Ambil semua bookings terkait dengan lesson schedule yang akan dihapus
+            $bookings = Booking::where('lesson_schedule_id', $lessonSchedule->id)->get();
+
+            foreach ($bookings as $booking) {
+                // Periksa apakah booking terkait memiliki user_id
+                if ($booking->user_id) {
+                    // Ambil data user terkait
+                    $user = User::find($booking->user_id);
+
+                    // Jika user ditemukan, kembalikan credit balance sesuai dengan `paid_credit` booking
+                    if ($user) {
+                        $user->credit_balance += $booking->paid_credit;
+                        $user->save();
+
+                        // Buat entri transaksi kredit sebagai pengembalian dana
+                        CreditTransaction::create([
+                            'user_id' => $user->id,
+                            'type' => 'return',
+                            'amount' => $booking->paid_credit,
+                            'transaction_code' => TransactionCodeHelper::generateTransactionCode(),
+                            'description' => $booking->paid_credit . ' credit has been returned to the account ' . $user->email . ' because the lesson schedule with code ' . $lessonSchedule->lesson_code . ' was cancelled.',
+                        ]);
+                    }
+                }
+
+                // Soft delete setiap booking setelah kredit dikembalikan
+                $booking->delete();
+            }
+
+            // Setelah semua booking diproses, hapus lesson schedule
             $lessonSchedule->delete();
 
+            // Commit transaksi jika semuanya berhasil
             DB::commit();
 
-            alert()->success("Yeay!", "Successfully deleted lesson schedule data.");
+            alert()->success("Yeay!", "Successfully deleted lesson schedule and refunded users' credits.");
             return redirect()->route("lesson-schedules.index");
         } catch (\Exception $e) {
+            // Log error jika terjadi kesalahan
             Log::error("Error deleting lesson schedule in LessonScheduleController@destroy: " . $e->getMessage());
+
+            // Rollback transaksi jika ada error
             DB::rollBack();
-            alert()->error("Oppss...", "An error occurred while deleted lesson schedule data, please try again.");
+
+            alert()->error("Oppss...", "An error occurred while deleting lesson schedule data, please try again.");
             return redirect()->back();
         }
     }

@@ -11,7 +11,7 @@ class Booking extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ["lesson_schedule_id", "booked_by_name", "user_id"];
+    protected $fillable = ["lesson_schedule_id", "paid_credit", "booked_by_name", "user_id"];
 
     public function lessonSchedule(): BelongsTo
     {
