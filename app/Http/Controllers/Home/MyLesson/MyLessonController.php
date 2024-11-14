@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Home\MyLesson;
 
+use App\Helpers\TransactionCodeHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\CreditTransaction;
@@ -84,6 +85,7 @@ class MyLessonController extends Controller
                         "user_id" => $user->id,
                         "type" => "return",
                         "amount" => $lessonSchedule->credit_price,
+                        "transaction_code" => TransactionCodeHelper::generateTransactionCode(),
                         "description" => $lessonSchedule->credit_price . ' credit has been returned to the account ' . $user->email . ' , because the booking for the lesson code has been cancelled ' . $lessonSchedule->lesson_code . '.'
                     ]);
                 }

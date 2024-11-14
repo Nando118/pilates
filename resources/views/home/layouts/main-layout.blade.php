@@ -38,6 +38,11 @@
                             @endcan
                             @can("access-client-menu")
                                 <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('my-transactions.index') }}">My Transactions</a>
+                                </li>
+                            @endcan
+                            @can("access-client-menu")
+                                <li class="nav-item">
                                     <a class="nav-link" href="{{ route('coaches.index') }}">Coaches</a>
                                 </li>
                             @endcan

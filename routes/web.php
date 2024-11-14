@@ -19,6 +19,7 @@ use App\Http\Controllers\Dashboard\CoachCertification\CoachCertificationControll
 use App\Http\Controllers\Dashboard\CreditTransaction\CreditTransactionController;
 use App\Http\Controllers\Dashboard\UserCredit\UserCreditController;
 use App\Http\Controllers\Home\Coach\CoachController;
+use App\Http\Controllers\Home\MyTransaction\MyTransactionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -93,6 +94,10 @@ Route::middleware(['auth', 'verified', 'onlyCoachClient'])->group(function () {
     Route::get("/home/my-schedules", [MyScheduleController::class, "index"])->name("my-schedules.index");
     Route::get("/home/my-schedules/{lessonSchedule}/participants", [MyScheduleController::class, "view"])->name("my-schedules.view");
     // END MY SCHEDULES ROUTE - CLIENT & COACH PAGES
+
+    // START MY TRANSACTIONS ROUTE - CLIENT PAGES
+    Route::get("/home/my-transactions", [MyTransactionController::class, "index"])->name("my-transactions.index");
+    // END MY TRANSACTIONS ROUTE - CLIENT PAGES
 
     // START COACHES ROUTE - CLIENT & COACH PAGES
     Route::get("/home/coaches", [CoachController::class, "index"])->name("coaches.index");

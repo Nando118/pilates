@@ -90,12 +90,15 @@
                                             $currentDateTime = now();
                                         @endphp
 
-                                        @if(in_array($lessonSchedule->id, $userBookings))
+                                        @if ($lessonSchedule->deleted_at)
+                                            {{-- Tampilkan keterangan jika lesson sudah dihapus --}}
+                                            <span class="badge bg-danger">Canceled</span>
+                                        @elseif (in_array($lessonSchedule->id, $userBookings))
                                             {{-- Tombol disabled jika sudah booking --}}
                                             <button class="btn btn-primary btn-sm" title="Already Booked" disabled>
                                                 <i class="fas fa-fw fa-user-check"></i>
                                             </button>
-                                        @elseif($currentDateTime->greaterThanOrEqualTo($lessonStartTime))
+                                        @elseif ($currentDateTime->greaterThanOrEqualTo($lessonStartTime))
                                             {{-- Tombol disabled jika waktu pelajaran sudah mulai --}}
                                             <button class="btn btn-primary btn-sm" title="Cannot Book" disabled>
                                                 <i class="fas fa-fw fa-user-plus"></i>

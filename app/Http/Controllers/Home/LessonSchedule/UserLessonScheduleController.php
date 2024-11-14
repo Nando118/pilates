@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Home\LessonSchedule;
 
+use App\Helpers\TransactionCodeHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Home\Bookings\UserCreateBookingsRequest;
 use App\Models\Booking;
@@ -37,7 +38,8 @@ class UserLessonScheduleController extends Controller
         ->toArray();
 
         // Ambil data lesson schedule dengan eager loading dan urutkan berdasarkan date dan start_time
-        $lessonScheduleDatas = LessonSchedule::with(["timeSlot", "lesson", "lessonType", "user"])
+        $lessonScheduleDatas = LessonSchedule::withTrashed()
+        ->with(["timeSlot", "lesson", "lessonType", "user"])
         ->join("time_slots", "lesson_schedules.time_slot_id", "=", "time_slots.id")
         ->select("lesson_schedules.*")
         ->orderBy("lesson_schedules.date")
@@ -112,7 +114,7 @@ class UserLessonScheduleController extends Controller
 
             // Cek saldo user apakah cukup untuk booking lesson atau tidak
             if ($currentUser->credit_balance < $lessonSchedule->credit_price) {
-                alert()->warning("Warning", "User {$currentUser->name} does not have enough credit balance to book this lesson.");
+                alert()->warning("Warning", "You do not have enough credits to book this lesson.");
                 return redirect()->back();
             }
 
@@ -125,12 +127,14 @@ class UserLessonScheduleController extends Controller
                 "user_id" => $currentUser->id,
                 "type" => "deduct",
                 "amount" => $lessonSchedule->credit_price,
+                "transaction_code" => TransactionCodeHelper::generateTransactionCode(),
                 "description" => $lessonSchedule->credit_price . ' credits have been deducted from the account ' . $currentUser->email . ' for booking the lesson code ' . $lessonSchedule->lesson_code . '.'
             ]);
 
             // Simpan booking baru
             Booking::create([
                 "lesson_schedule_id" => $lessonSchedule->id,
+                "paid_credit" => $lessonSchedule->credit_price,
                 "booked_by_name" => $currentUser->name,
                 "user_id" => $currentUser->id,
             ]);
