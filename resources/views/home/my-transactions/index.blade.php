@@ -4,25 +4,23 @@
 
 @push('styles')
     <style>
-        /* Style untuk tampilan tabel dan scrollable section */
+        /* Style for scrollable section */
         .scrollable-content {
             max-height: 100vh;
             overflow-y: auto;
-            scrollbar-width: none;
             display: flex;
             flex-direction: column;
+            min-height: 100vh; /* Ensures minimum height */
+            scrollbar-width: none;
         }
         .scrollable-content::-webkit-scrollbar {
             display: none;
         }
         .table-responsive {
-            flex-grow: 1; /* Agar tinggi container tetap 100% saat tidak ada data */
-        }
-        table thead {
-            background-color: #f8f9fa;
-            position: sticky;
-            top: 0;
-            z-index: 1;
+            flex-grow: 1; /* Keeps container height even without data */
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Center content vertically when empty */
         }
     </style>
 @endpush
@@ -30,7 +28,7 @@
 @section('content')
     <div class="w-100" style="max-width: 400px;">
         <!-- Filter Date and Type -->
-        <div class="row mb-3">
+        <div class="row my-3">
             <!-- Filter by Date -->
             <div class="col-md-6">
                 <label for="datePicker" class="form-label">Filter by Date</label>
@@ -58,7 +56,7 @@
             <p class="fs-5"><strong>My Schedules</strong></p>
             <div class="table-responsive">
                 @if($myTransactions->isEmpty())
-                    <p class="text-muted">You have no transactions yet.</p>
+                    <p class="text-muted text-center">You have no transactions yet.</p>
                 @else
                     @foreach ($myTransactions as $transaction)
                         <div class="card my-3" style="width: 100%;">
