@@ -139,7 +139,7 @@
 
                     // Mengambil tanggal dan hari
                     const day = date.getDate();
-                    const weekday = date.toLocaleDateString('id-ID', { weekday: 'short' });
+                    const weekday = date.toLocaleDateString('en-EN', { weekday: 'short' });
 
                     // Membuat tombol dengan format yang diinginkan
                     const button = `
