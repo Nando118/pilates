@@ -17,6 +17,38 @@
         .scrollable-content::-webkit-scrollbar {
             display: none; /* Untuk Chrome, Safari, dan Opera */
         }
+
+        .input-group {
+            margin-bottom: 15px; /* Tambahkan jarak di bawah elemen input group */
+        }
+
+        #dateButtonsContainer {
+            display: flex;
+            overflow-x: auto; /* Untuk mengaktifkan scroll horizontal */
+            white-space: nowrap; /* Mencegah tombol wrap ke baris baru */
+            -webkit-overflow-scrolling: touch; /* Mendukung scrolling yang halus di perangkat sentuh */
+            scrollbar-width: none; /* Menghilangkan scrollbar di Firefox */
+            margin-bottom: 15px; /* Tambahkan jarak di bawah container tombol */
+        }
+
+        #dateButtonsContainer::-webkit-scrollbar {
+            display: none; /* Menghilangkan scrollbar di WebKit (Chrome, Safari) */
+        }
+
+        .date-button {
+            flex: 0 0 auto; /* Pastikan tombol tidak mengecil */
+            width: 60px; /* Ukuran yang sama untuk setiap tombol */
+            height: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Rata tengah horizontal */
+            justify-content: center; /* Rata tengah vertikal */
+            text-align: center; /* Pusatkan teks dalam tombol */
+            line-height: 1.2; /* Jarak antar baris teks dalam tombol */
+            font-size: 0.9rem; /* Sesuaikan ukuran font */
+            margin: 5px; /* Margin antar tombol */
+            padding: 0; /* Hapus padding default */
+        }
     </style>
 @endpush
 
@@ -24,14 +56,9 @@
     <div class="w-100" style="max-width: 400px;">
         <!-- Filter Date and Group -->
         <div class="mb-3 px-3 pt-3">
-            <!-- Datepicker -->
-            <div class="input-group mb-3">
-                <span class="input-group-text" id="date-filter" style="width: 40px; display: flex; justify-content: center; align-items: center;"><i class="fas fa-calendar"></i></span>
-                <input type="text" id="datePicker" class="form-control" placeholder="Select Date" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" aria-describedby="date-filter">
-            </div>
-
+            <p class="fs-5"><strong>Filter By:</strong></p>
             <!-- Group Dropdown -->
-            <div class="input-group mb-3">
+            <div class="input-group">
                 <span class="input-group-text" id="basic-addon1" style="width: 40px; display: flex; justify-content: center; align-items: center;"><i class="fas fa-users"></i></span>
                 <select id="groupFilter" class="form-control" aria-describedby="basic-addon1">
                     <option value="All">All Groups</option>
@@ -40,6 +67,9 @@
                     @endforeach
                 </select>
             </div>
+
+            <!-- Date Buttons --> 
+            <div class="d-flex overflow-auto" id="dateButtonsContainer"></div>            
         </div>
 
         <!-- Scrollable Content Section with Cards -->
@@ -73,10 +103,10 @@
                                 </td>
                                 <td>
                                     <strong>
-                                        @if ($lessonSchedule->quota <= 0)
-                                            {{ $lessonSchedule->status ?? 'N/A' }}
-                                        @else
-                                            Quota {{ $lessonSchedule->quota ?? 'N/A' }}
+                                        @if ($lessonSchedule->quota <= 0) 
+                                            Full Booking 
+                                        @else 
+                                            Quota {{ $lessonSchedule->quota }} 
                                         @endif
                                     </strong>
                                     <br>
@@ -148,60 +178,85 @@
 @push("scripts")
     <script>
         $(document).ready(function() {
-            // Inisialisasi DatePicker dengan default tanggal hari ini
-            $('#datePicker').datepicker({
-                format: 'yyyy-mm-dd',
-                autoclose: true,
-                todayHighlight: true,  // Agar hari ini di highlight
-                startDate: Date(),
-            }).on('changeDate', function(e) {
-                filterTable(); // Panggil filter saat tanggal berubah
-            });
+            // Generate Date Buttons
+            function generateDateButtons() {
+                const container = $('#dateButtonsContainer');
+                const startDate = new Date(); // Hari ini
 
-            // Event Listener untuk perubahan pada Group Filter
-            $('#groupFilter').on('change', function() {
-                filterTable(); // Panggil filter saat group berubah
-            });
+                for (let i = 0; i < 15; i++) {
+                    const date = new Date();
+                    date.setDate(startDate.getDate() + i);
 
-            // Panggil filter saat halaman pertama kali dimuat dengan nilai default
-            filterTable();
+                    // Mengambil tanggal dan hari
+                    const day = date.getDate();
+                    const weekday = date.toLocaleDateString('id-ID', { weekday: 'short' });
 
+                    // Membuat tombol dengan format yang diinginkan
+                    const button = `
+                        <button class="btn btn-outline-dark m-1 date-button" data-date="${date.toISOString().split('T')[0]}">
+                            <strong>
+                                <div>${day}</div>
+                                <div>${weekday}</div>
+                            </strong>
+                        </button>`;
+                    
+                    container.append(button);
+                }
+            }
+
+            // Highlight Selected Button
+            function highlightSelectedButton(selectedDate) {
+                $('.date-button').removeClass('active');
+                $(`.date-button[data-date="${selectedDate}"]`).addClass('active');
+            }
+
+            // Filter Table
             function filterTable() {
-                const selectedDate = $('#datePicker').datepicker('getFormattedDate'); // Ambil tanggal yang dipilih
-                const selectedGroup = $('#groupFilter').val(); // Ambil nilai group yang dipilih dari dropdown
+                const selectedDate = $('.date-button.active').data('date');
+                const selectedGroup = $('#groupFilter').val();
 
-                let visibleRows = 0; // Counter untuk baris yang terlihat
+                let visibleRows = 0;
 
-                // Loop melalui setiap baris <tr> di tabel
                 $('#tbl_list tbody tr').each(function() {
-                    const rowDate = $(this).data('date'); // Ambil nilai data-date dari <tr>
-                    const rowGroup = $(this).data('group'); // Ambil nilai data-group dari <tr>
+                    const rowDate = $(this).data('date');
+                    const rowGroup = $(this).data('group');
 
-                    // Cek apakah ini placeholder "Tidak ada lesson"
                     if ($(this).attr('id') === 'noLessonPlaceholder') {
-                        return; // Skip baris placeholder
+                        return;
                     }
 
-                    // Check apakah baris cocok dengan tanggal yang dipilih dan group yang dipilih
-                    const dateMatch = selectedDate === '' || rowDate === selectedDate;
+                    const dateMatch = selectedDate === undefined || rowDate === selectedDate;
                     const groupMatch = selectedGroup === 'All' || rowGroup === selectedGroup;
 
-                    // Jika cocok, tampilkan baris, jika tidak, sembunyikan
                     if (dateMatch && groupMatch) {
                         $(this).show();
-                        visibleRows++; // Tambahkan counter untuk baris yang terlihat
+                        visibleRows++;
                     } else {
                         $(this).hide();
                     }
                 });
 
-                // Jika tidak ada baris yang cocok, tampilkan placeholder
                 if (visibleRows === 0) {
-                    $('#noLessonPlaceholder').show(); // Tampilkan placeholder
+                    $('#noLessonPlaceholder').show();
                 } else {
-                    $('#noLessonPlaceholder').hide(); // Sembunyikan placeholder jika ada data yang cocok
+                    $('#noLessonPlaceholder').hide(); 
                 }
             }
+
+            // Initial Setup
+            generateDateButtons();
+            $('.date-button').first().addClass('active'); // Set the first button as active
+            filterTable();
+
+            // Event Listeners
+            $(document).on('click', '.date-button', function() {
+                highlightSelectedButton($(this).data('date'));
+                filterTable();
+            });
+
+            $('#groupFilter').on('change', function() {
+                filterTable();
+            });
         });
     </script>
 @endpush
