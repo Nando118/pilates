@@ -111,6 +111,31 @@
                                         @endif
                                     </td>
                                 @endcan
+                                @can('access-coach-menu')
+                                    <td class="text-center">
+                                        @if ($lessonSchedule->deleted_at)
+                                            {{-- Tampilkan keterangan jika lesson sudah dihapus --}}
+                                            <span class="badge bg-danger">Canceled</span>
+                                        @else
+                                            @php
+                                                // Mendapatkan waktu mulai pelajaran
+                                                $lessonStartTime = \Carbon\Carbon::parse($lessonSchedule->date . ' ' . $lessonSchedule->timeSlot->start_time);
+                                                $currentDateTime = now();
+                                            @endphp
+
+                                            @if ($currentDateTime->greaterThanOrEqualTo($lessonStartTime))
+                                                {{-- Jika waktu sudah lewat, tampilkan "Not Available" --}}
+                                                <span class="badge bg-secondary">Not Available</span>
+                                            @elseif ($lessonSchedule->quota <= 0)
+                                                {{-- Jika kuota habis, tampilkan "Full Booking" --}}
+                                                <span class="badge bg-info">Full Booking</span>
+                                            @else
+                                                {{-- Jika kuota masih tersedia dan waktu belum lewat --}}
+                                                <span class="badge bg-success">Available</span>
+                                            @endif
+                                        @endif
+                                    </td>
+                                @endcan
                             </tr>
                         @endforeach
                     </tbody>

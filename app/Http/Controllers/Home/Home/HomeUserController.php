@@ -40,6 +40,7 @@ class HomeUserController extends Controller
         if ($isCoach) {
             // Jika user adalah coach, ambil lessons yang dia ajarkan dalam bulan ini
             $myLessons = LessonSchedule::where("user_id", $user->id)
+                ->whereNull("lesson_schedules.deleted_at") // Hanya ambil lesson yang belum dihapus
                 ->whereBetween("date", [$startOfMonth, $endOfMonth]) // Ambil pelajaran bulan ini
                 ->with([
                     "lesson",

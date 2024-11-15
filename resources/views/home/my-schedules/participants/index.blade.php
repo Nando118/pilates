@@ -34,7 +34,7 @@
                 </div>
                 
                 <!-- List of Participants -->
-                <div class="container-fluid">
+                <div class="container-fluid mb-3">
                     <h5>List Participants</h5>
                     @if($bookings->isEmpty())
                         <p>No participants have booked for this lesson schedule.</p>

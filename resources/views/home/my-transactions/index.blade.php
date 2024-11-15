@@ -17,7 +17,6 @@
             display: none;
         }
         .table-responsive {
-            flex-grow: 1; /* Keeps container height even without data */
             display: flex;
             flex-direction: column;
             justify-content: center; /* Center content vertically when empty */
