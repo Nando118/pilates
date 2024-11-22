@@ -85,13 +85,12 @@
                                 <th>Time</th>
                                 <th>Lesson</th>
                                 <th>Booking At</th>
-                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             <!-- Placeholder jika data tidak ditemukan -->
                             <tr id="noLessonPlaceholder" style="display: none;">
-                                <td colspan="4" class="text-center pt-2">There are no bookings matching the filter.</td>
+                                <td colspan="3" class="text-center pt-2">There are no bookings matching the filter.</td>
                             </tr>
 
                             @foreach($myBookings as $booking)
@@ -113,24 +112,7 @@
                                     <td>
                                         <strong>{{ $booking->created_at ? $booking->created_at->format('d-m-Y') : 'N/A' }}</strong><br>
                                         {{ $booking->created_at ? $booking->created_at->format('H:i') : 'N/A' }}
-                                    </td>
-                                    <td>
-                                        @php
-                                            // Mendapatkan waktu mulai pelajaran
-                                            $lessonStartTime = \Carbon\Carbon::parse($booking->lessonSchedule->date . ' ' . $booking->lessonSchedule->timeSlot->start_time);
-                                            $currentDateTime = now();
-                                        @endphp
-
-                                        @if($currentDateTime->greaterThanOrEqualTo($lessonStartTime))
-                                            <button class="btn btn-danger btn-sm" title="Cannot Delete" disabled>
-                                                <i class="fas fa-times-circle"></i>
-                                            </button>
-                                        @else
-                                            <a href="{{ route('my-lesson-schedules.delete', ["bookings" => $booking->id]) }}" class="btn btn-danger btn-sm" title="Delete" data-confirm-delete="true">
-                                                <i class="fas fa-times-circle"></i>
-                                            </a>
-                                        @endif
-                                    </td>
+                                    </td>                                    
                                 </tr>
                             @endforeach
                         </tbody>

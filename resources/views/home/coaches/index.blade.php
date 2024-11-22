@@ -53,11 +53,7 @@
                                 @if($coach->coachCertifications)
                                     @foreach($coach->coachCertifications as $certification)
                                         <li class="certification-item">
-                                            <strong>{{ $certification->certification_name }}</strong>
-                                            <br>
-                                            @isset($certification->issuing_organization)
-                                                <em>{{ $certification->issuing_organization }} - {{ date('Y', strtotime($certification->date_received ?? 'N/A')) }}</em>
-                                            @endisset
+                                            <strong>{{ $certification->certification_name }}</strong>                                            
                                         </li>
                                     @endforeach
                                 @else

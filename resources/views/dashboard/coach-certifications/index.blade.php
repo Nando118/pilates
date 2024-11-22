@@ -24,9 +24,7 @@
                                 <th>No</th>
                                 <th>Created At</th>
                                 <th>Coach Name</th>
-                                <th>Certification Name</th>
-                                <th>Date Received</th>
-                                <th>Organization</th>
+                                <th>Certification Name</th>                                
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -37,7 +35,7 @@
                 </div>
             </div>
             <div class="card-footer">
-                <a href="{{ route('coach-certifications.create') }}" class="btn btn-success">Add New Coach Certification</a>
+                <a href="{{ route('coach-certifications.create') }}" class="btn btn-success">Add New Certifications</a>
             </div>
         </div>
     </div>
@@ -67,8 +65,6 @@
                     { data: 'created_at', name: 'created_at', render: DataTable.render.date()},
                     { data: 'coach', name: 'coach'},
                     { data: 'certification_name', name: 'certification_name'},
-                    { data: 'date_received', name: 'date_received'},
-                    { data: 'issuing_organization', name: 'issuing_organization'},
                     { data: 'action', name: 'action', orderable: false, searchable: false},
                 ],
                 order: [1, 'desc'],

@@ -13,10 +13,7 @@ class CoachCertification extends Model
 
     protected $fillable = [
         'user_id',
-        'certification_name',
-        'date_received',
-        'issuing_organization',
-        'experience_details',
+        'certification_name'
     ];
 
     // Relasi ke User

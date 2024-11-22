@@ -3,7 +3,7 @@
 @section('title', $title_page)
 
 @section('content_header')
-    <h1 class="ml-2">Add New Coach Certification</h1>
+    <h1 class="ml-2">Update Coach Certification</h1>
 @endsection
 
 @section('content')
@@ -12,7 +12,7 @@
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
                 <li class="breadcrumb-item"><a href="{{ route('coach-certifications.index') }}">Coach Certification</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Add Coach Certification</li>
+                <li class="breadcrumb-item active" aria-current="page">Update Coach Certification</li>
             </ol>
         </nav>
 
@@ -39,19 +39,16 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="certification_names" class="form-label">Certification Names<span style="color: red;">*</span></label>
-                        <div id="certifications-container">
-                            <!-- Field pertama -->
-                            <input type="text" class="form-control mb-2 certification-name @error('certification_names.0') is-invalid @enderror" name="certification_names[]" autocomplete="off" value="{{ old('certification_names.0') ?? '' }}" required>
-                            @error('certification_names.0')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
+                        <label for="certification_name" class="form-label">Certification Name<span style="color: red;">*</span></label>
+                        <input type="text" class="form-control @error('certification_name') is-invalid @enderror" id="certification_name" name="certification_name" autocomplete="off" value="{{ old('certification_name') ?? (isset($coachCertification) ? $coachCertification->certification_name : "") }}" required>
+                        @error('certification_name')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
                     </div>                    
 
-                    <button id="btn_submit" class="btn btn-success" type="submit">Create</button>
+                    <button id="btn_submit" class="btn btn-success" type="submit">Update</button>
                 </form>
             </div>
         </div>
@@ -61,26 +58,22 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
-            // Initialize Select2 for the existing elements
+            function updateFileName(input) {
+                const fileName = input.files[0] ? input.files[0].name : 'Choose file';
+                const label = input.nextElementSibling;
+                label.textContent = fileName;
+            }
+
+            // Inisialisasi Select2 untuk elemen yang sudah ada saat halaman dimuat
             $('.select2').select2({
                 theme: 'bootstrap4',
             });
 
-            // Function to add new certification input
-            function addCertificationInput() {
-                const certificationInput = '<input type="text" class="form-control mb-2 certification-name" name="certification_names[]" autocomplete="off">';
-                $('#certifications-container').append(certificationInput);
-            }
-
-            // Event delegation to handle dynamically added elements
-            $('#certifications-container').on('input', '.certification-name', function() {
-                const lastInput = $('#certifications-container input').last();
-
-                // Check if the last input field has some value
-                if (lastInput.val() !== '') {
-                    // Add new certification input if the last one is not empty
-                    addCertificationInput();
-                }
+            $('.date').datepicker({
+                format: 'yyyy/mm/dd', // Mengatur format menjadi 2020/12/23
+                autoclose: true,      // Agar otomatis menutup setelah tanggal dipilih
+                todayHighlight: true,  // Agar hari ini di highlight
+                endDate: Date()
             });
         });
     </script>

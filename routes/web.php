@@ -35,7 +35,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['guest'])->group(function () {
     // START LOGIN ROUTE - GUEST PAGE
-    Route::get("/", [AuthController::class, "login"])->name("login");
+    Route::get("/", function () {
+        return redirect()->route("login");
+    });
     Route::get("/login", [AuthController::class, "login"])->name("login");
     Route::post("/login/submit", [AuthController::class, "loginPost"])->name("login.post");
     // END LOGIN ROUTE - GUEST PAGE
@@ -81,7 +83,6 @@ Route::middleware(['auth', 'verified', 'onlyCoachClient'])->group(function () {
 
     // START MY LESSONS ROUTE - CLIENT & COACH PAGES
     Route::get("/home/my-lesson-schedules", [MyLessonController::class, "index"])->name("my-lesson-schedules.index");
-    Route::delete("/home/my-lesson-schedules/{bookings}/delete", [MyLessonController::class, "destroy"])->name("my-lesson-schedules.delete");
     // END MY LESSONS ROUTE - CLIENT & COACH PAGES
 
     // START PROFILE ROUTE - CLIENT & COACH PAGES

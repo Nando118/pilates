@@ -30,24 +30,13 @@ class HomeUserController extends Controller
         $currentDate = Carbon::now()->translatedFormat("l, d F Y");
         $currentDateTime = Carbon::now();
 
-        // Ambil awal dan akhir bulan ini
-        $startOfMonth = Carbon::now()->startOfMonth()->toDateString();
-        $endOfMonth = Carbon::now()->endOfMonth()->toDateString();
-
         // Cek apakah user adalah coach
         $isCoach = $user->roles->contains("name", "coach"); // Pastikan role check sesuai dengan implementasi Anda
 
         if ($isCoach) {
-            // Jika user adalah coach, ambil lessons yang dia ajarkan dalam bulan ini
+            // Jika user adalah coach, ambil lessons yang dia ajarkan dari hari ini ke depan
             $myLessons = LessonSchedule::where("user_id", $user->id)
                 ->whereNull("lesson_schedules.deleted_at") // Hanya ambil lesson yang belum dihapus
-                ->whereBetween("date", [$startOfMonth, $endOfMonth]) // Ambil pelajaran bulan ini
-                ->with([
-                    "lesson",
-                    "lessonType",
-                    "timeSlot"
-                ]) // Eager load relasi yang diperlukan
-                ->join("time_slots", "lesson_schedules.time_slot_id", "=", "time_slots.id") // Melakukan join dengan time_slots
                 ->where(function ($query) use ($currentDateTime) {
                     $query->where("lesson_schedules.date", ">", $currentDateTime->toDateString()) // Tanggal lebih dari hari ini
                         ->orWhere(function ($query) use ($currentDateTime) {
@@ -55,24 +44,29 @@ class HomeUserController extends Controller
                                 ->where("time_slots.end_time", ">", $currentDateTime->toTimeString()); // Waktu berakhir di masa mendatang
                         });
                 })
+                ->with([
+                    "lesson",
+                    "lessonType",
+                    "timeSlot"
+                ]) // Eager load relasi yang diperlukan
+                ->join("time_slots", "lesson_schedules.time_slot_id", "=", "time_slots.id") // Melakukan join dengan time_slots
                 ->orderBy("lesson_schedules.date") // Urutkan berdasarkan tanggal
                 ->orderBy("time_slots.start_time") // Urutkan berdasarkan start_time
                 ->select("lesson_schedules.*") // Pilih kolom dari lesson_schedules
                 ->get();
         } else {
-            // Jika user adalah client, ambil lessons yang sudah dibooking bulan ini
+            // Jika user adalah client, ambil lessons yang sudah dibooking dari hari ini ke depan
             $myLessons = Booking::where("bookings.user_id", $user->id)
-                ->whereHas("lessonSchedule", function ($query) use ($startOfMonth, $endOfMonth, $currentDateTime) {
-                    $query->whereBetween("date", [$startOfMonth, $endOfMonth]) // Filter berdasarkan tanggal di lessonSchedule
-                        ->where(function ($query) use ($currentDateTime) {
-                            $query->where("date", ">", $currentDateTime->toDateString()) // Tanggal lebih dari hari ini
-                                ->orWhere(function ($query) use ($currentDateTime) {
-                                    $query->where("date", "=", $currentDateTime->toDateString())
-                                        ->whereHas("timeSlot", function ($query) use ($currentDateTime) {
-                                            $query->where("end_time", ">", $currentDateTime->toTimeString()); // Waktu berakhir di masa mendatang
-                                        });
-                                });
-                        });
+                ->whereHas("lessonSchedule", function ($query) use ($currentDateTime) {
+                    $query->where(function ($query) use ($currentDateTime) {
+                        $query->where("date", ">", $currentDateTime->toDateString()) // Tanggal lebih dari hari ini
+                            ->orWhere(function ($query) use ($currentDateTime) {
+                                $query->where("date", "=", $currentDateTime->toDateString())
+                                    ->whereHas("timeSlot", function ($query) use ($currentDateTime) {
+                                        $query->where("end_time", ">", $currentDateTime->toTimeString()); // Waktu berakhir di masa mendatang
+                                    });
+                            });
+                    });
                 })
                 ->with([
                     "lessonSchedule.lesson",
@@ -105,17 +99,12 @@ class HomeUserController extends Controller
         $currentDate = Carbon::now()->translatedFormat("l, d F Y");
         $currentDateTime = Carbon::now();
 
-        // Ambil awal dan akhir bulan ini
-        $startOfMonth = Carbon::now()->startOfMonth()->toDateString();
-        $endOfMonth = Carbon::now()->endOfMonth()->toDateString();
-
         // Cek apakah user adalah coach
         $isCoach = $user->roles->contains("name", "coach");
 
         if ($isCoach) {
-            // Jika user adalah coach, ambil lessons yang dia ajarkan yang sudah lewat dalam bulan ini
+            // Jika user adalah coach, ambil lessons yang dia ajarkan yang sudah lewat
             $myLessons = LessonSchedule::where("user_id", $user->id)
-                ->whereBetween("date", [$startOfMonth, $endOfMonth]) // Hanya untuk bulan ini
                 ->with(["lesson", "lessonType", "timeSlot"])
                 ->join("time_slots", "lesson_schedules.time_slot_id", "=", "time_slots.id")
                 ->where(function ($query) use ($currentDateTime) {
@@ -130,19 +119,18 @@ class HomeUserController extends Controller
                 ->select("lesson_schedules.*")
                 ->get();
         } else {
-            // Jika user adalah client, ambil lessons yang sudah dibooking yang sudah lewat dalam bulan ini
+            // Jika user adalah client, ambil lessons yang sudah dibooking yang sudah lewat
             $myLessons = Booking::where("bookings.user_id", $user->id)
-                ->whereHas("lessonSchedule", function ($query) use ($startOfMonth, $endOfMonth, $currentDateTime) {
-                    $query->whereBetween("date", [$startOfMonth, $endOfMonth])
-                        ->where(function ($query) use ($currentDateTime) {
-                            $query->where("date", "<", $currentDateTime->toDateString()) // Tanggal kurang dari hari ini
-                                ->orWhere(function ($query) use ($currentDateTime) {
-                                    $query->where("date", "=", $currentDateTime->toDateString())
-                                        ->whereHas("timeSlot", function ($query) use ($currentDateTime) {
-                                            $query->where("end_time", "<=", $currentDateTime->toTimeString()); // Waktu berakhir di masa lalu
-                                        });
-                                });
-                        });
+                ->whereHas("lessonSchedule", function ($query) use ($currentDateTime) {
+                    $query->where(function ($query) use ($currentDateTime) {
+                        $query->where("date", "<", $currentDateTime->toDateString()) // Tanggal kurang dari hari ini
+                            ->orWhere(function ($query) use ($currentDateTime) {
+                                $query->where("date", "=", $currentDateTime->toDateString())
+                                    ->whereHas("timeSlot", function ($query) use ($currentDateTime) {
+                                        $query->where("end_time", "<=", $currentDateTime->toTimeString()); // Waktu berakhir di masa lalu
+                                    });
+                            });
+                    });
                 })
                 ->with([
                     "lessonSchedule.lesson",

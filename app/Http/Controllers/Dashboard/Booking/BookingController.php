@@ -65,33 +65,39 @@ class BookingController extends Controller
         }
 
         return DataTables::of($query)
-        ->addColumn("phone", function ($booking) {
-            return $booking->user->profile->phone ?? "N/A";
-        })
-        ->addColumn("lesson_code", function ($booking) {
-            return $booking->lessonSchedule->lesson_code;
-        })
-        ->addColumn("action", function ($booking) {
-            $currentDateTime = Carbon::now();
-            $scheduleDateTime = Carbon::parse($booking->lessonSchedule->date . ' ' . $booking->lessonSchedule->timeSlot->start_time);
+            ->addColumn("phone", function ($booking) {
+                return $booking->user->profile->phone ?? "N/A";
+            })
+            ->addColumn("lesson_code", function ($booking) {
+                return $booking->lessonSchedule->lesson_code;
+            })
+            ->addColumn("lesson_time", function ($booking) {
+                $scheduleDate = Carbon::parse($booking->lessonSchedule->date)->format('Y-m-d');
+                $scheduleTime = date("H:i", strtotime($booking->lessonSchedule->timeSlot->start_time));
+                return "<strong>" . $scheduleDate . "</strong><br>" . $scheduleTime;
+            })
+            ->addColumn("action", function ($booking) {
+                $currentDateTime = Carbon::now();
+                $scheduleDateTime = Carbon::parse($booking->lessonSchedule->date . ' ' . $booking->lessonSchedule->timeSlot->start_time);
 
-            // Cek apakah jadwal masih lebih dari 24 jam dari waktu saat ini
-            $isCancellable = $scheduleDateTime->diffInHours($currentDateTime) > 24;
+                // Cek apakah jadwal masih belum lewat
+                $isCancellable = $scheduleDateTime->isFuture();
 
-            if ($isCancellable) {
-                $btn = '<div class="btn-group mr-1">';
-                $btn .= '<a href="' . route("bookings.delete", ["bookings" => $booking->id]) . '" class="btn btn-danger btn-sm" title="Cancle Booking" data-confirm-delete="true"><i class="fas fa-fw fa-ban"></i></a>';
-                $btn .= '</div>';
-                return $btn;
-            }
+                if ($isCancellable) {
+                    $btn = '<div class="btn-group mr-1">';
+                    $btn .= '<a href="' . route("bookings.delete", ["bookings" => $booking->id]) . '" class="btn btn-danger btn-sm" title="Cancel Booking" data-confirm-delete="true"><i class="fas fa-fw fa-ban"></i></a>';
+                    $btn .= '</div>';
+                    return $btn;
+                }
 
-            // Jika kurang dari 24 jam sebelum kelas, tombol dinonaktifkan
-            return
-            '<a href="' . route("bookings.delete", ["bookings" => $booking->id]) . '" class="btn btn-danger btn-sm disabled" title="Cancle Booking" data-confirm-delete="true"><i class="fas fa-fw fa-ban"></i></a>';
-        })
-        ->rawColumns(["action"])
-        ->make(true);
+                // Jika jadwal sudah lewat, tombol dinonaktifkan
+                return
+                    '<a href="' . route("bookings.delete", ["bookings" => $booking->id]) . '" class="btn btn-danger btn-sm disabled" title="Cancel Booking" data-confirm-delete="true"><i class="fas fa-fw fa-ban"></i></a>';
+            })
+            ->rawColumns(["action", "lesson_time"])
+            ->make(true);
     }
+
 
     public function create(LessonSchedule $bookings)
     {

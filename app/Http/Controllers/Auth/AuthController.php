@@ -329,7 +329,7 @@ class AuthController extends Controller
 
     private function isUserProfileIncomplete($userProfile)
     {
-        return empty($userProfile->username) || empty($userProfile->phone);
+        return empty($userProfile->gender) || empty($userProfile->phone);
     }
 
     // Forgot Password

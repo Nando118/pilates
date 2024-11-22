@@ -17,6 +17,20 @@
         .scrollable-content::-webkit-scrollbar {
             display: none; /* Untuk Chrome, Safari, dan Opera */
         }
+
+        /* Scrollable List */
+        .scrollable-list {
+            max-height: 400px; /* Atur ketinggian maksimum sesuai kebutuhan */
+            overflow-y: auto;
+            
+            /* Menyembunyikan scrollbar */
+            scrollbar-width: none; /* Untuk Firefox */
+            -ms-overflow-style: none; /* Untuk Internet Explorer dan Edge lama */
+        }
+
+        .scrollable-list::-webkit-scrollbar {
+            display: none; /* Untuk Chrome, Safari, dan Opera */
+        }
     </style>
 @endpush
 
@@ -44,13 +58,13 @@
                     <div class="card-header">
                         <strong>Upcoming lessons</strong>
                     </div>
-                    <ul class="list-group list-group-flush">
+                    <ul class="list-group list-group-flush scrollable-list">
                         @if($myLessons->isEmpty())
                             <li class="list-group-item">
                                 @if($isCoach)
-                                    There are no lessons you teach this month.
+                                    There are no lessons you teach.
                                 @else
-                                    There are no lessons you have booked this month.
+                                    There are no lessons you have booked.
                                 @endif
                             </li>
                         @else

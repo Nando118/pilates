@@ -81,21 +81,23 @@ class CoachCertificationController extends Controller
 
             DB::beginTransaction();
 
-            $user = CoachCertification::create([
-                "user_id" => $validated["name"],
-                "certification_name" => $validated["certification_name"],
-                "date_received" => $validated["date"],
-                "issuing_organization" => $validated["organization_name"]
-            ]);
+            foreach ($validated['certification_names'] as $certification_name) {
+                if (!empty($certification_name)) { // Pastikan field tidak kosong
+                    CoachCertification::create([
+                        "user_id" => $validated["name"],
+                        "certification_name" => $certification_name
+                    ]);
+                }
+            }
 
             DB::commit();
 
-            alert()->success("Yeay!", "Successfully added new coach certification.");
+            alert()->success("Yeay!", "Successfully added new coach certifications.");
             return redirect()->route("coach-certifications.index");
         } catch (\Exception $e) {
-            Log::error("Error adding coach certification in CoachCertificationController@store: " . $e->getMessage());
+            Log::error("Error adding coach certifications in CoachCertificationController@store: " . $e->getMessage());
             DB::rollBack();
-            alert()->error("Oppss...", "An error occurred while adding a new coach certification, please try again.");
+            alert()->error("Oppss...", "An error occurred while adding new coach certifications, please try again.");
             return redirect()->back();
         }
     }
@@ -112,7 +114,7 @@ class CoachCertificationController extends Controller
             $query->where("name", "coach");
         })->get();
 
-        return view("dashboard.coach-certifications.form.form", [
+        return view("dashboard.coach-certifications.form.form-edit", [
             "title_page" => "Ohana Pilates | Update Coach Certification",
             "action" => $action,
             "method" => "POST",
@@ -129,9 +131,7 @@ class CoachCertificationController extends Controller
             DB::beginTransaction();
 
             $coachCertification->user_id = $validated["name"];
-            $coachCertification->certification_name = $validated["certification_name"];
-            $coachCertification->date_received = $validated["date"];
-            $coachCertification->issuing_organization = $validated["organization_name"];
+            $coachCertification->certification_name = $validated["certification_name"];            
             $coachCertification->save();
 
             DB::commit();

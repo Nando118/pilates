@@ -24,9 +24,7 @@ class UpdateCoachCertificationRequest extends FormRequest
         return [
             "id" => ["required", "string"],
             "name" => ["required", "string"],
-            "certification_name" => ["required", "string", "min:3", "max:50"],
-            "date" => ["required", "date"],
-            "organization_name" => ["required", "string", "min:3", "max:50"]
+            "certification_name" => ["required", "string", "min:3", "max:50"]
         ];
     }
 }

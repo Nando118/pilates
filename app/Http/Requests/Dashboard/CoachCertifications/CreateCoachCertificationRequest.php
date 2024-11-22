@@ -23,9 +23,8 @@ class CreateCoachCertificationRequest extends FormRequest
     {
         return [
             "name" => ["required", "string"],
-            "certification_name" => ["required", "string", "min:3", "max:50"],
-            "date" => ["required", "date"],
-            "organization_name" => ["required", "string", "min:3", "max:50"]
+            "certification_names.0" => ["required", "string", "min:3", "max:50"], // Field pertama harus diisi
+            "certification_names.*" => ["nullable", "string", "min:3", "max:50"]  // Field lainnya validasi hanya jika diisi
         ];
     }
 }

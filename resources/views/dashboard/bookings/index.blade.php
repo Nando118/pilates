@@ -57,7 +57,8 @@
                                 <th>No</th>                                
                                 <th>Name</th>
                                 <th>Phone</th>                                
-                                <th>Lesson Code</th>                              
+                                <th>Lesson Code</th>                          
+                                <th>Lesson Time</th>                          
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -102,7 +103,8 @@
                     },
                     { data: 'booked_by_name', name: 'booked_by_name', className: 'align-middle'},
                     { data: 'phone', name: 'phone', className: 'align-middle'},                    
-                    { data: 'lesson_code', name: 'lesson_code', className: 'align-middle'},                    
+                    { data: 'lesson_code', name: 'lesson_code', className: 'align-middle'},                
+                    { data: 'lesson_time', name: 'lesson_time', className: 'align-middle'},                
                     { data: 'action', name: 'action', orderable: false, searchable: false, className: 'align-middle'},
                 ],
                 order: [

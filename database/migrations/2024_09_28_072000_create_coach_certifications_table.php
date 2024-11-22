@@ -15,8 +15,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Relasi ke tabel users
             $table->string('certification_name')->nullable();
-            $table->date('date_received')->nullable(); // Tanggal sertifikasi diterima
-            $table->string('issuing_organization')->nullable(); // Organisasi yang mengeluarkan sertifikat
             $table->timestamps();
             $table->softDeletes();
         });
