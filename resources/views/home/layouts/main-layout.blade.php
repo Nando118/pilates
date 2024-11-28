@@ -17,9 +17,11 @@
     <div class="d-flex align-items-center justify-content-center min-vh-100 bg-light">
         <div class="w-100" style="max-width: 430px;">
             <!-- Sticky Navbar -->
-            <nav class="navbar sticky-top bg-dark" data-bs-theme="dark">
+            <nav class="navbar sticky-top" style="background-color: #FAF7F0;">
                 <div class="container-fluid">
-                    <a class="navbar-brand" href="{{ route('home') }}"><strong>Ohana Pilates</strong></a>
+                    <a class="navbar-brand" href="{{ route('home') }}">
+                        <img src="{{ asset('img/logo ohana - navbar brand.png') }}" alt="Bootstrap" height="30">
+                    </a>
                     <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>

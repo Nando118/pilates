@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{{ asset('vendor/fontawesome-free/css/all.css') }}">
 </head>
 <body>
-    <div class="d-flex align-items-center justify-content-center min-vh-100 bg-light">
+    <div class="d-flex align-items-center justify-content-center min-vh-100">
         @yield('content')
     </div>
 <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>

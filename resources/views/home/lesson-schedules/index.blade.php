@@ -54,7 +54,11 @@
 
 @section('content')
     <div class="w-100" style="max-width: 400px;">
-        <!-- Filter Date and Group -->
+        {{-- Location --}}
+        <p class="text-end">
+            <a href="https://g.co/kgs/TM6Cy6r" target="_blank" style="text-decoration: none; color: inherit;"><i class="fas fa-map-pin"></i> <strong>Modernland</strong></a>
+        </p>
+        <!-- Filter Date and Group -->        
         <div class="mb-3 px-3 pt-3">
             <p class="fs-5"><strong>Filter By:</strong></p>
             <!-- Group Dropdown -->
