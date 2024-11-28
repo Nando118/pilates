@@ -67,90 +67,9 @@ class DatabaseSeeder extends Seeder
                     "role" => 'admin'
                 ],
                 [
-                    "name" => "Justin",
-                    "email" => "justin@coach.com",
-                    "password" => Hash::make("justin@coach.com"),
-                    "registration_type" => "form",
-                    "profile" => [
-                        "gender" => "male",
-                        "phone" => "081234567890",
-                        "address" => "Jakarta",
-                        "profile_picture" => null
-                    ],
-                    "role" => 'coach'
-                ],
-                [
-                    "name" => "Adam Levin",
-                    "email" => "adam.levin@client.com",
-                    "password" => Hash::make("adam.levin@client.com"),
-                    "registration_type" => "form",
-                    "credit_balance" => 10,
-                    "profile" => [
-                        "gender" => "male",
-                        "phone" => "1122334455",
-                        "address" => "California",
-                        "profile_picture" => null
-                    ],
-                    "role" => 'client'
-                ],
-                [
-                    "name" => "Helga",
-                    "email" => "helga@coach.com",
-                    "password" => Hash::make("helga@coach.com"),
-                    "registration_type" => "form",
-                    "profile" => [
-                        "gender" => "female",
-                        "phone" => "0987654321",
-                        "address" => "Tangerang",
-                        "profile_picture" => null
-                    ],
-                    "role" => 'coach'
-                ],
-                [
-                    "name" => "Sumiko",
-                    "email" => "sumiko@client.com",
-                    "password" => Hash::make("sumiko@client.com"),
-                    "registration_type" => "form",
-                    "credit_balance" => 10,
-                    "profile" => [
-                        "gender" => "female",
-                        "phone" => "1122334455",
-                        "address" => "Yokohama",
-                        "profile_picture" => null
-                    ],
-                    "role" => 'client'
-                ],
-                [
-                    "name" => "Tatang",
-                    "email" => "mastatang@client.com",
-                    "password" => Hash::make("mastatang@client.com"),
-                    "registration_type" => "form",
-                    "credit_balance" => 10,
-                    "profile" => [
-                        "gender" => "male",
-                        "phone" => "1122334455",
-                        "address" => "Bandung",
-                        "profile_picture" => null
-                    ],
-                    "role" => 'client'
-                ],
-                [
-                    "name" => "MFS",
-                    "email" => "support@ptmfs.co.id",
-                    "password" => Hash::make("support@ptmfs.co.id"),
-                    "registration_type" => "form",                    
-                    "profile" => [
-                        "gender" => "male",
-                        "phone" => "01234567890",
-                        "address" => "Tangerang",
-                        "profile_picture" => null
-                    ],
-                    "role" => 'super_admin'
-                ],
-                [
-                    "name" => "Super Admin Ohana",
-                    "email" => "ohana.super@admin.com",
-                    "password" => Hash::make("ohana.super@admin.com"),
+                    "name" => "Nando",
+                    "email" => "nando@client.com",
+                    "password" => Hash::make("nando@client.com"),
                     "registration_type" => "form",
                     "profile" => [
                         "gender" => "male",
@@ -158,21 +77,8 @@ class DatabaseSeeder extends Seeder
                         "address" => "Tangerang",
                         "profile_picture" => null
                     ],
-                    "role" => 'super_admin'
-                ],
-                [
-                    "name" => "Admin Ohana",
-                    "email" => "admin.ohana@admin.com",
-                    "password" => Hash::make("admin.ohana@admin.com"),
-                    "registration_type" => "form",
-                    "profile" => [
-                        "gender" => "male",
-                        "phone" => "1234567890",
-                        "address" => "Tangerang",
-                        "profile_picture" => null
-                    ],
-                    "role" => 'admin'
-                ],
+                    "role" => 'client'
+                ]
             ];
 
             // Loop data user dan buat user beserta profile serta assign role
@@ -204,7 +110,7 @@ class DatabaseSeeder extends Seeder
             $start = strtotime('09:00');
             $end = strtotime('18:00');
 
-            while ($start < $end) {
+            /*while ($start < $end) {
                 $end_time = $start + 3600; // Tambah 1 jam
 
                 DB::table('time_slots')->insert([
@@ -216,8 +122,8 @@ class DatabaseSeeder extends Seeder
                 ]);
 
                 $start = $end_time; // Waktu berikutnya
-            }
-        
+            }*/
+
             // Buat Lesson Types
             $lessonTypes = [
                 [
@@ -230,9 +136,9 @@ class DatabaseSeeder extends Seeder
                 ]
             ];
 
-            foreach ($lessonTypes as $lessonType) {
+            /*foreach ($lessonTypes as $lessonType) {
                 LessonType::query()->create($lessonType);
-            }
+            }*/
 
             // Buat Lesson
             $lessons = [
@@ -250,9 +156,9 @@ class DatabaseSeeder extends Seeder
                 ]
             ];
 
-            foreach ($lessons as $lesson) {
+            /*foreach ($lessons as $lesson) {
                 Lesson::query()->create($lesson);
-            }
+            }*/
 
             // Buat Schedule
             $startDate = Carbon::now();
@@ -299,9 +205,9 @@ class DatabaseSeeder extends Seeder
                 ]
             ];
 
-            foreach ($scheduleData as $schedule) {
+            /*foreach ($scheduleData as $schedule) {
                 LessonSchedule::query()->create($schedule);
-            }
+            }*/
 
             // Certification
             // Seeder Coach Certifications
