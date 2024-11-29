@@ -67,6 +67,35 @@ class DatabaseSeeder extends Seeder
                     "role" => 'admin'
                 ],
                 [
+                    "name" => "MFS",
+                    "email" => "support@ptmfs.co.id",
+                    "password" => Hash::make("support@ptmfs.co.id"),
+                    "registration_type" => "form",                    
+                    "profile" => [
+                        "gender" => "male",
+                        "phone" => "01234567890",
+                        "address" => "Tangerang",
+                        "profile_picture" => null
+                    ],
+                    "role" => 'super_admin'
+                ],
+                [
+                    "name" => "Adam Levin",
+                    "email" => "adam.levin@client.com",
+                    "password" => Hash::make("adam.levin@client.com"),
+                    "registration_type" => "form",
+                    "credit_balance" => 10,
+                    "profile" => [
+                        "gender" => "male",
+                        "phone" => "1122334455",
+                        "address" => "California",
+                        "profile_picture" => null
+                    ],
+                    "role" => 'client'
+                ]
+                
+                /* ,
+                [
                     "name" => "Justin",
                     "email" => "justin@coach.com",
                     "password" => Hash::make("justin@coach.com"),
@@ -133,20 +162,7 @@ class DatabaseSeeder extends Seeder
                         "profile_picture" => null
                     ],
                     "role" => 'client'
-                ],
-                [
-                    "name" => "MFS",
-                    "email" => "support@ptmfs.co.id",
-                    "password" => Hash::make("support@ptmfs.co.id"),
-                    "registration_type" => "form",                    
-                    "profile" => [
-                        "gender" => "male",
-                        "phone" => "01234567890",
-                        "address" => "Tangerang",
-                        "profile_picture" => null
-                    ],
-                    "role" => 'super_admin'
-                ],
+                ],                
                 [
                     "name" => "Super Admin Ohana",
                     "email" => "ohana.super@admin.com",
@@ -172,7 +188,7 @@ class DatabaseSeeder extends Seeder
                         "profile_picture" => null
                     ],
                     "role" => 'admin'
-                ],
+                ], */
             ];
 
             // Loop data user dan buat user beserta profile serta assign role
@@ -201,7 +217,7 @@ class DatabaseSeeder extends Seeder
             }
 
             // Buat Time Slots
-            $start = strtotime('09:00');
+            /* $start = strtotime('09:00');
             $end = strtotime('18:00');
 
             while ($start < $end) {
@@ -301,7 +317,7 @@ class DatabaseSeeder extends Seeder
 
             foreach ($scheduleData as $schedule) {
                 LessonSchedule::query()->create($schedule);
-            }
+            } */
 
             // Certification
             // Seeder Coach Certifications
