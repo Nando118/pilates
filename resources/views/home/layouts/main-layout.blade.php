@@ -18,13 +18,27 @@
         <div class="w-100" style="max-width: 430px;">
             <!-- Sticky Navbar -->
             <nav class="navbar sticky-top" style="background-color: #FAF7F0;">
-                <div class="container-fluid">
+                <div class="container-fluid d-flex justify-content-between align-items-center">
+                    <!-- Left Side: Navbar Brand -->
                     <a class="navbar-brand" href="{{ route('home') }}">
                         <img src="{{ asset('img/logo ohana - navbar brand.png') }}" alt="Bootstrap" height="30">
                     </a>
-                    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
+
+                    <!-- Right Side: Location and Burger Button -->
+                    <div class="d-flex align-items-center">
+                        {{-- Location --}}
+                        <p class="mb-0 me-3">
+                            <a href="https://g.co/kgs/TM6Cy6r" target="_blank" style="text-decoration: none; color: inherit;">
+                                <i class="fas fa-map-pin"></i> <strong>Modernland</strong>
+                            </a>
+                        </p>
+                        <!-- Burger Button -->
+                        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                    </div>
+
+                    <!-- Collapsible Navbar Content -->
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                             <li class="nav-item active">
@@ -64,6 +78,7 @@
                     </div>
                 </div>
             </nav>
+
 
             <div class="py-2 d-flex align-items-center justify-content-center" style="background-color: #FAF7F0;">
                 @yield('content')

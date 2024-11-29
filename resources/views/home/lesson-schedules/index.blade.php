@@ -54,11 +54,8 @@
 
 @section('content')
     <div class="w-100" style="max-width: 400px;">
-        {{-- Location --}}
-        <p class="text-end">
-            <a href="https://g.co/kgs/TM6Cy6r" target="_blank" style="text-decoration: none; color: inherit;"><i class="fas fa-map-pin"></i> <strong>Modernland</strong></a>
-        </p>
-        <!-- Filter Date and Group -->        
+
+        <!-- Filter Date and Group -->
         <div class="mb-3 px-3 pt-3">
             <p class="fs-5"><strong>Filter By:</strong></p>
             <!-- Group Dropdown -->
@@ -72,8 +69,8 @@
                 </select>
             </div>
 
-            <!-- Date Buttons --> 
-            <div class="d-flex overflow-auto" id="dateButtonsContainer"></div>            
+            <!-- Date Buttons -->
+            <div class="d-flex overflow-auto" id="dateButtonsContainer"></div>
         </div>
 
         <!-- Scrollable Content Section with Cards -->
@@ -107,10 +104,10 @@
                                 </td>
                                 <td>
                                     <strong>
-                                        @if ($lessonSchedule->quota <= 0) 
-                                            Full Booking 
-                                        @else 
-                                            Quota {{ $lessonSchedule->quota }} 
+                                        @if ($lessonSchedule->quota <= 0)
+                                            Full Booking
+                                        @else
+                                            Quota {{ $lessonSchedule->quota }}
                                         @endif
                                     </strong>
                                     <br>
@@ -203,7 +200,7 @@
                                 <div>${weekday}</div>
                             </strong>
                         </button>`;
-                    
+
                     container.append(button);
                 }
             }
@@ -243,7 +240,7 @@
                 if (visibleRows === 0) {
                     $('#noLessonPlaceholder').show();
                 } else {
-                    $('#noLessonPlaceholder').hide(); 
+                    $('#noLessonPlaceholder').hide();
                 }
             }
 

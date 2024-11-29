@@ -67,6 +67,7 @@ class DatabaseSeeder extends Seeder
                     "role" => 'admin'
                 ],
                 [
+<<<<<<< HEAD
                     "name" => "MFS",
                     "email" => "support@ptmfs.co.id",
                     "password" => Hash::make("support@ptmfs.co.id"),
@@ -180,6 +181,11 @@ class DatabaseSeeder extends Seeder
                     "name" => "Admin Ohana",
                     "email" => "admin.ohana@admin.com",
                     "password" => Hash::make("admin.ohana@admin.com"),
+=======
+                    "name" => "Nando",
+                    "email" => "nando@client.com",
+                    "password" => Hash::make("nando@client.com"),
+>>>>>>> 7c9ae7e7ac8c2a12392d5f73713f52ffee45928f
                     "registration_type" => "form",
                     "profile" => [
                         "gender" => "male",
@@ -187,8 +193,13 @@ class DatabaseSeeder extends Seeder
                         "address" => "Tangerang",
                         "profile_picture" => null
                     ],
+<<<<<<< HEAD
                     "role" => 'admin'
                 ], */
+=======
+                    "role" => 'client'
+                ]
+>>>>>>> 7c9ae7e7ac8c2a12392d5f73713f52ffee45928f
             ];
 
             // Loop data user dan buat user beserta profile serta assign role
@@ -220,7 +231,7 @@ class DatabaseSeeder extends Seeder
             /* $start = strtotime('09:00');
             $end = strtotime('18:00');
 
-            while ($start < $end) {
+            /*while ($start < $end) {
                 $end_time = $start + 3600; // Tambah 1 jam
 
                 DB::table('time_slots')->insert([
@@ -232,8 +243,8 @@ class DatabaseSeeder extends Seeder
                 ]);
 
                 $start = $end_time; // Waktu berikutnya
-            }
-        
+            }*/
+
             // Buat Lesson Types
             $lessonTypes = [
                 [
@@ -246,9 +257,9 @@ class DatabaseSeeder extends Seeder
                 ]
             ];
 
-            foreach ($lessonTypes as $lessonType) {
+            /*foreach ($lessonTypes as $lessonType) {
                 LessonType::query()->create($lessonType);
-            }
+            }*/
 
             // Buat Lesson
             $lessons = [
@@ -266,9 +277,9 @@ class DatabaseSeeder extends Seeder
                 ]
             ];
 
-            foreach ($lessons as $lesson) {
+            /*foreach ($lessons as $lesson) {
                 Lesson::query()->create($lesson);
-            }
+            }*/
 
             // Buat Schedule
             $startDate = Carbon::now();
@@ -315,9 +326,13 @@ class DatabaseSeeder extends Seeder
                 ]
             ];
 
-            foreach ($scheduleData as $schedule) {
+            /*foreach ($scheduleData as $schedule) {
                 LessonSchedule::query()->create($schedule);
+<<<<<<< HEAD
             } */
+=======
+            }*/
+>>>>>>> 7c9ae7e7ac8c2a12392d5f73713f52ffee45928f
 
             // Certification
             // Seeder Coach Certifications
