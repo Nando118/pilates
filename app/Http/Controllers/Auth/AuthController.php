@@ -138,33 +138,51 @@ class AuthController extends Controller
 
     public function emailNotice(Request $request)
     {
-        $user = $request->user();
+        try {
+            $user = $request->user();
 
-        // Jika sudah terverifikasi, langsung redirect berdasarkan role
-        if ($user->hasVerifiedEmail()) {
-            return RedirectByRoleHelper::redirectBasedOnRole($user);
+            // Jika sudah terverifikasi, langsung redirect berdasarkan role
+            if ($user->hasVerifiedEmail()) {
+                return RedirectByRoleHelper::redirectBasedOnRole($user);
+            }
+
+            // Jika belum terverifikasi, tampilkan form verifikasi email
+            return view("auth.email-verify.form", [
+                "title_page" => "Ohana Pilates | Sign Up"
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Error adding new user in AuthController@emailNotice: " . $e->getMessage());
+            alert()->error("Oppss...", "An error occurred during the registration process, please try again.");
+            return redirect()->route("login");
         }
-
-        // Jika belum terverifikasi, tampilkan form verifikasi email
-        return view("auth.email-verify.form", [
-            "title_page" => "Ohana Pilates | Sign Up"
-        ]);
     }
 
     public function emailVerify(EmailVerificationRequest $request)
     {
-        $request->fulfill();
-        return RedirectByRoleHelper::redirectBasedOnRole($request->user());
+        try {
+            $request->fulfill();
+            return RedirectByRoleHelper::redirectBasedOnRole($request->user());
+        } catch (\Exception $e) {
+            Log::error("Error adding new user in AuthController@emailVerify: " . $e->getMessage());
+            alert()->error("Oppss...", "An error occurred during the registration process, please try again.");
+            return redirect()->route("login");
+        }
     }
 
     public function emailResend(Request $request)
     {
-        $request->user()->sendEmailVerificationNotification();
+        try {
+            $request->user()->sendEmailVerificationNotification();
 
-        // Menambahkan pesan notifikasi
-        alert()->success("Success", "Verification email has been resent.");
+            // Menambahkan pesan notifikasi
+            alert()->success("Success", "Verification email has been resent.");
 
-        return back();
+            return back();
+        } catch (\Exception $e) {
+            Log::error("Error adding new user in AuthController@emailResend: " . $e->getMessage());
+            alert()->error("Oppss...", "An error occurred during the registration process, please try again.");
+            return redirect()->route("login");
+        }
     }
 
     // Register or Login With Social Media Account

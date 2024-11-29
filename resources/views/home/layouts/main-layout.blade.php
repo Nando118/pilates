@@ -28,8 +28,8 @@
                     <div class="d-flex align-items-center">
                         {{-- Location --}}
                         <p class="mb-0 me-3">
-                            <a href="https://g.co/kgs/TM6Cy6r" target="_blank" style="text-decoration: none; color: inherit;">
-                                <i class="fas fa-map-pin"></i> <strong>Modernland</strong>
+                            <a href="https://www.google.com/search?q=Ohana+Pilates+Gading+Serpong" target="_blank" style="text-decoration: none; color: inherit;">
+                                <i class="fas fa-map-pin"></i> <strong>Gading Serpong</strong>
                             </a>
                         </p>
                         <!-- Burger Button -->
