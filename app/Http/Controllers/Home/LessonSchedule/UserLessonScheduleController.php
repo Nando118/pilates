@@ -28,25 +28,47 @@ class UserLessonScheduleController extends Controller
         });
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $userId = Auth::id(); // ID pengguna yang sedang login
 
         // Ambil semua id lesson_schedule yang sudah dipesan pengguna
         $userBookings = Booking::where("user_id", $userId)
-        ->pluck("lesson_schedule_id")
-        ->toArray();
+            ->pluck("lesson_schedule_id")
+            ->toArray();
 
-        // Ambil data lesson schedule dengan eager loading dan urutkan berdasarkan date dan start_time
-        $lessonScheduleDatas = LessonSchedule::withTrashed()
-        ->with(["timeSlot", "lesson", "lessonType", "user"])
-        ->join("time_slots", "lesson_schedules.time_slot_id", "=", "time_slots.id")
-        ->select("lesson_schedules.*")
-        ->orderBy("lesson_schedules.date")
+        // Ambil tanggal dari request atau gunakan tanggal hari ini sebagai default
+        $dateFilter = $request->input('date', date('Y-m-d'));
+        $groupFilter = $request->input('group', 'All');
+
+        // Query untuk mengambil data lesson schedule berdasarkan filter
+        $query = LessonSchedule::with(["timeSlot", "lesson", "lessonType", "user"])
+            ->join("time_slots", "lesson_schedules.time_slot_id", "=", "time_slots.id")
+            ->select("lesson_schedules.*")
+            ->whereDate("lesson_schedules.date", $dateFilter);
+
+        // Tambahkan filter group jika dipilih
+        if ($groupFilter !== 'All') {
+            $query->whereHas('lessonType', function ($q) use ($groupFilter) {
+                $q->where('name', $groupFilter);
+            });
+        }
+
+        // Urutkan berdasarkan date dan start_time
+        $lessonScheduleDatas = $query->orderBy("lesson_schedules.date")
         ->orderBy("time_slots.start_time")
         ->get();
 
+        // Ambil semua lesson types untuk dropdown filter
         $lessonTypes = LessonType::all();
+
+        // Cek apakah permintaan berasal dari AJAX
+        if ($request->ajax()) {
+            return view("home.lesson-schedules.partials.schedule-table", [
+                "lessonScheduleDatas" => $lessonScheduleDatas,
+                "userBookings" => $userBookings
+            ])->render();
+        }
 
         return view("home.lesson-schedules.index", [
             "title_page" => "Ohana Pilates | Lesson Schedules",

@@ -47,8 +47,7 @@ class LessonScheduleController extends Controller
     public function getData()
     {
         // Mengambil semua data LessonSchedule termasuk yang sudah dihapus
-        $lessonScheduleDatas = LessonSchedule::withTrashed()
-            ->join("time_slots", "lesson_schedules.time_slot_id", "=", "time_slots.id") // Join dengan time_slots
+        $lessonScheduleDatas = LessonSchedule::join("time_slots", "lesson_schedules.time_slot_id", "=", "time_slots.id") // Join dengan time_slots
             ->select("lesson_schedules.*", "time_slots.start_time") // Pastikan memilih kolom yang diperlukan
             ->orderBy("lesson_schedules.date", "desc") // Mengurutkan berdasarkan tanggal terbaru
             ->orderBy("time_slots.start_time", "desc") // Mengurutkan berdasarkan waktu terbaru pada time_slots

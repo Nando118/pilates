@@ -22,27 +22,50 @@ class MyScheduleController extends Controller
         });
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        // Dapatkan user_id dari coach yang sedang login
-        $coach_id = Auth::id();
+        $coach_id = Auth::id(); // ID pengguna yang sedang login (coach)
 
-        // Ambil data lesson schedules berdasarkan user_id coach
-        $lessonScheduleDatas = LessonSchedule::where("user_id", $coach_id)
+        // Ambil tanggal dari request atau gunakan tanggal hari ini sebagai default
+        $dateFilter = $request->input('date', date('Y-m-d'));
+        $groupFilter = $request->input('group', 'All');
+
+        // Query untuk mengambil data lesson schedule yang diajar oleh coach
+        $query = LessonSchedule::where("lesson_schedules.user_id", $coach_id) // Filter berdasarkan coach yang sedang login
             ->join("time_slots", "lesson_schedules.time_slot_id", "=", "time_slots.id") // Join dengan time_slots
             ->with(["timeSlot", "lesson", "lessonType", "user"]) // Eager load relasi yang diperlukan
-            ->orderBy("lesson_schedules.date") // Urutkan berdasarkan tanggal
-            ->orderBy("time_slots.start_time") // Urutkan berdasarkan start_time
-            ->select("lesson_schedules.*") // Pastikan hanya memilih kolom dari lesson_schedules
-            ->get();
+            ->select("lesson_schedules.*")
+            ->whereDate("lesson_schedules.date", $dateFilter); // Filter berdasarkan tanggal
 
-        $lessonTypes = LessonType::get();
+        // Tambahkan filter group jika dipilih
+        if ($groupFilter !== 'All') {
+            $query->whereHas('lessonType', function ($q) use ($groupFilter) {
+                $q->where('name', $groupFilter);
+            });
+        }
 
+        // Urutkan berdasarkan date dan start_time
+        $lessonScheduleDatas = $query->orderBy("lesson_schedules.date")
+        ->orderBy("time_slots.start_time")
+        ->get();
+
+        // Ambil semua lesson types untuk dropdown filter
+        $lessonTypes = LessonType::all();
+
+        // Cek apakah permintaan berasal dari AJAX
+        if ($request->ajax()) {
+            return view("home.my-schedules.partials.schedule-table", [
+                "lessonScheduleDatas" => $lessonScheduleDatas,
+                "lessonTypes" => $lessonTypes
+            ])->render();
+        }
+
+        // Tampilkan tampilan utama
         return view("home.my-schedules.index", [
             "title_page" => "Ohana Pilates | My Schedules",
             "lessonScheduleDatas" => $lessonScheduleDatas,
-            "lessonTypes" => $lessonTypes
-        ]);        
+            "lessonTypes" => $lessonTypes // Kirim data lesson types untuk filter
+        ]);
     }
 
     public function view(LessonSchedule $lessonSchedule)
