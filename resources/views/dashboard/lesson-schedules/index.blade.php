@@ -17,6 +17,39 @@
 
         <div class="card">
             <div class="card-body">
+
+                <div class="row mb-4">
+                    <div class="col d-flex justify-content-between align-items-center">
+                        <div>
+                            <form method="GET" id="filter-form">
+                                <div class="form-row align-items-center justify-content-center">
+                                    <div class="col-auto">
+                                        <label class="mr-sm-2">Date:</label>                                        
+                                        <div class="input-group date" data-provide="datepicker">
+                                            <input type="text" class="form-control" id="date" name="date" autocomplete="off" placeholder="{{ now()->format('Y/m/d') }}">
+                                            <div class="input-group-addon">
+                                                <span class="glyphicon glyphicon-th"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <label class="mr-sm-2">Time:</label>
+                                        <select class="form-control" id="time" name="time_slot_id"> <!-- Ubah name menjadi time_slot_id -->
+                                            <option value="">All Times</option> <!-- Tambahkan opsi untuk semua waktu -->
+                                            @foreach ($timeSlots as $timeSlot)                                            
+                                                <option value="{{ $timeSlot->id }}">{{ date("H:i", strtotime($timeSlot->start_time)) }}</option>
+                                            @endforeach
+                                        </select>                                        
+                                    </div>
+                                    <div class="col-auto btn-list align-self-end">
+                                        <button type="submit" id="cari" class="btn btn-info"><i class="fa fa-search mr-1"></i> Filter</button>                                        
+                                    </div>
+                                </div>
+                            </form>
+                        </div>                        
+                    </div>
+                </div>
+
                 <div class="table-responsive">
                     <table id="tbl_list" class="table table-striped" width="100%">
                         <thead>
@@ -44,35 +77,6 @@
         </div>
     </div>
 
-    <!-- Modal HTML -->
-    <div class="modal fade" id="bookingModal" tabindex="-1" role="dialog" aria-labelledby="bookingModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="bookingModalLabel">Add Booking</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="bookingForm" method="POST">
-                        @csrf
-                        <div id="nameFields">
-                            <!-- Nama fields akan ditambahkan di sini dengan JavaScript -->
-                        </div>
-                        <input type="hidden" name="lesson_schedule_id" id="lessonScheduleId">
-                        <button type="button" class="btn btn-secondary" id="addNameField">Add Participant Field</button>
-                        <span id="fieldCountMessage" class="ml-2"></span>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="submitBooking">Save Booking</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
 @endsection
 
 @push("scripts")
@@ -81,7 +85,13 @@
             $('#tbl_list').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: '{{ route('lesson-schedules.data') }}',
+                ajax: {
+                    url: '{{ route('lesson-schedules.data') }}',
+                    data: function(d) {
+                        d.date = $('#date').val(); // Ambil nilai tanggal
+                        d.time_slot_id = $('#time').val(); // Ambil nilai time_slot_id
+                    }
+                },
                 language: {
                     zeroRecords: "There is no lesson schedule data yet",
                 },
@@ -108,70 +118,19 @@
                 ]
             });
 
-            // Event handler untuk tombol Add Booking
-            // Inisialisasi variabel untuk menghitung jumlah field yang ditambahkan
-            let addedFieldsCount = 0;
-            let maxQuota;
+            // Initialize datepicker
+            $('.date').datepicker({
+                format: 'yyyy/mm/dd',
+                autoclose: true,
+                todayHighlight: true,
+                orientation: 'bottom'
+            });
 
-            $(document).on("click", ".add-booking-btn", function (e) {
+            // Handle filter form submit
+            $('#filter-form').on('submit', function(e) {
                 e.preventDefault();
-
-                var lessonScheduleId = $(this).data("id");
-                maxQuota = $(this).data("quota");
-
-                $("#nameFields").empty();
-                $("#lessonScheduleId").val(lessonScheduleId);
-                addedFieldsCount = 0; // Reset jumlah field saat modal dibuka
-
-                $("#bookingModal").modal("show");
-                updateFieldCountMessage();
+                $('#tbl_list').DataTable().ajax.reload(); // Reload tabel dengan filter baru
             });
-
-            $("#addNameField").on("click", function () {
-                if (addedFieldsCount < maxQuota) {
-                    addedFieldsCount++;
-                    $("#nameFields").append(`
-                        <div class="form-group">
-                            <label for="name${addedFieldsCount}">Participant ${addedFieldsCount}</label>
-                            <input type="text" class="form-control" id="name${addedFieldsCount}" name="names[]" required>
-                        </div>
-                    `);
-                    updateFieldCountMessage();
-                } else {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Maximum quota reached!',
-                        text: 'You cannot add more fields than the maximum quota.',
-                    });
-                }
-            });
-
-            $("#submitBooking").on("click", function () {
-                $.ajax({
-                    url: '/bookings/store',
-                    method: "POST",
-                    data: $("#bookingForm").serialize(),
-                    success: function (response) {
-                        $("#bookingModal").modal("hide");
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Booking saved successfully!',
-                        });
-                        $('#tbl_list').DataTable().ajax.reload(); // Reload data table after success
-                    },
-                    error: function (xhr) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'An error occurred while saving the booking.',
-                        });
-                    }
-                });
-            });
-
-            function updateFieldCountMessage() {
-                $("#fieldCountMessage").text(`Fields added: ${addedFieldsCount}/${maxQuota}`);
-            }
         });
     </script>
 @endpush

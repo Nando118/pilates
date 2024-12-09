@@ -124,6 +124,7 @@ Route::middleware(['auth', 'verified', 'onlyAdmin'])->group(function () {
     Route::get("/dashboard/users/add-new-user", [UserController::class, "create"])->name("users.create");
     Route::post("/dashboard/users/add-new-user/store", [UserController::class, "store"])->name("users.store");
     Route::get("/dashboard/users/profile/{user}", [UserController::class, "view"])->name("users.view");
+    Route::get("/dashboard/users/profile/{user}/data-bookings", [UserController::class, "getDataBookings"])->name("users.view.data-bookings");
     Route::get("/dashboard/users/profile/edit/{user}", [UserController::class, "edit"])->name("users.edit");
     Route::put("/dashboard/users/profile/edit/{user}/update", [UserController::class, "update"])->name("users.update");
     Route::delete("/dashboard/users/profile/{user}/delete", [UserController::class, "destroy"])->name("users.delete");

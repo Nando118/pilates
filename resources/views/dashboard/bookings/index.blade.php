@@ -123,7 +123,7 @@
             // Handle filter form submit
             $('#filter-form').on('submit', function(e) {
                 e.preventDefault();
-                table.ajax.reload(); // Reload tabel dengan filter baru
+                $('#tbl_list').DataTable().ajax.reload(); // Reload tabel dengan filter baru
             });
         });
     </script>

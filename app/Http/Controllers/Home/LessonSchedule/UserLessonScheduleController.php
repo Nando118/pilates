@@ -11,6 +11,7 @@ use App\Models\LessonSchedule;
 use App\Models\LessonType;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -34,18 +35,20 @@ class UserLessonScheduleController extends Controller
 
         // Ambil semua id lesson_schedule yang sudah dipesan pengguna
         $userBookings = Booking::where("user_id", $userId)
-            ->pluck("lesson_schedule_id")
-            ->toArray();
+        ->pluck("lesson_schedule_id")
+        ->toArray();
 
-        // Ambil tanggal dari request atau gunakan tanggal hari ini sebagai default
-        $dateFilter = $request->input('date', date('Y-m-d'));
+        // Ambil tanggal dari request dan konversi ke Asia/Jakarta
+        $dateFilter = $request->input('date', date('Y-m-d'));  // Default tanggal hari ini
+        $dateFilter = Carbon::createFromFormat('Y-m-d', $dateFilter)->setTimezone('Asia/Jakarta')->toDateString();
+
         $groupFilter = $request->input('group', 'All');
 
         // Query untuk mengambil data lesson schedule berdasarkan filter
         $query = LessonSchedule::with(["timeSlot", "lesson", "lessonType", "user"])
-            ->join("time_slots", "lesson_schedules.time_slot_id", "=", "time_slots.id")
-            ->select("lesson_schedules.*")
-            ->whereDate("lesson_schedules.date", $dateFilter);
+        ->join("time_slots", "lesson_schedules.time_slot_id", "=", "time_slots.id")
+        ->select("lesson_schedules.*")
+        ->whereDate("lesson_schedules.date", $dateFilter);
 
         // Tambahkan filter group jika dipilih
         if ($groupFilter !== 'All') {

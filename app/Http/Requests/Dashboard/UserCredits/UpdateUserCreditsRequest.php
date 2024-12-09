@@ -22,7 +22,20 @@ class UpdateUserCreditsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "credit_balance" => ["required", "integer", "min:1"]
+            "type" => "required|in:add,deduct",
+            "credit_balance" => "required|integer|min:1"
         ];
     }
+
+    public function messages()
+    {
+        return [
+            "type.required" => "Transaction type is required.",
+            "type.in" => "Invalid transaction type.",
+            "credit_balance.required" => "Credit balance is required.",
+            "credit_balance.integer" => "Credit balance must be a number.",
+            "credit_balance.min" => "Credit balance must be at least 1."
+        ];
+    }
+
 }

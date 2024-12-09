@@ -112,16 +112,15 @@
             // Generate Date Buttons
             function generateDateButtons() {
                 const container = $('#dateButtonsContainer');
-                const startDate = new Date();
+                const startDate = moment.tz("Asia/Jakarta");  // Menggunakan zona waktu Jakarta
 
                 for (let i = 0; i < 30; i++) {
-                    const date = new Date();
-                    date.setDate(startDate.getDate() + i);
-                    const day = date.getDate();
-                    const weekday = date.toLocaleDateString('en-EN', { weekday: 'short' });
+                    const date = startDate.clone().add(i, 'days');
+                    const day = date.date();
+                    const weekday = date.format('ddd');  // Menggunakan format singkat untuk hari
 
                     const button = `
-                        <button class="btn btn-outline-dark m-1 date-button" data-date="${date.toISOString().split('T')[0]}">
+                        <button class="btn btn-outline-dark m-1 date-button" data-date="${date.format('YYYY-MM-DD')}">
                             <strong>
                                 <div>${day}</div>
                                 <div>${weekday}</div>
@@ -132,22 +131,20 @@
                 }
             }
 
-            // Highlight Selected Button
             function highlightSelectedButton(selectedDate) {
                 $('.date-button').removeClass('active');
                 $(`.date-button[data-date="${selectedDate}"]`).addClass('active');
             }
 
-            // Filter Table
             function filterTable() {
                 const selectedDate = $('.date-button.active').data('date');
                 const selectedGroup = $('#groupFilter').val();
 
                 $.ajax({
-                    url: "{{ route('my-schedules.index') }}",
+                    url: "{{ route('user-lesson-schedules.index') }}",
                     method: "GET",
                     data: {
-                        date: selectedDate,
+                        date: selectedDate,  // Kirim tanggal dengan format yang sudah dikonversi
                         group: selectedGroup
                     },
                     success: function(data) {
@@ -159,6 +156,7 @@
                 });
             }
 
+            // Initialize filters and buttons
             generateDateButtons();
             $('.date-button').first().addClass('active');
             filterTable();

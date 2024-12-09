@@ -39,51 +39,65 @@ class LessonScheduleController extends Controller
         $text = "Are you sure you want to delete?";
         confirmDelete($title, $text);
 
+        $timeSlots = TimeSlot::get();
+
         return view("dashboard.lesson-schedules.index", [
-            "title_page" => "Ohana Pilates | Lesson Schedules"
+            "title_page" => "Ohana Pilates | Lesson Schedules",
+            "timeSlots" => $timeSlots
         ]);
     }
 
-    public function getData()
+    public function getData(Request $request)
     {
-        // Mengambil semua data LessonSchedule termasuk yang sudah dihapus
-        $lessonScheduleDatas = LessonSchedule::join("time_slots", "lesson_schedules.time_slot_id", "=", "time_slots.id") // Join dengan time_slots
-            ->select("lesson_schedules.*", "time_slots.start_time") // Pastikan memilih kolom yang diperlukan
-            ->orderBy("lesson_schedules.date", "desc") // Mengurutkan berdasarkan tanggal terbaru
-            ->orderBy("time_slots.start_time", "desc") // Mengurutkan berdasarkan waktu terbaru pada time_slots
+        // Ambil parameter filter dari request
+        $filterDate = $request->input('date', now()->format('Y-m-d')); // Default ke hari ini
+        $filterTimeSlotId = $request->input('time_slot_id', null); // Default ke null (all)
+
+        // Query awal dengan join ke time_slots
+        $query = LessonSchedule::join("time_slots", "lesson_schedules.time_slot_id", "=", "time_slots.id")
+        ->select("lesson_schedules.*", "time_slots.start_time", "time_slots.duration");
+
+        // Filter berdasarkan tanggal jika parameter 'date' diberikan
+        if (!empty($filterDate) && $filterDate !== now()->format('Y-m-d')) {
+            $query->whereDate('lesson_schedules.date', $filterDate);
+        }
+
+        // Filter berdasarkan time_slot_id jika ada
+        if ($filterTimeSlotId) {
+            $query->where('lesson_schedules.time_slot_id', $filterTimeSlotId);
+        }
+
+        // Urutkan data berdasarkan tanggal dan waktu terbaru
+        $lessonScheduleDatas = $query
+            ->orderBy("lesson_schedules.date", "desc")
+            ->orderBy("time_slots.start_time", "desc")
             ->get();
 
+        // DataTables processing
         return DataTables::of($lessonScheduleDatas)
             ->addColumn("date", function ($lessonSchedule) {
-                // Memformat tanggal menjadi dd/mm/yyyy
                 return Carbon::parse($lessonSchedule->date)->format('d/m/Y');
             })
             ->addColumn("time", function ($lessonSchedule) {
                 $startTime = $lessonSchedule->start_time ?? "N/A";
-                $duration = $lessonSchedule->timeSlot->duration ?? 0; // Pastikan Anda memiliki kolom duration di timeSlot
-
-                // Format waktu dan durasi
+                $duration = $lessonSchedule->duration ?? 0;
                 return "<strong>" . date("H:i", strtotime($startTime)) . "</strong><br>" . $duration . " Minute";
             })
             ->addColumn("lesson", function ($lessonSchedule) {
                 $lessonName = ucfirst($lessonSchedule->lesson->name ?? "N/A");
                 $lessonType = ucfirst($lessonSchedule->lessonType->name ?? "N/A");
                 $coachName = ucfirst($lessonSchedule->user->name ?? "N/A");
-
                 return "<strong>" . $lessonName . " / " . $lessonType . "</strong><br>" . $coachName;
             })
             ->addColumn("status", function ($lessonSchedule) {
                 if ($lessonSchedule->deleted_at) {
-                    return "<span class='text-danger'>Cancelled</span>"; // Status untuk jadwal yang sudah dihapus
+                    return "<span class='text-danger'>Cancelled</span>";
                 }
-
                 return $lessonSchedule->quota <= 0 ? "Full Booking" : "Available";
             })
             ->addColumn("action", function ($lessonSchedule) {
                 $currentDateTime = Carbon::now();
                 $scheduleDateTime = Carbon::parse($lessonSchedule->date . ' ' . $lessonSchedule->start_time);
-
-                // Tentukan apakah tombol Booking harus dinonaktifkan
                 $disabledAttribute = $lessonSchedule->quota <= 0 ? "disabled" : "";
 
                 if ($scheduleDateTime->greaterThanOrEqualTo($currentDateTime) && !$lessonSchedule->deleted_at) {

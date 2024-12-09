@@ -113,16 +113,15 @@
             // Generate Date Buttons
             function generateDateButtons() {
                 const container = $('#dateButtonsContainer');
-                const startDate = new Date();
+                const startDate = moment.tz("Asia/Jakarta");  // Using Jakarta timezone
 
                 for (let i = 0; i < 30; i++) {
-                    const date = new Date();
-                    date.setDate(startDate.getDate() + i);
-                    const day = date.getDate();
-                    const weekday = date.toLocaleDateString('en-EN', { weekday: 'short' });
+                    const date = startDate.clone().add(i, 'days');
+                    const day = date.date();
+                    const weekday = date.format('ddd');  // Short day format
 
                     const button = `
-                        <button class="btn btn-outline-dark m-1 date-button" data-date="${date.toISOString().split('T')[0]}">
+                        <button class="btn btn-outline-dark m-1 date-button" data-date="${date.format('YYYY-MM-DD')}">
                             <strong>
                                 <div>${day}</div>
                                 <div>${weekday}</div>
@@ -133,22 +132,22 @@
                 }
             }
 
-            // Highlight Selected Button
+            // Highlight selected date button
             function highlightSelectedButton(selectedDate) {
                 $('.date-button').removeClass('active');
                 $(`.date-button[data-date="${selectedDate}"]`).addClass('active');
             }
 
-            // Filter Table
+            // Filter table based on date and group
             function filterTable() {
                 const selectedDate = $('.date-button.active').data('date');
                 const selectedGroup = $('#groupFilter').val();
 
                 $.ajax({
-                    url: "{{ route('my-lesson-schedules.index') }}",
+                    url: "{{ route('my-lesson-schedules.index') }}",  // Update with the correct route for page B
                     method: "GET",
                     data: {
-                        date: selectedDate,
+                        date: selectedDate,  // Send the formatted date
                         group: selectedGroup
                     },
                     success: function(data) {
@@ -164,14 +163,17 @@
             $('.date-button').first().addClass('active');
             filterTable();
 
+            // Date button click event
             $(document).on('click', '.date-button', function() {
                 highlightSelectedButton($(this).data('date'));
                 filterTable();
             });
 
+            // Group filter change event
             $('#groupFilter').on('change', function() {
                 filterTable();
             });
+
         });
     </script>
 @endpush

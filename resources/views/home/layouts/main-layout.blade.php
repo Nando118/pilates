@@ -107,6 +107,8 @@
     <script src="{{ asset("libs/dataTables/js/dataTables-bootstrap4-min.js") }}"></script>
     <script src="{{ asset("/libs/select2/js/select2.min.js") }}"></script>
     <script src="{{ asset("/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js") }}"></script>
+    <script src="{{ asset("libs/moment/moment.js") }}"></script>
+    <script src="{{ asset("libs/moment/moment-time-zone-with-data.js") }}"></script>
     <script src="{{ asset('js/script.js') }}"></script>
     @stack('scripts')
 </body>

@@ -39,9 +39,11 @@ class MyLessonController extends Controller
 
         // Ambil tanggal dari request atau gunakan tanggal hari ini sebagai default
         $dateFilter = $request->input('date', date('Y-m-d'));
+        $dateFilter = Carbon::createFromFormat('Y-m-d', $dateFilter)->setTimezone('Asia/Jakarta')->toDateString(); // Menyesuaikan zona waktu
+
         $groupFilter = $request->input('group', 'All');
 
-        // Query untuk mengambil data lesson schedule berdasarkan filter
+        // Query untuk mengambil data booking berdasarkan filter
         $query = Booking::where("bookings.user_id", $user_id)
             ->join("lesson_schedules", "bookings.lesson_schedule_id", "=", "lesson_schedules.id") // Join dengan lesson_schedules
             ->join("time_slots", "lesson_schedules.time_slot_id", "=", "time_slots.id") // Join dengan time_slots

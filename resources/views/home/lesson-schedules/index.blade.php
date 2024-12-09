@@ -107,18 +107,77 @@
 @push("scripts")
     <script>
         $(document).ready(function() {
+            // function generateDateButtons() {
+            //     const container = $('#dateButtonsContainer');
+            //     const startDate = new Date();
+
+            //     for (let i = 0; i < 30; i++) {
+            //         const date = new Date();
+            //         date.setDate(startDate.getDate() + i);
+            //         const day = date.getDate();
+            //         const weekday = date.toLocaleDateString('en-EN', { weekday: 'short' });
+
+            //         const button = `
+            //             <button class="btn btn-outline-dark m-1 date-button" data-date="${date.toISOString().split('T')[0]}">
+            //                 <strong>
+            //                     <div>${day}</div>
+            //                     <div>${weekday}</div>
+            //                 </strong>
+            //             </button>`;
+
+            //         container.append(button);
+            //     }
+            // }
+
+            // function highlightSelectedButton(selectedDate) {
+            //     $('.date-button').removeClass('active');
+            //     $(`.date-button[data-date="${selectedDate}"]`).addClass('active');
+            // }
+
+            // function filterTable() {
+            //     const selectedDate = $('.date-button.active').data('date');
+            //     const selectedGroup = $('#groupFilter').val();
+
+            //     $.ajax({
+            //         url: "{{ route('user-lesson-schedules.index') }}",
+            //         method: "GET",
+            //         data: {
+            //             date: selectedDate,
+            //             group: selectedGroup
+            //         },
+            //         success: function(data) {
+            //             $('#tbl_list tbody').html(data);
+            //         },
+            //         error: function() {
+            //             console.error("Error fetching data.");
+            //         }
+            //     });
+            // }
+
+            // generateDateButtons();
+            // $('.date-button').first().addClass('active');
+            // filterTable();
+
+            // $(document).on('click', '.date-button', function() {
+            //     highlightSelectedButton($(this).data('date'));
+            //     filterTable();
+            // });
+
+            // $('#groupFilter').on('change', function() {
+            //     filterTable();
+            // });
+
             function generateDateButtons() {
                 const container = $('#dateButtonsContainer');
-                const startDate = new Date();
+                const startDate = moment.tz("Asia/Jakarta");  // Menggunakan zona waktu Jakarta
 
                 for (let i = 0; i < 30; i++) {
-                    const date = new Date();
-                    date.setDate(startDate.getDate() + i);
-                    const day = date.getDate();
-                    const weekday = date.toLocaleDateString('en-EN', { weekday: 'short' });
+                    const date = startDate.clone().add(i, 'days');
+                    const day = date.date();
+                    const weekday = date.format('ddd');  // Menggunakan format singkat untuk hari
 
                     const button = `
-                        <button class="btn btn-outline-dark m-1 date-button" data-date="${date.toISOString().split('T')[0]}">
+                        <button class="btn btn-outline-dark m-1 date-button" data-date="${date.format('YYYY-MM-DD')}">
                             <strong>
                                 <div>${day}</div>
                                 <div>${weekday}</div>
@@ -142,7 +201,7 @@
                     url: "{{ route('user-lesson-schedules.index') }}",
                     method: "GET",
                     data: {
-                        date: selectedDate,
+                        date: selectedDate,  // Kirim tanggal dengan format yang sudah dikonversi
                         group: selectedGroup
                     },
                     success: function(data) {
@@ -166,6 +225,7 @@
             $('#groupFilter').on('change', function() {
                 filterTable();
             });
+
         });
     </script>
 @endpush

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Dashboard\User;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Dashboard\Users\CreateUserRequest;
 use App\Http\Requests\Dashboard\Users\UpdateUserRequest;
+use App\Models\Booking;
+use App\Models\TimeSlot;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Models\UserRole;
@@ -167,10 +169,70 @@ class UserController extends Controller
         // Ambil role pertama (jika user memiliki lebih dari satu role, sesuaikan logikanya)
         $roleName = ucfirst($userData->roles->pluck("name")->first());
 
+        $timeSlots = TimeSlot::get();
+
         // Kirim data ke view menggunakan compact
-        return view("dashboard.users.profile.profile", compact("userData", "roleName"))
+        return view("dashboard.users.profile.profile", compact("userData", "roleName", "timeSlots"))
             ->with("title_page", "Ohana Pilates | User Profile");
     }
+
+    public function getDataBookings(User $user, Request $request)
+    {
+        // Query dasar
+        $query = Booking::query()
+            ->with(['lessonSchedule', 'lessonSchedule.timeSlot', 'user.profile'])
+            ->where('user_id', $user->id);
+
+        // Menambahkan pencarian berdasarkan parameter search
+        if ($request->has('search') && $request->search['value']) {
+            $searchValue = $request->search['value'];
+            $query->where(function ($q) use ($searchValue) {
+                $q->whereHas('lessonSchedule', function ($q) use ($searchValue) {
+                    $q->where('lesson_code', 'like', "%{$searchValue}%");
+                })
+                    ->orWhereHas('user.profile', function ($q) use ($searchValue) {
+                        $q->where('name', 'like', "%{$searchValue}%");
+                    })
+                    ->orWhereHas('lessonSchedule.timeSlot', function ($q) use ($searchValue) {
+                        $q->where('start_time', 'like', "%{$searchValue}%");
+                    });
+            });
+        }
+
+        // Filter berdasarkan tanggal jika ada
+        if ($request->has("date") && $request->date) {
+            $filterDate = Carbon::parse($request->date)->format('Y-m-d');
+            $query->whereHas('lessonSchedule', function ($q) use ($filterDate) {
+                $q->whereDate('date', '=', $filterDate);
+            });
+        }
+
+        // Filter berdasarkan waktu jika ada
+        if ($request->has("time_slot_id") && $request->time_slot_id) {
+            $query->whereHas('lessonSchedule', function ($q) use ($request) {
+                $q->where('time_slot_id', '=', $request->time_slot_id);
+            });
+        }
+
+        return DataTables::of($query)
+            ->addColumn("lesson_time", function ($booking) {
+                $scheduleDate = Carbon::parse($booking->lessonSchedule->date)->format('Y-m-d');
+                $scheduleTime = date("H:i", strtotime($booking->lessonSchedule->timeSlot->start_time));
+                return "<strong>" . $scheduleDate . "</strong><br>" . $scheduleTime;
+            })
+            ->addColumn("lesson_code", function ($booking) {
+                return $booking->lessonSchedule->lesson_code;
+            })
+            ->addColumn("booked_at", function ($booking) {
+                $scheduleDate = Carbon::parse($booking->created_at);
+                $formattedDate = $scheduleDate->format('Y-m-d');
+                $formattedTime = $scheduleDate->format('H:i');
+                return "<strong>" . $formattedDate . "</strong><br>" . $formattedTime;
+            })
+            ->rawColumns(["lesson_time", "booked_at"])
+            ->make(true);
+    }
+
 
     public function edit(User $user)
     {

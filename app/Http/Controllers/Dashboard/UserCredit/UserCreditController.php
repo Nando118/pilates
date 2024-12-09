@@ -48,7 +48,7 @@ class UserCreditController extends Controller
             })
             ->addColumn("action", function ($user) {
                 $btn = '<div class="btn-group mr-1">';
-                $btn .= '<a href="'. route('user-credits.edit', ["user" => $user->id]) .'" class="btn btn-success btn-sm" title="Add Credits to User"><i class="fas fa-fw fa-coins"></i></a> ';
+                $btn .= '<a href="'. route('user-credits.edit', ["user" => $user->id]) .'" class="btn btn-info btn-sm" title="Manage User Credits"><i class="fas fa-fw fa-coins"></i></a> ';
                 $btn .= '</div>';
                 return $btn;
             })
@@ -71,32 +71,51 @@ class UserCreditController extends Controller
     {
         try {
             $validated = $request->validated();
+            $transactionType = $validated['type']; // add or subtract
 
             DB::beginTransaction();
 
-            // Update data di tabel 'users'
+            // Ambil data user
             $user = User::findOrFail($user->id);
-            $old_credits = $user->credit_balance;
-            $new_credits = $old_credits + intval($validated["credit_balance"]);
-            $user->credit_balance = $new_credits;
+            $oldCredits = $user->credit_balance;
+            $creditChange = intval($validated["credit_balance"]);
+
+            // Logika untuk menambah/mengurangi kredit
+            if ($transactionType === "add") {
+                $newCredits = $oldCredits + $creditChange;
+            } elseif ($transactionType === "deduct") {
+                // Pastikan kredit tidak negatif
+                if ($oldCredits < $creditChange) {
+                    alert()->error("Oops...", "The reduction in the credit amount cannot exceed the current credit amount.");
+                    return redirect()->back();
+                }
+                $newCredits = $oldCredits - $creditChange;
+            } else {
+                alert()->error("Oops...", "Invalid transaction type. Please try again.");
+                return redirect()->back();
+            }
+
+            // Update kredit pengguna
+            $user->credit_balance = $newCredits;
             $user->save();
 
+            // Tambahkan catatan transaksi
             CreditTransaction::query()->create([
                 "user_id" => $user->id,
-                "type" => "add",
-                "amount" => $validated["credit_balance"],
-                "transaction_code" => TransactionCodeHelper::generateTransactionCode(),
-                "description" => 'Credit was added to account '. $user->email . ' by ' . Auth::user()->email . ', amounting to ' . $validated["credit_balance"] . ' credit.'
+                "type" => $transactionType,
+                "amount" => $creditChange,
+                "transaction_code" => TransactionCodeHelper::generateTransactionCode(),                
+                "description" => $creditChange . ' credits has been '. $transactionType .' by '. Auth::user()->email .' on the account ' . $user->email . '.'
             ]);
 
             DB::commit();
 
-            alert()->success("Yeay!", "Successfully added user credit.");
+            alert()->success("Success!", ucfirst($transactionType) . "ed user credits successfully.");
             return redirect()->route("user-credits.index");
         } catch (\Exception $e) {
             Log::error("Error updating user credit in UserCreditController@update: " . $e->getMessage());
             DB::rollBack();
-            alert()->error("Oppss...", "An error occurred while updating user credit data, please try again.");
+            alert()->error("Oops...", "An error occurred while updating user credit data. Please try again.");
             return redirect()->back();
         }
     }

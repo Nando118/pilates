@@ -24,7 +24,7 @@
                 <td>
                     <strong>
                         @if ($lessonSchedule->quota <= 0)
-                            Full Booking
+                            <span class="text-danger">FULLY BOOKED</span>
                         @else
                             Quota {{ $lessonSchedule->quota }}
                         @endif
@@ -44,7 +44,7 @@
                             <button class="btn btn-primary btn-sm" title="Already Booked" disabled>
                                 <i class="fas fa-fw fa-user-check"></i>
                             </button>
-                        @elseif ($currentDateTime->greaterThanOrEqualTo($lessonStartTime))
+                        @elseif ($lessonSchedule->quota <= 0 || $currentDateTime->greaterThanOrEqualTo($lessonStartTime))
                             <button class="btn btn-primary btn-sm" title="Cannot Book" disabled>
                                 <i class="fas fa-fw fa-user-plus"></i>
                             </button>

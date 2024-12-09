@@ -7,6 +7,7 @@ use App\Models\Booking;
 use App\Models\LessonSchedule;
 use App\Models\LessonType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
@@ -26,8 +27,16 @@ class MyScheduleController extends Controller
     {
         $coach_id = Auth::id(); // ID pengguna yang sedang login (coach)
 
-        // Ambil tanggal dari request atau gunakan tanggal hari ini sebagai default
-        $dateFilter = $request->input('date', date('Y-m-d'));
+        // Ambil semua id lesson_schedule yang sudah dipesan oleh coach
+        // (Jika perlu, Anda bisa menyesuaikan logika ini untuk mengambil booking oleh coach)
+        $userBookings = Booking::where("user_id", $coach_id)
+            ->pluck("lesson_schedule_id")
+            ->toArray();
+
+        // Ambil tanggal dari request dan konversi ke Asia/Jakarta
+        $dateFilter = $request->input('date', date('Y-m-d'));  // Default tanggal hari ini
+        $dateFilter = Carbon::createFromFormat('Y-m-d', $dateFilter)->setTimezone('Asia/Jakarta')->toDateString();
+
         $groupFilter = $request->input('group', 'All');
 
         // Query untuk mengambil data lesson schedule yang diajar oleh coach
@@ -56,7 +65,8 @@ class MyScheduleController extends Controller
         if ($request->ajax()) {
             return view("home.my-schedules.partials.schedule-table", [
                 "lessonScheduleDatas" => $lessonScheduleDatas,
-                "lessonTypes" => $lessonTypes
+                "lessonTypes" => $lessonTypes,
+                "userBookings" => $userBookings // Kirim data booking pengguna
             ])->render();
         }
 
@@ -64,7 +74,8 @@ class MyScheduleController extends Controller
         return view("home.my-schedules.index", [
             "title_page" => "Ohana Pilates | My Schedules",
             "lessonScheduleDatas" => $lessonScheduleDatas,
-            "lessonTypes" => $lessonTypes // Kirim data lesson types untuk filter
+            "lessonTypes" => $lessonTypes, // Kirim data lesson types untuk filter
+            "userBookings" => $userBookings // Kirim data booking pengguna
         ]);
     }
 
