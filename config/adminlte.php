@@ -366,6 +366,12 @@ return [
             'url' => '/dashboard/bookings',
             'icon' => 'fas fa-fw fa-calendar',
         ],
+        ['header' => 'REPORTS'],
+        [
+            'text' => 'Reports',
+            'url' => '/dashboard/reports',
+            'icon' => 'fas fa-fw fa-file-alt',
+        ],
 //        [
 //            'text' => 'profile',
 //            'url' => 'admin/settings',

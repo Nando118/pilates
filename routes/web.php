@@ -17,6 +17,7 @@ use App\Http\Controllers\Home\MySchedule\MyScheduleController;
 use App\Http\Controllers\Home\Profile\ProfileController;
 use App\Http\Controllers\Dashboard\CoachCertification\CoachCertificationController;
 use App\Http\Controllers\Dashboard\CreditTransaction\CreditTransactionController;
+use App\Http\Controllers\Dashboard\Report\ReportController;
 use App\Http\Controllers\Dashboard\UserCredit\UserCreditController;
 use App\Http\Controllers\Home\Coach\CoachController;
 use App\Http\Controllers\Home\MyTransaction\MyTransactionController;
@@ -200,4 +201,11 @@ Route::middleware(['auth', 'verified', 'onlyAdmin'])->group(function () {
     Route::get("/dashboard/credit-transactions", [CreditTransactionController::class, "index"])->name("credit-transactions.index");
     Route::get("/dashboard/credit-transactions/data", [CreditTransactionController::class, "getData"])->name("credit-transactions.data");
     // END USER CREDITS HISTORY ROUTE - SUPER ADMIN PAGE
+
+    // START REPORTS ROUTE - SUPER ADMIN PAGE
+    Route::get('/dashboard/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/dashboard/reports/generate', [ReportController::class, 'generateReport'])->name('reports.generate');
+    Route::get('/dashboard/reports/export-weekly', [ReportController::class, 'exportWeeklyReport'])->name('reports.export.weekly');
+    Route::get('/dashboard/reports/export-monthly', [ReportController::class, 'exportMonthlyReport'])->name('reports.export.monthly');   
+    // END REPORTS ROUTE - SUPER ADMIN PAGE
 });

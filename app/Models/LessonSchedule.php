@@ -47,4 +47,9 @@ class LessonSchedule extends Model
     {
         return $this->hasMany(Booking::class, "lesson_schedule_id", "id");
     }
+
+    public function coach()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 }
