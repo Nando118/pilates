@@ -44,17 +44,32 @@ class ReportController extends Controller
     }
 
     public function weeklyReport($startDate, $endDate)
-    {        
-        // Ambil data jadwal pelajaran, coach, dan peserta
-        $lessonSchedules = LessonSchedule::with(["timeSlot", "coach", "bookings.user"])
-            ->join("time_slots", "lesson_schedules.time_slot_id", "=", "time_slots.id")
-            ->whereBetween("date", [$startDate, $endDate])
-            ->orderBy("date") // Mengurutkan berdasarkan tanggal
-            ->orderBy("time_slots.start_time") // Mengurutkan berdasarkan waktu mulai
-            ->get();
+    {
+        // Ambil data jadwal pelajaran, time slot, dan coach
+        $lessonSchedules = LessonSchedule::with([
+            'timeSlot', // Relasi dengan timeSlot
+            'coach',    // Relasi dengan coach
+            'bookings', // Relasi dengan bookings (peserta)
+        ])
+            ->whereBetween('lesson_schedules.date', [$startDate, $endDate]) // Filter berdasarkan rentang tanggal
+            ->orderBy('lesson_schedules.date') // Mengurutkan berdasarkan tanggal
+            ->get(); // Ambil data
 
-        return view("dashboard.reports.weekly", compact("lessonSchedules", "startDate", "endDate"))->with("title_page", "Weekly Report");
+        // Menghitung jumlah peserta untuk setiap lessonSchedule
+        foreach ($lessonSchedules as $schedule) {
+            $schedule->participants_count = $schedule->bookings->count(); // Hitung jumlah bookings untuk setiap schedule
+        }
+
+        // Urutkan berdasarkan tanggal terlebih dahulu, kemudian waktu mulai
+        $lessonSchedules = $lessonSchedules->sortBy(function ($schedule) {
+            return $schedule->date . $schedule->timeSlot->start_time; // Gabungkan date dan start_time untuk urutkan dengan benar
+        });
+
+        // Kirim data ke view
+        return view('dashboard.reports.weekly', compact('lessonSchedules', 'startDate', 'endDate'))
+        ->with('title_page', 'Weekly Report');
     }
+
 
     public function exportWeeklyReport(Request $request)
     {
@@ -68,15 +83,29 @@ class ReportController extends Controller
     public function monthlyReport($startDate, $endDate)
     {
         // Ambil data jadwal pelajaran, coach, dan peserta
-        $lessonSchedules = LessonSchedule::with(["timeSlot", "coach", "bookings.user"])
-            ->join("time_slots", "lesson_schedules.time_slot_id", "=", "time_slots.id")
-            ->whereMonth("date", "=", date("m", strtotime($startDate)))
-            ->whereYear('date', "=", date("Y", strtotime($startDate)))
-            ->orderBy("date") // Mengurutkan berdasarkan tanggal
-            ->orderBy("time_slots.start_time") // Mengurutkan berdasarkan waktu mulai
-            ->get();
+        $lessonSchedules = LessonSchedule::with([
+            'timeSlot', // Relasi dengan timeSlot
+            'coach',    // Relasi dengan coach
+            'bookings', // Relasi dengan bookings (peserta)
+        ])
+        ->whereMonth('lesson_schedules.date', '=', date('m', strtotime($startDate))) // Filter berdasarkan bulan
+        ->whereYear('lesson_schedules.date', '=', date('Y', strtotime($startDate))) // Filter berdasarkan tahun
+        ->orderBy('lesson_schedules.date') // Mengurutkan berdasarkan tanggal
+        ->get(); // Ambil data
 
-        return view("dashboard.reports.monthly", compact("lessonSchedules", "startDate", "endDate"))->with("title_page", "Monthly Report");
+        // Menghitung jumlah peserta untuk setiap lessonSchedule
+        foreach ($lessonSchedules as $schedule) {
+            $schedule->participants_count = $schedule->bookings->count(); // Hitung jumlah bookings untuk setiap schedule
+        }
+
+        // Urutkan berdasarkan tanggal terlebih dahulu, kemudian waktu mulai
+        $lessonSchedules = $lessonSchedules->sortBy(function ($schedule) {
+            return $schedule->date . $schedule->timeSlot->start_time; // Gabungkan date dan start_time untuk urutkan dengan benar
+        });
+
+        // Kirim data ke view
+        return view('dashboard.reports.monthly', compact('lessonSchedules', 'startDate', 'endDate'))
+        ->with('title_page', 'Monthly Report');
     }
 
     public function exportMonthlyReport(Request $request)

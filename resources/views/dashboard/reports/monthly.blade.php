@@ -37,6 +37,7 @@
                                 <th>Time</th>
                                 <th>Coach</th>
                                 <th>Participants</th>
+                                <th>Participants Count</th> <!-- Kolom untuk menampilkan jumlah peserta -->
                             </tr>
                         </thead>
                         <tbody>
@@ -44,7 +45,7 @@
                                 <tr>
                                     <td>{{ $schedule->lesson_code }}</td>
                                     <td>{{ \Carbon\Carbon::parse($schedule->date)->format('D, d M Y') }}</td>
-                                            <td>{{ date("H:i", strtotime($schedule->timeSlot->start_time)) }} - {{ date("H:i", strtotime($schedule->timeSlot->end_time)) }}</td>
+                                    <td>{{ date("H:i", strtotime($schedule->timeSlot->start_time)) }} - {{ date("H:i", strtotime($schedule->timeSlot->end_time)) }}</td>
                                     <td>{{ $schedule->coach ? $schedule->coach->name : 'N/A' }}</td>
                                     <td>
                                         @if ($schedule->bookings->isEmpty())
@@ -55,6 +56,7 @@
                                             @endforeach
                                         @endif
                                     </td>
+                                    <td>{{ $schedule->participants_count }}</td> <!-- Tampilkan jumlah peserta -->
                                 </tr>
                             @endforeach
                         </tbody>

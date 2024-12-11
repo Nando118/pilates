@@ -29,7 +29,7 @@
                 <div class="mt-4">
                     <h4>Report from {{ \Carbon\Carbon::parse($startDate)->format('D, d M Y') }} to {{ \Carbon\Carbon::parse($endDate)->format('D, d M Y') }}</h4>
 
-                    <table class="table table-bordered mt-3">
+                    <table class="table mt-3">
                         <thead>
                             <tr>
                                 <th>Lesson Code</th>
@@ -37,6 +37,7 @@
                                 <th>Time</th>
                                 <th>Coach</th>
                                 <th>Participants</th>
+                                <th>Total Participants</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -53,11 +54,81 @@
                                             @foreach ($schedule->bookings as $booking)
                                                 {{ $booking->user ? $booking->user->name : $booking->booked_by_name }}<br>
                                             @endforeach
-                                        @endif                                  
+                                        @endif
                                     </td>
+                                    <td>{{ $schedule->participants_count }}</td> <!-- Tampilkan jumlah peserta -->
                                 </tr>
                             @endforeach
                         </tbody>
+
+                        {{-- <thead>
+                            <tr>
+                                <th rowspan="2" class="text-center align-middle">Time/Date</th>
+                                @php
+                                    $processedDates = [];
+                                @endphp
+
+                                @foreach ($lessonSchedules as $schedule)
+                                    @php
+                                        $day = \Carbon\Carbon::parse($schedule->date)->format('D');
+                                    @endphp
+
+                                    @if (!in_array($schedule->date, $processedDates))
+                                        <th>{{ $day }}</th>
+                                        @php
+                                            $processedDates[] = $schedule->date;
+                                        @endphp
+                                    @endif
+                                @endforeach
+                            </tr>
+                            <tr>                                
+                                @foreach ($processedDates as $date)
+                                    <th>{{ \Carbon\Carbon::parse($date)->format('d M') }}</th>
+                                @endforeach
+                            </tr>
+                        </thead> --}}
+                        {{-- <tbody>
+                            @foreach ($lessonSchedules->groupBy('timeSlot.start_time') as $timeSlot => $schedules)
+                                <tr>
+                                    <th rowspan="2" style="border-right: 2px solid #dee2e6">{{ \Carbon\Carbon::parse($timeSlot)->format('H:i') }}</th>
+
+                                    Row pertama untuk Coach
+                                    @foreach ($processedDates as $date)
+                                        @php
+                                            $scheduleForDate = $schedules->firstWhere('date', $date);
+                                        @endphp
+
+                                        <td class="table-danger">
+                                            <strong>{{ $scheduleForDate ? $scheduleForDate->coach->name : 'TBA / No class' }}</strong>
+                                        </td>
+                                    @endforeach
+                                </tr>
+                                <tr>
+                                    Row kedua untuk Participant
+                                    @foreach ($processedDates as $date)
+                                        @php
+                                            $scheduleForDate = $schedules->firstWhere('date', $date);
+                                        @endphp
+
+                                        <td class="align-middle">
+                                            @if ($scheduleForDate && $scheduleForDate->bookings->isNotEmpty())
+                                                <table class="table" style="margin: 0;">
+                                                    <tbody>
+                                                        @foreach ($scheduleForDate->bookings as $booking)
+                                                            <tr>
+                                                                <td>{{ $booking->user ? $booking->user->name : $booking->booked_by_name }}</td>
+                                                            </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            @else
+                                                <span>No participants / No class</span>
+                                            @endif
+                                        </td>
+                                    @endforeach
+                                </tr>
+                            @endforeach
+                        </tbody> --}}
                     </table>
                 </div>
             </div>

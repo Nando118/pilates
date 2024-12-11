@@ -26,23 +26,44 @@ class WeeklyReportExport implements FromCollection, WithHeadings, WithStyles, Wi
 
     public function collection()
     {
-        return LessonSchedule::with(["timeSlot", "coach", "bookings.user"])
-            ->join("time_slots", "lesson_schedules.time_slot_id", "=", "time_slots.id")
-            ->whereBetween("date", [$this->startDate, $this->endDate])
-            ->orderBy("date") // Mengurutkan berdasarkan tanggal
-            ->orderBy("time_slots.start_time") // Mengurutkan berdasarkan waktu mulai
-            ->get()
-            ->map(function ($schedule) {
-                return [
-                    'Lesson Code' => $schedule->lesson_code,
-                    'Date' => Carbon::parse($schedule->date)->format('D, d M Y'),
-                    'Time' => date("H:i", strtotime($schedule->timeSlot->start_time)) . ' - ' . date("H:i", strtotime($schedule->timeSlot->end_time)),
-                    'Coach' => $schedule->coach ? $schedule->coach->name : 'N/A',
-                    'Participants' => $schedule->bookings->isEmpty() ? 'No Participants' : $schedule->bookings->map(function ($booking) {
-                        return $booking->user ? $booking->user->name : $booking->booked_by_name;
-                    })->implode(', ')
-                ];
+        // Ambil data jadwal pelajaran, time slot, dan coach
+        $lessonSchedules = LessonSchedule::with([
+            'timeSlot', // Relasi dengan timeSlot
+            'coach',    // Relasi dengan coach
+            'bookings', // Relasi dengan bookings (peserta)
+        ])
+            ->whereBetween('lesson_schedules.date', [$this->startDate, $this->endDate]) // Filter berdasarkan rentang tanggal
+            ->orderBy('lesson_schedules.date') // Mengurutkan berdasarkan tanggal
+            ->get(); // Ambil data
+
+        // Menghitung jumlah peserta untuk setiap lessonSchedule
+        foreach ($lessonSchedules as $schedule) {
+            $schedule->participants_count = $schedule->bookings->count(); // Hitung jumlah bookings untuk setiap schedule
+        }
+
+        // Urutkan berdasarkan tanggal terlebih dahulu, kemudian waktu mulai
+        $lessonSchedules = $lessonSchedules->sortBy(function ($schedule) {
+            return $schedule->date . $schedule->timeSlot->start_time; // Gabungkan date dan start_time untuk urutkan dengan benar
+        });
+
+        return $lessonSchedules->map(function ($schedule) {
+            // Ambil peserta (user) dari relasi bookings
+            $participants = $schedule->bookings->map(function ($booking) {
+                return $booking->user ? $booking->user->name : $booking->booked_by_name;
             });
+
+            // Hitung jumlah peserta
+            $participantCount = $schedule->participants_count; // Dapatkan jumlah peserta dari hasil penghitungan sebelumnya
+
+            return [
+                'Lesson Code' => $schedule->lesson_code,
+                'Date' => Carbon::parse($schedule->date)->format('D, d M Y'),
+                'Time' => date("H:i", strtotime($schedule->timeSlot->start_time)) . ' - ' . date("H:i", strtotime($schedule->timeSlot->end_time)),
+                'Coach' => $schedule->coach ? $schedule->coach->name : 'N/A',
+                'Participants' => $participantCount > 0 ? $participants->implode(', ') : 'No Participants', // Menampilkan peserta
+                'Participants Count' => $participantCount, // Menampilkan jumlah peserta
+            ];
+        });
     }
 
     public function headings(): array
@@ -52,24 +73,25 @@ class WeeklyReportExport implements FromCollection, WithHeadings, WithStyles, Wi
             'Date',
             'Time',
             'Coach',
-            'Participants'
+            'Participants',
+            'Participants Count',
         ];
     }
 
-    // Menambahkan style pada sheet
     public function styles(Worksheet $sheet)
     {
-        $sheet->getStyle('A1:E1')->getFont()->setBold(true); // Header bold
-        $sheet->getStyle('A1:E1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER); // Header center
-        $sheet->getStyle('A1:E1')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN); // Border pada header
+        // Menambahkan style untuk header
+        $sheet->getStyle('A1:F1')->getFont()->setBold(true); // Header bold
+        $sheet->getStyle('A1:F1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER); // Header center
+        $sheet->getStyle('A1:F1')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN); // Border pada header
 
-        $sheet->getStyle('A2:E' . (count($this->collection()) + 1))
+        // Menambahkan border pada seluruh data
+        $sheet->getStyle('A2:F' . (count($this->collection()) + 1))
             ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN); // Border pada data
 
         return [];
     }
 
-    // Event untuk setelah sheet diproses
     public function registerEvents(): array
     {
         return [
@@ -77,12 +99,12 @@ class WeeklyReportExport implements FromCollection, WithHeadings, WithStyles, Wi
                 $sheet = $event->sheet;
 
                 // Menambahkan border ke seluruh sel
-                $sheet->getStyle('A1:E' . (count($this->collection()) + 1))
+                $sheet->getStyle('A1:F' . (count($this->collection()) + 1))
                     ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
-                // Membuat header menjadi bold
-                $sheet->getStyle('A1:E1')->getFont()->setBold(true);
-                $sheet->getStyle('A1:E1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                // Membuat header menjadi bold dan di-center
+                $sheet->getStyle('A1:F1')->getFont()->setBold(true);
+                $sheet->getStyle('A1:F1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             },
         ];
     }
