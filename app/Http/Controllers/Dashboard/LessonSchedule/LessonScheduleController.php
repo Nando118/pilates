@@ -76,7 +76,7 @@ class LessonScheduleController extends Controller
         // DataTables processing
         return DataTables::of($lessonScheduleDatas)
             ->addColumn("date", function ($lessonSchedule) {
-                return Carbon::parse($lessonSchedule->date)->format('d/m/Y');
+                return Carbon::parse($lessonSchedule->date)->format('d-m-Y');
             })
             ->addColumn("time", function ($lessonSchedule) {
                 $startTime = $lessonSchedule->start_time ?? "N/A";

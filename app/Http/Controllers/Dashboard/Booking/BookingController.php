@@ -72,7 +72,7 @@ class BookingController extends Controller
                 return $booking->lessonSchedule->lesson_code;
             })
             ->addColumn("lesson_time", function ($booking) {
-                $scheduleDate = Carbon::parse($booking->lessonSchedule->date)->format('Y-m-d');
+                $scheduleDate = Carbon::parse($booking->lessonSchedule->date)->format('d-m-Y');
                 $scheduleTime = date("H:i", strtotime($booking->lessonSchedule->timeSlot->start_time));
                 return "<strong>" . $scheduleDate . "</strong><br>" . $scheduleTime;
             })

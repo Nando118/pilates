@@ -61,7 +61,14 @@
                             return meta.row + meta.settings._iDisplayStart + 1;
                         }
                     },
-                    { data: 'created_at', name: 'created_at', render: DataTable.render.date()},
+                    {
+                        data: 'created_at',
+                        name: 'created_at',
+                        render: function (data, type, row) {
+                            // Format tanggal menjadi DD-MM-YYYY
+                            return moment(data).format('DD-MM-YYYY');
+                        }
+                    },
                     { data: 'name', name: 'name'},
                     { data: 'action', name: 'action', orderable: false, searchable: false},
                 ],

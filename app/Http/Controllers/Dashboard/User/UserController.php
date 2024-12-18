@@ -216,7 +216,7 @@ class UserController extends Controller
 
         return DataTables::of($query)
             ->addColumn("lesson_time", function ($booking) {
-                $scheduleDate = Carbon::parse($booking->lessonSchedule->date)->format('Y-m-d');
+                $scheduleDate = Carbon::parse($booking->lessonSchedule->date)->format('d-m-Y');
                 $scheduleTime = date("H:i", strtotime($booking->lessonSchedule->timeSlot->start_time));
                 return "<strong>" . $scheduleDate . "</strong><br>" . $scheduleTime;
             })
@@ -225,7 +225,7 @@ class UserController extends Controller
             })
             ->addColumn("booked_at", function ($booking) {
                 $scheduleDate = Carbon::parse($booking->created_at);
-                $formattedDate = $scheduleDate->format('Y-m-d');
+                $formattedDate = $scheduleDate->format('d-m-Y');
                 $formattedTime = $scheduleDate->format('H:i');
                 return "<strong>" . $formattedDate . "</strong><br>" . $formattedTime;
             })
