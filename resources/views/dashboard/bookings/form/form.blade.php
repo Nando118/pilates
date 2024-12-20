@@ -112,7 +112,6 @@
                     // Inisialisasi Select2 pada elemen baru
                     $('.select2').select2({
                         theme: 'bootstrap4',
-                        tags: true
                     });
 
                     // Update kuota yang tersisa
@@ -123,7 +122,6 @@
             // Inisialisasi Select2 untuk elemen yang sudah ada saat halaman dimuat
             $('.select2').select2({
                 theme: 'bootstrap4',
-                tags: true
             });
         });
     </script>

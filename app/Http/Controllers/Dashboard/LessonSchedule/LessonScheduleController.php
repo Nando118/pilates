@@ -47,7 +47,7 @@ class LessonScheduleController extends Controller
         ]);
     }
 
-    public function getData(Request $request)
+    /* public function getData(Request $request)
     {
         // Ambil parameter filter dari request
         $filterDate = $request->input('date', now()->format('Y-m-d')); // Default ke hari ini
@@ -83,6 +83,91 @@ class LessonScheduleController extends Controller
                 $duration = $lessonSchedule->duration ?? 0;
                 return "<strong>" . date("H:i", strtotime($startTime)) . "</strong><br>" . $duration . " Minute";
             })
+            ->addColumn("lesson", function ($lessonSchedule) {
+                $lessonName = ucfirst($lessonSchedule->lesson->name ?? "N/A");
+                $lessonType = ucfirst($lessonSchedule->lessonType->name ?? "N/A");
+                $coachName = ucfirst($lessonSchedule->user->name ?? "N/A");
+                return "<strong>" . $lessonName . " / " . $lessonType . "</strong><br>" . $coachName;
+            })
+            ->addColumn("status", function ($lessonSchedule) {
+                if ($lessonSchedule->deleted_at) {
+                    return "<span class='text-danger'>Cancelled</span>";
+                }
+                return $lessonSchedule->quota <= 0 ? "Full Booking" : "Available";
+            })
+            ->addColumn("action", function ($lessonSchedule) {
+                $currentDateTime = Carbon::now();
+                $scheduleDateTime = Carbon::parse($lessonSchedule->date . ' ' . $lessonSchedule->start_time);
+                $disabledAttribute = $lessonSchedule->quota <= 0 ? "disabled" : "";
+
+                if ($scheduleDateTime->greaterThanOrEqualTo($currentDateTime) && !$lessonSchedule->deleted_at) {
+                    $btn = '<div class="btn-group mr-1">';
+                    $btn .= '<a href="' . route("bookings.create", ["bookings" => $lessonSchedule->id]) . '" class="btn btn-primary btn-sm ' . $disabledAttribute . '" title="Booking"><i class="fas fa-fw fa-user-plus"></i></a> ';
+                    $btn .= '<a href="' . route("lesson-schedules.edit", ["lessonSchedule" => $lessonSchedule->id]) . '" class="btn btn-warning btn-sm" title="Edit"><i class="fas fa-fw fa-edit"></i></a> ';
+                    $btn .= '<a href="' . route("lesson-schedules.delete", ["lessonSchedule" => $lessonSchedule->id]) . '" class="btn btn-danger btn-sm" title="Delete" data-confirm-delete="true"><i class="fas fa-fw fa-trash"></i></a> ';
+                    $btn .= '</div>';
+                    return $btn;
+                }
+
+                return $lessonSchedule->deleted_at ? '<span class="text-muted">Deleted</span>' : '<span class="text-muted">Not Available to edit</span>';
+            })
+            ->rawColumns(["time", "lesson", "status", "action"])
+            ->make(true);
+    } */
+
+    public function getData(Request $request)
+    {
+        // Ambil parameter filter dari request
+        $filterDate = $request->input('date', now()->format('Y-m-d')); // Default ke hari ini
+        $filterTimeSlotId = $request->input('time_slot_id', null); // Default ke null (all)
+
+        // Query awal dengan join ke time_slots
+        $query = LessonSchedule::join("time_slots", "lesson_schedules.time_slot_id", "=", "time_slots.id")
+        ->with([
+            'lesson' => function ($query) {
+                $query->select('id', 'name');
+            },
+            'lessonType' => function ($query) {
+                $query->select('id', 'name');
+            },
+            'user' => function ($query) {
+                $query->select('id', 'name');
+            }
+        ])
+            ->select("lesson_schedules.*", "time_slots.start_time", "time_slots.duration");
+
+        // Filter berdasarkan tanggal jika parameter 'date' diberikan
+        if (!empty($filterDate) && $filterDate !== now()->format('Y-m-d')) {
+            $query->whereDate('lesson_schedules.date', $filterDate);
+        }
+
+        // Filter berdasarkan time_slot_id jika ada
+        if ($filterTimeSlotId) {
+            $query->where('lesson_schedules.time_slot_id', $filterTimeSlotId);
+        }
+
+        // Urutkan data berdasarkan tanggal dan waktu terbaru
+        $query->orderBy("lesson_schedules.date", "desc")
+        ->orderBy("time_slots.start_time", "desc");
+
+        // Menggunakan chunk untuk memproses data dalam batch yang lebih kecil
+        $lessonScheduleDatas = collect();
+        $query->chunk(100, function ($schedules) use ($lessonScheduleDatas) {
+            foreach ($schedules as $schedule) {
+                $lessonScheduleDatas->push($schedule);
+            }
+        });
+
+        // DataTables processing
+        return DataTables::of($lessonScheduleDatas)
+        ->addColumn("date", function ($lessonSchedule) {
+            return Carbon::parse($lessonSchedule->date)->format('d-m-Y');
+        })
+        ->addColumn("time", function ($lessonSchedule) {
+            $startTime = $lessonSchedule->start_time ?? "N/A";
+            $duration = $lessonSchedule->duration ?? 0;
+            return "<strong>" . date("H:i", strtotime($startTime)) . "</strong><br>" . $duration . " Minute";
+        })
             ->addColumn("lesson", function ($lessonSchedule) {
                 $lessonName = ucfirst($lessonSchedule->lesson->name ?? "N/A");
                 $lessonType = ucfirst($lessonSchedule->lessonType->name ?? "N/A");

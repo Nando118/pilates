@@ -67,19 +67,19 @@
                         }
                     },
                     {
-                        data: 'created_at',
-                        name: 'created_at',
+                        data: 'user_created_at',
+                        name: 'users.created_at',
                         render: function (data, type, row) {
                             // Format tanggal menjadi DD-MM-YYYY
                             return moment(data).format('DD-MM-YYYY');
                         }
                     },
-                    { data: 'name', name: 'name'},
-                    { data: 'email', name: 'email'},
-                    { data: 'phone', name: 'phone'},
-                    { data: 'gender', name: 'gender'},
-                    { data: 'platform', name: 'platform'},
-                    { data: 'role', name: 'role'},
+                    { data: 'name', name: 'users.name'},
+                    { data: 'email', name: 'users.email'},
+                    { data: 'phone', name: 'user_profiles.phone'},
+                    { data: 'gender', name: 'user_profiles.gender'},
+                    { data: 'platform', name: 'social_accounts.provider'},
+                    { data: 'role', name: 'roles.name'},
                     { data: 'action', name: 'action', orderable: false, searchable: false},
                 ],
                 order: [1, 'desc'],

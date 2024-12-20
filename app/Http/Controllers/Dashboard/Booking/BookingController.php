@@ -103,12 +103,13 @@ class BookingController extends Controller
     {
         $action = route("bookings.store", ["bookings" => $bookings->id]);
 
-        // Ambil user dengan role client yang belum melakukan booking pada lesson_schedule saat ini
+        // Ambil user dengan role client yang belum melakukan booking pada lesson_schedule saat ini dan memiliki kredit lebih dari 0
         $clientUsers = User::with("profile")->whereHas("roles", function ($query) {
             $query->where("name", "client");
         })->whereDoesntHave("bookings", function ($query) use ($bookings) {
             $query->where("lesson_schedule_id", $bookings->id);
-        })->get();
+        })->where('credit_balance', '>', 0) // Filter pengguna dengan kredit lebih dari 0
+        ->get();
 
         // Hitung kuota yang tersisa
         $remainingQuota = $bookings->quota - $bookings->bookings()->count();

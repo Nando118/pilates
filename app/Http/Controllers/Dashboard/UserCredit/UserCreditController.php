@@ -33,7 +33,7 @@ class UserCreditController extends Controller
         ]);
     }
 
-    public function getData()
+    /* public function getData()
     {
         $users = User::with("profile")->whereDoesntHave("roles", function ($query) {
             $query->whereIn("name", ["super_admin", "admin", "coach"]);
@@ -53,6 +53,32 @@ class UserCreditController extends Controller
                 return $btn;
             })
             ->make(true);
+    } */
+
+    public function getData()
+    {
+        // Join tabel untuk menghindari N+1 problem
+        $query = User::select('users.*', 'user_profiles.phone', 'user_profiles.gender')
+        ->leftJoin('user_profiles', 'users.id', '=', 'user_profiles.user_id')
+        ->leftJoin('user_roles', 'users.id', '=', 'user_roles.user_id')
+        ->leftJoin('roles', 'user_roles.role_id', '=', 'roles.id')
+        ->whereNotIn('roles.name', ['super_admin', 'admin', 'coach']);
+
+        return DataTables::eloquent($query)
+        ->addColumn('phone', function ($user) {
+            return $user->phone ?? 'N/A';
+        })
+        ->addColumn('gender', function ($user) {
+            return ucfirst($user->gender) ?? 'N/A';
+        })
+        ->addColumn('action', function ($user) {
+            $btn = '<div class="btn-group mr-1">';
+            $btn .= '<a href="' . route('user-credits.edit', ["user" => $user->id]) . '" class="btn btn-info btn-sm" title="Manage User Credits"><i class="fas fa-fw fa-coins"></i></a> ';
+            $btn .= '</div>';
+            return $btn;
+        })
+        ->rawColumns(['action'])
+        ->make(true);
     }
 
     public function edit(User $user)

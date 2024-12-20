@@ -136,9 +136,9 @@
                         },
                         className: 'align-middle'
                     },                    
-                    { data: 'lesson_time', name: 'lesson_time', className: 'align-middle'},                     
-                    { data: 'lesson_code', name: 'lesson_code', className: 'align-middle'},
-                    { data: 'booked_at', name: 'booked_at', className: 'align-middle'},                     
+                    { data: 'lesson_time', name: 'lesson_schedules.date', className: 'align-middle'},                     
+                    { data: 'lesson_code', name: 'lesson_schedules.lesson_code', className: 'align-middle'},
+                    { data: 'booked_at', name: 'bookings.created_at', className: 'align-middle'},                     
                 ],
                 order: [
                     [1, 'desc']

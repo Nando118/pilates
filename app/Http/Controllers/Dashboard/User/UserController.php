@@ -43,7 +43,7 @@ class UserController extends Controller
         ]);
     }
 
-    public function getData()
+    /* public function getData()
     {
         $query = User::with("profile", "roles");
 
@@ -60,6 +60,74 @@ class UserController extends Controller
         $users = $query->get();
 
         return DataTables::of($users)
+        ->addColumn("phone", function ($user) {
+            return $user->profile->phone ?? "N/A";
+        })
+        ->addColumn("gender", function ($user) {
+            return ucfirst($user->profile->gender) ?? "N/A";
+        })
+        ->addColumn("platform", function ($user) {
+            $socialAccount = $user->socialAccounts->first();
+            return $socialAccount ? ucfirst($socialAccount->provider) : "-";
+        })
+        ->addColumn("role", function ($user) {
+            return ucfirst($user->roles->pluck("name")->first() ?? "N/A");
+        })
+        ->addColumn("action", function ($user) {
+            $btn = '<div class="btn-group mr-1">';
+
+            // Tombol Edit dan View tetap muncul
+            $btn .= '<a href="' . route("users.edit", ["user" => $user->id]) . '" class="btn btn-warning btn-sm" title="Edit"><i class="fas fa-fw fa-edit"></i></a> ';
+            $btn .= '<a href="' . route("users.view", ["user" => $user->id]) . '" class="btn btn-info btn-sm" title="View"><i class="fas fa-fw fa-eye"></i></a> ';
+
+            // Menambahkan tombol Delete berdasarkan role pengguna yang login
+            if (auth()->user()->hasRole('super_admin')) {
+                // Super Admin tidak bisa menghapus dirinya sendiri dan sesama super_admin, tapi bisa menghapus admin
+                if (auth()->user()->id !== $user->id && !$user->hasRole('super_admin')) {
+                    $btn .= '<a href="' . route("users.delete", ["user" => $user->id]) . '" class="btn btn-danger btn-sm" title="Delete" data-confirm-delete="true"><i class="fas fa-fw fa-trash"></i></a>';
+                }
+            } elseif (auth()->user()->hasRole('admin')) {
+                // Admin tidak bisa menghapus user dengan role admin dan super_admin
+                if (!$user->hasRole('admin') && !$user->hasRole('super_admin')) {
+                    $btn .= '<a href="' . route("users.delete", ["user" => $user->id]) . '" class="btn btn-danger btn-sm" title="Delete" data-confirm-delete="true"><i class="fas fa-fw fa-trash"></i></a>';
+                }
+            }
+
+            $btn .= '</div>';
+            return $btn;
+        })
+        ->make(true);
+    } */
+
+    public function getData()
+    {
+        $query = User::select(
+            'users.id',
+            'users.name',
+            'users.email',
+            'users.credit_balance',
+            'user_profiles.phone',
+            'user_profiles.gender',
+            'users.created_at as user_created_at',
+            'social_accounts.provider',
+            'roles.name as role_name'
+        )
+        ->leftJoin('user_profiles', 'users.id', '=', 'user_profiles.user_id')
+        ->leftJoin('social_accounts', 'users.id', '=', 'social_accounts.user_id')
+        ->leftJoin('user_roles', 'users.id', '=', 'user_roles.user_id')
+        ->leftJoin('roles', 'user_roles.role_id', '=', 'roles.id');
+
+        if (auth()->user()->hasRole('admin')) {
+            // Jika yang login adalah admin, tampilkan user dengan role admin, coach, dan client saja
+            $query->whereHas("roles", function ($query) {
+                $query->whereIn("name", ["admin", "coach", "client"]);
+            });
+        } elseif (auth()->user()->hasRole('super_admin')) {
+            // Jika yang login adalah super_admin, tampilkan semua user kecuali satu user tertentu (berdasarkan email)
+            $query->where("email", "!=", "support@ptmfs.co.id");
+        }
+
+        return DataTables::of($query)
         ->addColumn("phone", function ($user) {
             return $user->profile->phone ?? "N/A";
         })
@@ -176,7 +244,7 @@ class UserController extends Controller
             ->with("title_page", "Ohana Pilates | User Profile");
     }
 
-    public function getDataBookings(User $user, Request $request)
+    /* public function getDataBookings(User $user, Request $request)
     {
         // Query dasar
         $query = Booking::query()
@@ -231,8 +299,61 @@ class UserController extends Controller
             })
             ->rawColumns(["lesson_time", "booked_at"])
             ->make(true);
-    }
+    } */
 
+    public function getDataBookings(User $user, Request $request)
+    {
+        $today = Carbon::today()->format('Y-m-d');
+
+        // Query dasar dengan eager loading
+        $query = Booking::select('bookings.*')
+        ->join('lesson_schedules', 'bookings.lesson_schedule_id', '=', 'lesson_schedules.id')
+        ->join('time_slots', 'lesson_schedules.time_slot_id', '=', 'time_slots.id')
+        ->join('users', 'bookings.user_id', '=', 'users.id')
+        ->join('user_profiles', 'users.id', '=', 'user_profiles.user_id')
+        ->where('bookings.user_id', $user->id)
+        ->where('lesson_schedules.date', '>=', $today);
+
+        // Menambahkan pencarian berdasarkan parameter search
+        if ($request->has('search') && $request->search['value']) {
+            $searchValue = $request->search['value'];
+            $query->where(function ($q) use ($searchValue) {
+                $q->where('lesson_schedules.lesson_code', 'like', "%{$searchValue}%")
+                ->orWhere('user_profiles.name', 'like', "%{$searchValue}%")
+                ->orWhere('time_slots.start_time', 'like', "%{$searchValue}%");
+            });
+        }
+
+        // Filter berdasarkan tanggal jika ada
+        if ($request->has("date") && $request->date) {
+            $filterDate = Carbon::parse($request->date)->format('Y-m-d');
+            $query->whereDate('lesson_schedules.date', '=', $filterDate);
+        }
+
+        // Filter berdasarkan waktu jika ada
+        if ($request->has("time_slot_id") && $request->time_slot_id
+        ) {
+            $query->where('lesson_schedules.time_slot_id', '=', $request->time_slot_id);
+        }
+
+        return DataTables::eloquent($query)
+        ->addColumn("lesson_time", function ($booking) {
+            $scheduleDate = Carbon::parse($booking->lessonSchedule->date)->format('d-m-Y');
+            $scheduleTime = date("H:i", strtotime($booking->lessonSchedule->timeSlot->start_time));
+            return "<strong>" . $scheduleDate . "</strong><br>" . $scheduleTime;
+        })
+        ->addColumn("lesson_code", function ($booking) {
+            return $booking->lessonSchedule->lesson_code;
+        })
+        ->addColumn("booked_at", function ($booking) {
+            $scheduleDate = Carbon::parse($booking->created_at);
+            $formattedDate = $scheduleDate->format('d-m-Y');
+            $formattedTime = $scheduleDate->format('H:i');
+            return "<strong>" . $formattedDate . "</strong><br>" . $formattedTime;
+        })
+            ->rawColumns(["lesson_time", "booked_at"])
+            ->make(true);
+    }
 
     public function edit(User $user)
     {
