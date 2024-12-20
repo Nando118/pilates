@@ -35,8 +35,8 @@ class UserLessonScheduleController extends Controller
 
         // Ambil semua id lesson_schedule yang sudah dipesan pengguna
         $userBookings = Booking::where("user_id", $userId)
-        ->pluck("lesson_schedule_id")
-        ->toArray();
+            ->pluck("lesson_schedule_id")
+            ->toArray();
 
         // Ambil tanggal dari request dan konversi ke Asia/Jakarta
         $dateFilter = $request->input('date', date('Y-m-d'));  // Default tanggal hari ini
@@ -46,9 +46,9 @@ class UserLessonScheduleController extends Controller
 
         // Query untuk mengambil data lesson schedule berdasarkan filter
         $query = LessonSchedule::with(["timeSlot", "lesson", "lessonType", "user"])
-        ->join("time_slots", "lesson_schedules.time_slot_id", "=", "time_slots.id")
-        ->select("lesson_schedules.*")
-        ->whereDate("lesson_schedules.date", $dateFilter);
+            ->join("time_slots", "lesson_schedules.time_slot_id", "=", "time_slots.id")
+            ->select("lesson_schedules.*")
+            ->whereDate("lesson_schedules.date", $dateFilter);
 
         // Tambahkan filter group jika dipilih
         if ($groupFilter !== 'All') {
@@ -59,8 +59,8 @@ class UserLessonScheduleController extends Controller
 
         // Urutkan berdasarkan date dan start_time
         $lessonScheduleDatas = $query->orderBy("lesson_schedules.date")
-        ->orderBy("time_slots.start_time")
-        ->get();
+            ->orderBy("time_slots.start_time")
+            ->get();
 
         // Ambil semua lesson types untuk dropdown filter
         $lessonTypes = LessonType::all();
@@ -168,9 +168,9 @@ class UserLessonScheduleController extends Controller
             $lessonSchedule->quota -= 1;
 
             // Update status jika kuota habis
-            if ($lessonSchedule->quota <= 0) {
-                $lessonSchedule->status = "Full Booked";
-            }
+            // if ($lessonSchedule->quota <= 0) {
+            //     $lessonSchedule->status = "Full Booked";
+            // }
 
             // Simpan perubahan pada lesson_schedules
             $lessonSchedule->save();
@@ -187,5 +187,4 @@ class UserLessonScheduleController extends Controller
             return redirect()->back();
         }
     }
-
 }
