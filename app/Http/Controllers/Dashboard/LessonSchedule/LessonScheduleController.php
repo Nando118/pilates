@@ -123,17 +123,17 @@ class LessonScheduleController extends Controller
 
         // Query awal dengan join ke time_slots
         $query = LessonSchedule::join("time_slots", "lesson_schedules.time_slot_id", "=", "time_slots.id")
-        ->with([
-            'lesson' => function ($query) {
-                $query->select('id', 'name');
-            },
-            'lessonType' => function ($query) {
-                $query->select('id', 'name');
-            },
-            'user' => function ($query) {
-                $query->select('id', 'name');
-            }
-        ])
+            ->with([
+                'lesson' => function ($query) {
+                    $query->select('id', 'name');
+                },
+                'lessonType' => function ($query) {
+                    $query->select('id', 'name');
+                },
+                'user' => function ($query) {
+                    $query->select('id', 'name');
+                }
+            ])
             ->select("lesson_schedules.*", "time_slots.start_time", "time_slots.duration");
 
         // Filter berdasarkan tanggal jika parameter 'date' diberikan
@@ -148,7 +148,7 @@ class LessonScheduleController extends Controller
 
         // Urutkan data berdasarkan tanggal dan waktu terbaru
         $query->orderBy("lesson_schedules.date", "desc")
-        ->orderBy("time_slots.start_time", "desc");
+            ->orderBy("time_slots.start_time", "desc");
 
         // Menggunakan chunk untuk memproses data dalam batch yang lebih kecil
         $lessonScheduleDatas = collect();
@@ -160,14 +160,14 @@ class LessonScheduleController extends Controller
 
         // DataTables processing
         return DataTables::of($lessonScheduleDatas)
-        ->addColumn("date", function ($lessonSchedule) {
-            return Carbon::parse($lessonSchedule->date)->format('d-m-Y');
-        })
-        ->addColumn("time", function ($lessonSchedule) {
-            $startTime = $lessonSchedule->start_time ?? "N/A";
-            $duration = $lessonSchedule->duration ?? 0;
-            return "<strong>" . date("H:i", strtotime($startTime)) . "</strong><br>" . $duration . " Minute";
-        })
+            ->addColumn("date", function ($lessonSchedule) {
+                return Carbon::parse($lessonSchedule->date)->format('d-m-Y');
+            })
+            ->addColumn("time", function ($lessonSchedule) {
+                $startTime = $lessonSchedule->start_time ?? "N/A";
+                $duration = $lessonSchedule->duration ?? 0;
+                return "<strong>" . date("H:i", strtotime($startTime)) . "</strong><br>" . $duration . " Minute";
+            })
             ->addColumn("lesson", function ($lessonSchedule) {
                 $lessonName = ucfirst($lessonSchedule->lesson->name ?? "N/A");
                 $lessonType = ucfirst($lessonSchedule->lessonType->name ?? "N/A");
@@ -207,11 +207,11 @@ class LessonScheduleController extends Controller
         // Ambil semua time slot yang ada
         $availableTimeSlots = TimeSlot::whereDoesntHave("schedules", function ($query) use ($selectedDate) {
             $query->where("date", $selectedDate); // Cari lesson schedules pada tanggal yang dipilih
-        })->get(); // Hanya ambil time slot yang belum ada lesson schedule
+        })->orderBy("start_time", "asc")
+            ->get(); // Hanya ambil time slot yang belum ada lesson schedule
 
         return response()->json($availableTimeSlots);
     }
-
 
     public function create()
     {
@@ -259,7 +259,7 @@ class LessonScheduleController extends Controller
                 }
             }
 
-            foreach ($dates as $date) {
+            /* foreach ($dates as $date) {
                 // Periksa apakah coach tersedia di waktu tersebut
                 $isCoachAvailable = LessonSchedule::where("user_id", $coachId)
                     ->where("date", $date)
@@ -273,6 +273,52 @@ class LessonScheduleController extends Controller
                 if ($isCoachAvailable) {
                     DB::rollBack();
                     alert()->error("Oops...", "Coach is already scheduled at the selected time on $date, please select a different time.");
+                    return redirect()->back()->withInput();
+                }
+
+                // Generate kode lesson
+                $lessonCode = LessonCodeHelper::generateLessonCode();
+
+                // Buat jadwal baru
+                LessonSchedule::create([
+                    "date" => $date,
+                    "lesson_code" => $lessonCode,
+                    "time_slot_id" => $validated["time_slot"],
+                    "lesson_id" => $validated["lesson"],
+                    "lesson_type_id" => $validated["lesson_type"],
+                    "user_id" => $validated["coach_user"],
+                    "quota" => $validated["quota"],
+                    "credit_price" => $validated["credit_price"]
+                ]);
+            } */
+
+            foreach ($dates as $date) {
+                // Format tanggal menjadi DD-MM-YYYY
+                $formattedDate = Carbon::parse($date)->format('d-m-Y');
+
+                // Ambil timeSlot berdasarkan $timeSlotId
+                $timeSlot = TimeSlot::find($timeSlotId);
+                if (!$timeSlot) {
+                    DB::rollBack();
+                    alert()->error("Oops...", "Invalid time slot selected.");
+                    return redirect()->back()->withInput();
+                }
+
+                // Periksa apakah coach tersedia di waktu tersebut
+                $conflictingSchedule = LessonSchedule::where("user_id", $coachId)
+                    ->where("date", $date)
+                    ->whereHas("timeSlot", function ($query) use ($timeSlot) {
+                        $query->where("start_time", "<", $timeSlot->end_time)
+                            ->where("end_time", ">", $timeSlot->start_time);
+                    })
+                    ->with("timeSlot") // Pastikan timeSlot di-load
+                    ->first();
+
+                if ($conflictingSchedule) {
+                    // Ambil start_time dari jadwal yang konflik
+                    $conflictingStartTime = Carbon::parse($conflictingSchedule->timeSlot->start_time)->format('H:i');
+                    alert()->error("Oops...", "Coach is already scheduled at the selected time on $formattedDate at $conflictingStartTime, please select a different time.");
+                    DB::rollBack();
                     return redirect()->back()->withInput();
                 }
 
@@ -367,7 +413,7 @@ class LessonScheduleController extends Controller
             $old_quota = $lessonSchedule->quota;
 
             // Cek apakah value Quota diubah atau tidak
-            if($old_quota != $validated["quota"]) {
+            if ($old_quota != $validated["quota"]) {
                 $new_quota = $old_quota + intval($validated["quota"]);
 
                 $lessonSchedule->update([

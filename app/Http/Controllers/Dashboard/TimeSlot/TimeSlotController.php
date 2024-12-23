@@ -99,6 +99,9 @@ class TimeSlotController extends Controller
                     ->where("end_time", ">", $newStartTime);
             })->exists();
 
+            // KHUSUS UNTUK SITE SERPONG
+            // $isConflict = TimeSlot::where("start_time", $newStartTime)->exists();
+
             if ($isConflict) {
                 alert()->error("Oppss...", "The created time already exists or conflicts with an existing time. Please enter another time to avoid schedule conflicts.");
                 return redirect()->back()->withInput();
@@ -130,10 +133,10 @@ class TimeSlotController extends Controller
         $action = route("time-slots.update", ["timeSlot" => $timeSlot->id]);
 
         return view("dashboard.time-slots.form.form", compact("timeSlot", "action"))
-        ->with([
-            "title_page" => "Ohana Pilates | Update Time Slot",
-            "method" => "POST"
-        ]);
+            ->with([
+                "title_page" => "Ohana Pilates | Update Time Slot",
+                "method" => "POST"
+            ]);
     }
 
     public function update(TimeSlot $timeSlot, UpdateTimeSlotRequest $request)
