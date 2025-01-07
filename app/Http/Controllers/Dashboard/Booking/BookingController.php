@@ -152,6 +152,17 @@ class BookingController extends Controller
                 $names = array_slice($names, 0, $lessonSchedule->quota);
             }
 
+            // Ambil data start_time berdasarkan start_time_id
+            $timeSlot = TimeSlot::find($lessonSchedule->time_slot_id);
+            if (!$timeSlot) {
+                // Jika tidak ditemukan, throw error
+                throw new \Exception('Time slot not found');
+            }
+
+            // Format tanggal dan waktu untuk deskripsi transaksi
+            $formattedDate = \Carbon\Carbon::parse($lessonSchedule->date)->format('d-m-Y');
+            $formattedTime = \Carbon\Carbon::parse($timeSlot->start_time)->format('H:i');
+
             // Simpan setiap nama ke tabel bookings
             foreach ($names as $name) {
                 // Cek apakah nama ini adalah user yang terdaftar
@@ -174,7 +185,7 @@ class BookingController extends Controller
                         "type" => "deduct",
                         "amount" => $lessonSchedule->credit_price,
                         "transaction_code" => TransactionCodeHelper::generateTransactionCode(),
-                        "description" => $lessonSchedule->credit_price . ' credit has been deducted from the account '. $user->email .' , to make a booking for the lesson code '. $lessonSchedule->lesson_code .'.'
+                        "description" => $lessonSchedule->credit_price . ' credit has been deducted from the account '. $user->email .' , to make a booking for the lesson on '. $formattedDate .' - '. $formattedTime .'.'
                     ]);
                 }
 

@@ -79,7 +79,7 @@
                 <a class="link-dark text-decoration-none" href="{{ route('password.request') }}"><strong>Forgot Password?</strong></a>
             </div>
 
-            <p class="text-center mt-4 mb-0">Doesn't have account?<a class="link-dark text-decoration-none" href="{{ route('register') }}"> <strong>Register Now</strong></a></p>
+            {{-- <p class="text-center mt-4 mb-0">Doesn't have account?<a class="link-dark text-decoration-none" href="{{ route('register') }}"> <strong>Register Now</strong></a></p>
 
             <hr class="w-50 mx-auto my-4">
 
@@ -87,7 +87,7 @@
                 <a href="{{ route('redirectToProvider', ['provider' => 'google']) }}" class="btn btn-outline-dark btn-block social-btn">
                     <i class="fab fa-google"></i> Sign in with Google
                 </a>
-            </div>
+            </div> --}}
 
         </form>
         <p class="text-center text-muted mt-3" style="color: white !important;">

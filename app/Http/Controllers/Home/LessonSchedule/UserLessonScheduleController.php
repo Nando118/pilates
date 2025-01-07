@@ -9,6 +9,7 @@ use App\Models\Booking;
 use App\Models\CreditTransaction;
 use App\Models\LessonSchedule;
 use App\Models\LessonType;
+use App\Models\TimeSlot;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -143,6 +144,17 @@ class UserLessonScheduleController extends Controller
                 return redirect()->back();
             }
 
+            // Ambil data start_time berdasarkan start_time_id
+            $timeSlot = TimeSlot::find($lessonSchedule->time_slot_id);
+            if (!$timeSlot) {
+                // Jika tidak ditemukan, throw error
+                throw new \Exception('Time slot not found');
+            }
+
+            // Format tanggal dan waktu untuk deskripsi transaksi
+            $formattedDate = \Carbon\Carbon::parse($lessonSchedule->date)->format('d-m-Y');
+            $formattedTime = \Carbon\Carbon::parse($timeSlot->start_time)->format('H:i');
+
             // Jika cukup, kurangi credit balance
             $currentUser->credit_balance -= $lessonSchedule->credit_price;
             $currentUser->save();
@@ -153,7 +165,7 @@ class UserLessonScheduleController extends Controller
                 "type" => "deduct",
                 "amount" => $lessonSchedule->credit_price,
                 "transaction_code" => TransactionCodeHelper::generateTransactionCode(),
-                "description" => $lessonSchedule->credit_price . ' credits have been deducted from the account ' . $currentUser->email . ' for booking the lesson code ' . $lessonSchedule->lesson_code . '.'
+                "description" => $lessonSchedule->credit_price . ' credits have been deducted from the account ' . $currentUser->email . ' for booking the lesson on ' . $formattedDate . ' - ' . $formattedTime . '.'
             ]);
 
             // Simpan booking baru

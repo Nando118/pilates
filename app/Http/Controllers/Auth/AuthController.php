@@ -71,7 +71,7 @@ class AuthController extends Controller
         return redirect()->back();
     }
 
-    public function register()
+  /*   public function register()
     {
         return view("auth.register.form", [
             "title_page" => "Ohana Pilates | Sign Up"
@@ -349,6 +349,7 @@ class AuthController extends Controller
     {
         return empty($userProfile->gender) || empty($userProfile->phone);
     }
+ */
 
     // Forgot Password
     public function forgotPassword()

@@ -44,15 +44,15 @@ Route::middleware(['guest'])->group(function () {
     // END LOGIN ROUTE - GUEST PAGE
 
     // START REGISTER ROUTE - GUEST PAGE
-    Route::get("/register/form", [AuthController::class, "register"])->name("register");
+    /* Route::get("/register/form", [AuthController::class, "register"])->name("register");
     Route::post("/register/form/submit", [AuthController::class, "registerPost"])->name("register.submit");
     Route::get("/register/complete-registration", [AuthController::class, "completeRegistration"])->name("complete-registration");
-    Route::post("/register/complete-registration/submit", [AuthController::class, "completeRegistrationPost"])->name("complete-registration.submit");
+    Route::post("/register/complete-registration/submit", [AuthController::class, "completeRegistrationPost"])->name("complete-registration.submit"); */
     // END REGISTER ROUTE - GUEST PAGE
 
     // START REDIRECT PROVIDER ROUTE - GUEST PAGE
-    Route::get("/auth/{provider}", [AuthController::class, "redirectToProvider"])->name("redirectToProvider");
-    Route::get("/auth/{provider}/callback", [AuthController::class, "handleProvideCallback"])->name("handleProvideCallback");
+    /* Route::get("/auth/{provider}", [AuthController::class, "redirectToProvider"])->name("redirectToProvider");
+    Route::get("/auth/{provider}/callback", [AuthController::class, "handleProvideCallback"])->name("handleProvideCallback"); */
     // END REDIRECT PROVIDER ROUTE - GUEST PAGE
 
     // START FORGOT PASSWORD ROUTE - GUEST PAGE
